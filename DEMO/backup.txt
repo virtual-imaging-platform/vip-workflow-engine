@@ -1,0 +1,419 @@
+GASW
+package fr.demo;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Map;
+
+
+import org.xml.sax.SAXException;
+
+import fr.insalyon.creatis.gasw.Gasw;
+import fr.insalyon.creatis.gasw.GaswException;
+import fr.insalyon.creatis.gasw.GaswInput;
+import fr.insalyon.creatis.gasw.parser.GaswParser;
+
+public class MoteurLite {
+    public static void main(String[] args) throws GaswException, SAXException, IOException, URISyntaxException {
+        new MoteurLite(args);
+    }
+
+    public MoteurLite(String[] args) throws GaswException, SAXException, IOException, URISyntaxException {
+        String gaswFilePath = args[0];
+        String inputsFilePath = args[1];
+
+        GaswParser gaswParser = new GaswParser();
+        gaswParser.parse(gaswFilePath);
+
+        Map<String, String> inputsMap = new DataSetParser(inputsFilePath).getInputValues();
+        GaswInput gaswInput = gaswParser.getGaswInput(inputsMap);
+
+        Gasw gasw = Gasw.getInstance();
+        //gasw.setNotificationClient(this);
+        String jobID = gasw.submit(gaswInput);
+        System.out.println("job launched : " + jobID);
+    }
+}
+
+DataSetParser
+/* Copyright CNRS-I3S
+ *
+ * Johan Montagnat
+ * johan@i3s.unice.fr
+ * http://www.i3s.unice.fr/~johan
+ *
+ * This software is a grid-enabled data-driven workflow manager and editor.
+ * 
+ * This software is governed by the CeCILL  license under French law and
+ * abiding by the rules of distribution of free software.  You can  use, 
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info". 
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability. 
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or  
+ * data to be ensured and,  more generally, to use and operate it in the 
+ * same conditions as regards security. 
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
+
+package fr.demo;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+/**
+ * DataSet file parser.
+ */
+public class DataSetParser extends DefaultHandler {
+    private boolean parsing = false;
+    private String input = null;
+    private String type = null;
+    private List<String> array = null;
+    private int [] indices = null;
+    private String item = null;
+    private int depth = 0, maxdepth = 0;
+    private HashMap<String, String> itemTags = null;
+    private Vector<HashMap<String, String>> arrayTags = new Vector<HashMap<String, String>>();
+    private boolean isvoid = false;
+    private boolean parsingItem = false;
+    private String currentSourceTag ="";
+    private int currentItemIndex = 0;
+    private Map<String, String> inputValues = new HashMap<>();
+    /**
+     * Build data set parser and parse file.
+     * @param dataset data set to parse data in
+     * @throws org.xml.sax.SAXException file parsing exception
+     * @throws java.io.IOException file IO exception
+     */
+    public DataSetParser(String filePath) throws SAXException, IOException {
+        XMLReader reader = XMLReaderFactory.createXMLReader();
+        reader.setContentHandler(this);
+        reader.parse(filePath);
+    }
+
+    public Map<String, String> getInputValues() {
+        return inputValues;
+    }
+
+    /**
+     * DataSet file parser XML tag start call back.
+     */
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        if(localName.equals("inputdata") || localName.equals("d:inputdata")) {
+            if(parsing) {
+                throw new SAXException("Nested <inputdata> tags.");
+            }
+            parsing = true;
+        }
+        else if(localName.equals("source") || localName.equals("d:source")) {
+            if(input != null) {
+                throw new SAXException("Nested <source> tags.");
+            }
+            input = attributes.getValue("name");
+            if(input == null || input.length() == 0) {
+                throw new SAXException("One source tag has no name attribute.");
+            }
+            type = attributes.getValue("type");
+            if(type == null) {
+                throw new SAXException("Unknown type \"" + type + "\" for source \"" + input + "\"");
+            }
+        }
+        else if(localName.equals("item") || localName.equals("d:item")) {
+            if(array == null || indices == null) {
+                throw new SAXException("<item> tag outside of data array");
+            }
+            parsingItem = true;
+            item = "";
+            isvoid = false;
+            String special = attributes.getValue("special");
+            if(special != null) {
+                if(special.toLowerCase().equals("void")) {
+                    isvoid = true;
+                }
+                else {
+                    throw new SAXException("<item> tag has \"special\" attribute with unknown value \"" + special + "\"");
+                }
+            }
+        }
+        else if(localName.equals("tag") || localName.equals("d:tag")) {
+            if(array == null || indices == null) {
+                throw new SAXException("<tag> tag outside of data array");
+            }
+            String name = attributes.getValue("name");
+            if(name == null || name.length() == 0) {
+                throw new SAXException("<tag> tag has no \"name\" attribute.");
+            }
+            String value = attributes.getValue("value");
+            if(value == null || value.length() == 0) {
+                throw new SAXException("<tag> tag has no \"value\" attribute.");
+            }
+            if(parsingItem) {
+                if(itemTags == null) {
+                    itemTags = new HashMap<String, String>();
+                }
+                itemTags.put(name, value);
+            }
+            else {
+                arrayTags.get(indices.length - 1).put(name, value);
+            }
+        }
+        else if(localName.equals("array") || localName.equals("d:array") || localName.equals("list") || localName.equals("d:list")) {
+            if(array == null) {
+                array = new ArrayList<String>();
+                indices = new int[1];
+                indices[0] = 0;
+                maxdepth = depth = 1;
+            }
+            else {
+                if(indices == null) {
+                    throw new SAXException("source \"" + input + "\" has two root <array> tags");
+                }
+                depth++;
+                if(depth > maxdepth) {
+                    maxdepth = depth;
+                }
+                int [] ix = new int[indices.length + 1];
+                for(int i = 0; i < indices.length; i++) {
+                    ix[i] = indices[i];
+                }
+                ix[ix.length - 1] = 0;
+                indices = ix;
+            }
+            arrayTags.add(new HashMap<String, String>());
+        }
+        else if(localName.equals("scalar")) {
+            if(array != null) {
+                throw new SAXException("a <scalar> tag is not the only tag in source \"" + input + "\"");
+            }
+            array = new ArrayList<String>();
+            indices = new int[0];
+            maxdepth = depth = 0;
+        }
+        else {
+            throw new SAXException("Unknown tag <" + localName + ">");
+        }
+    }   
+    
+    /**
+     * DataSet file parser XML tag end call back.
+     */
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        if(localName.equals("source") || localName.equals("d:source")) {
+            if(array != null) {
+                inputValues.put(input, array.get(0));
+                array = null;
+            }
+            input = null;
+        }
+        else if(localName.equals("array") || localName.equals("d:array") || localName.equals("list") || localName.equals("d:list")) {
+           
+        }
+        else if(localName.equals("scalar")) {
+            indices = null;
+        }
+        else if(localName.equals("item") || localName.equals("d:item")) {
+
+            Object value = null;
+            if(type.equalsIgnoreCase("String")) {
+                value = item;
+            }
+            else if(type.equalsIgnoreCase("URI")) {
+                try {
+                    value = new URI(item.trim());
+                }
+                catch(URISyntaxException e) {
+                    throw new SAXException(e.getMessage());
+                }
+            }
+            else if(type.equalsIgnoreCase("Integer")) {
+                try {
+                    value = Integer.parseInt(item.trim());
+                }
+                catch(NumberFormatException e) {
+                    throw new SAXException(e.getMessage());
+                }
+            }
+                
+            array.add(value.toString());
+
+            item = null;
+            parsingItem = false;
+            itemTags = null;
+            if(indices.length > 0) {
+                indices[indices.length - 1]++;                
+            }
+        }
+    }
+    
+    /**
+     * DataSet file parser XML characters reading callback.
+     */
+    @Override
+    public void characters(char[] ch, int start, int length) {
+        if(parsingItem) {
+            String chars = new String(ch);
+            item += chars.substring(start, start+length);
+        }
+    }
+
+	@Override
+	public String toString() {
+		return "DataSetParser [parsing=" + parsing + ", input=" + input + ", type=" + type
+				+ ", array=" + array + ", indices=" + Arrays.toString(indices) + ", item=" + item + ", depth=" + depth
+				+ ", maxdepth=" + maxdepth + ", itemTags=" + itemTags + ", arrayTags=" + arrayTags + ", isvoid="
+				+ isvoid + ", parsingItem=" + parsingItem + ", currentSourceTag=" + currentSourceTag
+				+ ", currentItemIndex=" + currentItemIndex + "]";
+	}
+    
+}
+
+POM.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright and authors: see LICENSE.txt in base repository.
+
+This software is a web portal for pipeline execution on distributed systems.
+
+This software is governed by the CeCILL-B license under French law and
+abiding by the rules of distribution of free software.  You can  use,
+modify and/ or redistribute the software under the terms of the CeCILL-B
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info".
+
+As a counterpart to the access to the source code and  rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty  and the software's author,  the holder of the
+economic rights,  and the successive licensors  have only  limited
+liability.
+
+In this respect, the user's attention is drawn to the risks associated
+with loading,  using,  modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean  that it is complicated to manipulate,  and  that  also
+therefore means  that it is reserved for developers  and  experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or
+data to be ensured and,  more generally, to use and operate it in the
+same conditions as regards security.
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL-B license and that you accept its terms.
+
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.insalyon.creatis</groupId>
+    <artifactId>vip</artifactId>
+    <packaging>pom</packaging>
+    <version>${revision}${sha1}${changelist}</version>
+    <name>VIP</name>
+
+    <properties>
+        <!-- project version. Only to change it here (and in CoreConstants.java
+           Follow this practice : https://maven.apache.org/maven-ci-friendly.html-->
+        <revision>2.4.1</revision>
+        <log4jdbc.log4j2.version>1.16</log4jdbc.log4j2.version>
+        <changelist></changelist>
+        <sha1/>
+
+        <!-- other maven config -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+    </properties>
+
+    <description>VIP</description>
+    <inceptionYear>2010</inceptionYear>
+    <url>http://vip.creatis.insa-lyon.fr:9002/projects/vip</url>
+    <licenses>
+        <license>
+            <name>CeCILL-B, Version 1.0</name>
+            <url>http://www.cecill.info/</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization>
+        <name>CREATIS</name>
+        <url>http://www.creatis.insa-lyon.fr/</url>
+    </organization>
+
+    <dependencies>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>gasw</artifactId>
+            <version>3.8.0</version>
+            <scope>GASW</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+
+        <repository>
+            <id>creatis</id>
+            <name>Creatis Insa Lyon repository [creatis]</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
+        </repository>
+        
+        <!-- repo used to get empty jar for commons logging and log4j -->
+        <repository>
+            <id>version99</id>
+            <!-- highly available repository serving empty artifacts -->
+            <url>https://version99.qos.ch/</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>creatis-releases</id>
+            <name>Internal Releases</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/releases</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>creatis-snapshots</id>
+            <name>Internal Snapshots</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/snapshots</url>
+        </snapshotRepository>
+
+    </distributionManagement>
+</project>
+
+
+settings.json
+
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic"
+    
+}

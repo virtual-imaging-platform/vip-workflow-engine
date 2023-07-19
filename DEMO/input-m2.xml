@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inputdata>
+	<source name="indir"  type="String">
+<array>
+		<item><tag name="Group" value="0"/>srm://marsedpm.in2p3.fr:8446/dpm/in2p3.fr/home/vip/home/gfal_testing</item>
+</array>
+	</source>
+	<source name="results-directory"  type="String">
+<array>
+		<item><tag name="Group" value="0"/>/biomed/user/a/abonnet/vip-tutorial-sbg/users/localadminfirstname_localadminlastname</item>
+</array>
+	</source>
+</inputdata>
+
