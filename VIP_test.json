@@ -1,0 +1,38 @@
+{   
+    "name": "VIP_test",
+    "author": "Sandesh PATIL",
+
+    "command-line": "temp=[INPUT_NAME][INPUT_NAME2] && touch $temp && tar -zcf $temp.tar.gz $temp && cp $PWD/$temp.tar.gz $PWD/${temp}_1.tar.gz",
+    "description": "Test application for VIP",
+    "inputs": [
+            {"description":"Input Name", 
+            "id":"inname", 
+            "name":"Input Name", 
+            "optional":false, 
+            "type":"File", 
+            "value-key":"[INPUT_NAME]"},
+            
+            {"description":"Input Name 2", 
+            "id":"inname2", 
+            "name":"Input Name 2", 
+            "optional":false, 
+            "type":"File", 
+            "value-key":"[INPUT_NAME2]"}
+        ],
+
+    "output-files": [
+            {"description":"output", 
+            "id":"outfile", 
+            "name":"Output file", 
+            "optional":false, 
+            "path-template":"[INPUT_NAME][INPUT_NAME2].tar.gz"},
+             {"description":"output", 
+            "id":"outfile1", 
+            "name":"Output file", 
+            "optional":false, 
+            "path-template":"[INPUT_NAME][INPUT_NAME2]_1.tar.gz"}
+        ],
+    
+    "schema-version": "0.5",
+    "tool-version": "0.0.0"
+}                                                                                                                                           

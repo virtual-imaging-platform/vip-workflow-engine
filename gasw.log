@@ -1,0 +1,114 @@
+2024-02-18 01:51:12,575 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 01:51:13,393 | INFO | gasw:267 - Loading db plugin from  (loaded URI : file:/mnt/c/Users/patil/projects/moteurlite_on_wsl/)
+2024-02-18 01:52:47,021 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 01:52:47,952 | INFO | gasw:267 - Loading db plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 01:52:51,314 | INFO | gasw:267 - Loading executor plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 01:52:51,487 | INFO | gasw:267 - Loading listener plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 01:52:51,637 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 01:52:53,305 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 01:56:38,482 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 01:56:39,327 | INFO | gasw:267 - Loading db plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 01:56:42,405 | INFO | gasw:267 - Loading executor plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 01:56:42,555 | INFO | gasw:267 - Loading listener plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 01:56:42,683 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 01:56:44,243 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 01:57:08,968 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 01:57:09,713 | INFO | gasw:267 - Loading db plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 01:57:12,348 | INFO | gasw:267 - Loading executor plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 01:57:12,509 | INFO | gasw:267 - Loading listener plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 01:57:12,672 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 01:57:14,073 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 01:57:53,292 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 01:57:54,176 | INFO | gasw:267 - Loading db plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 01:57:57,124 | INFO | gasw:267 - Loading executor plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 01:57:57,275 | INFO | gasw:267 - Loading listener plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 01:57:57,416 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 01:57:58,868 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 01:58:25,849 | INFO | gasw:106 - Adding job: VIP_test.sh-123756974028632
+2024-02-18 01:58:27,530 | INFO | gasw:102 - Local Executor Job ID: VIP_test.sh-123756974028632
+2024-02-18 01:58:45,920 | INFO | gasw:124 - [Healing] : job VIP_test.sh-123756974028632 finished with exit code ERROR_READ_GRID
+2024-02-18 01:58:45,925 | INFO | gasw:326 - [Healing] Updated the jobErrorRate to NaN
+2024-02-18 01:58:45,926 | INFO | gasw:341 - [Healing] Updated the invocationPartialErrorRate to NaN
+2024-02-18 01:58:45,933 | WARN | gasw:137 - Job [VIP_test.sh-123756974028632] finished as "ERROR" (retried 0 times).
+2024-02-18 01:58:45,934 |ERROR | gasw:153 - [GASW Parser] Error finalising job VIP_test.sh-123756974028632
+fr.insalyon.creatis.gasw.GaswException: 
+	at fr.insalyon.creatis.gasw.plugin.executor.local.execution.LocalOutputParser.resubmit(LocalOutputParser.java:95)
+	at fr.insalyon.creatis.gasw.execution.GaswOutputParser.run(GaswOutputParser.java:138)
+2024-02-18 02:01:42,516 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 02:01:43,279 | INFO | gasw:267 - Loading db plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:01:46,273 | INFO | gasw:267 - Loading executor plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:01:46,420 | INFO | gasw:267 - Loading listener plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 02:01:46,573 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 02:01:48,071 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 02:02:25,275 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 02:02:26,104 | INFO | gasw:267 - Loading db plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:02:29,175 | INFO | gasw:267 - Loading executor plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:02:29,347 | INFO | gasw:267 - Loading listener plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 02:02:29,496 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 02:02:30,948 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 02:23:58,239 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 02:23:59,050 | INFO | gasw:267 - Loading db plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:24:02,060 | INFO | gasw:267 - Loading executor plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:24:02,209 | INFO | gasw:267 - Loading listener plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 02:24:02,334 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 02:24:03,781 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 02:24:42,053 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 02:24:42,910 | INFO | gasw:267 - Loading db plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:24:45,966 | INFO | gasw:267 - Loading executor plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:24:46,123 | INFO | gasw:267 - Loading listener plugin from /mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/mnt/c/Users/patil/projects/shared_folder/MoteurLite_17_02_2024/MoteurLite/test_env/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 02:24:46,264 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 02:24:47,814 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 02:26:04,803 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 02:26:05,618 | INFO | gasw:267 - Loading db plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:26:08,516 | INFO | gasw:267 - Loading executor plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:26:08,653 | INFO | gasw:267 - Loading listener plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 02:26:08,768 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 02:26:10,387 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 02:27:04,738 | INFO | gasw:106 - Adding job: VIP_test.sh-125475850584310
+2024-02-18 02:27:06,587 | INFO | gasw:102 - Local Executor Job ID: VIP_test.sh-125475850584310
+2024-02-18 02:27:24,982 | INFO | gasw:124 - [Healing] : job VIP_test.sh-125475850584310 finished with exit code ERROR_READ_GRID
+2024-02-18 02:27:24,995 | INFO | gasw:326 - [Healing] Updated the jobErrorRate to NaN
+2024-02-18 02:27:25,003 | INFO | gasw:341 - [Healing] Updated the invocationPartialErrorRate to NaN
+2024-02-18 02:27:25,043 | WARN | gasw:137 - Job [VIP_test.sh-125475850584310] finished as "ERROR" (retried 1 times).
+2024-02-18 02:27:25,067 |ERROR | gasw:153 - [GASW Parser] Error finalising job VIP_test.sh-125475850584310
+fr.insalyon.creatis.gasw.GaswException: 
+	at fr.insalyon.creatis.gasw.plugin.executor.local.execution.LocalOutputParser.resubmit(LocalOutputParser.java:95)
+	at fr.insalyon.creatis.gasw.execution.GaswOutputParser.run(GaswOutputParser.java:138)
+2024-02-18 02:28:47,312 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 02:28:48,169 | INFO | gasw:267 - Loading db plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:28:51,000 | INFO | gasw:267 - Loading executor plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:28:51,145 | INFO | gasw:267 - Loading listener plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 02:28:51,281 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 02:28:52,801 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 02:31:42,141 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 02:31:43,176 | INFO | gasw:267 - Loading db plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:31:46,906 | INFO | gasw:267 - Loading executor plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 02:31:47,002 | INFO | gasw:267 - Loading listener plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 02:31:47,184 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 02:31:48,776 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 02:31:59,110 | INFO | gasw:106 - Adding job: VIP_test.sh-125770228253523
+2024-02-18 02:32:00,678 | INFO | gasw:102 - Local Executor Job ID: VIP_test.sh-125770228253523
+2024-02-18 02:32:19,208 | INFO | gasw:124 - [Healing] : job VIP_test.sh-125770228253523 finished with exit code ERROR_READ_GRID
+2024-02-18 02:32:19,216 | INFO | gasw:326 - [Healing] Updated the jobErrorRate to NaN
+2024-02-18 02:32:19,218 | INFO | gasw:341 - [Healing] Updated the invocationPartialErrorRate to NaN
+2024-02-18 02:32:19,235 | WARN | gasw:137 - Job [VIP_test.sh-125770228253523] finished as "ERROR" (retried 2 times).
+2024-02-18 02:32:19,242 |ERROR | gasw:153 - [GASW Parser] Error finalising job VIP_test.sh-125770228253523
+fr.insalyon.creatis.gasw.GaswException: 
+	at fr.insalyon.creatis.gasw.plugin.executor.local.execution.LocalOutputParser.resubmit(LocalOutputParser.java:95)
+	at fr.insalyon.creatis.gasw.execution.GaswOutputParser.run(GaswOutputParser.java:138)
+2024-02-18 14:04:39,967 | INFO | gasw:79 - Initializing GASW.
+2024-02-18 14:04:40,702 | INFO | gasw:267 - Loading db plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-h2-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 14:04:43,371 | INFO | gasw:267 - Loading executor plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-local-plugin-3.1.0-jar-with-dependencies.jar)
+2024-02-18 14:04:43,551 | INFO | gasw:267 - Loading listener plugin from /home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar (loaded URI : file:/home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/plugins/gasw-healing-plugin-3.4.0-jar-with-dependencies.jar)
+2024-02-18 14:04:43,691 | INFO | gasw:279 - Loading database plugin 'H2 Database'.
+2024-02-18 14:04:45,075 | INFO | gasw:84 - Loading Self-Healing GASW Plugin version 3.4.0
+2024-02-18 14:04:54,414 | INFO | gasw:106 - Adding job: VIP_test.sh-128782269736684
+2024-02-18 14:04:55,798 | INFO | gasw:102 - Local Executor Job ID: VIP_test.sh-128782269736684
+2024-02-18 14:05:14,494 | INFO | gasw:124 - [Healing] : job VIP_test.sh-128782269736684 finished with exit code ERROR_READ_GRID
+2024-02-18 14:05:14,501 | INFO | gasw:326 - [Healing] Updated the jobErrorRate to NaN
+2024-02-18 14:05:14,503 | INFO | gasw:341 - [Healing] Updated the invocationPartialErrorRate to NaN
+2024-02-18 14:05:14,519 | WARN | gasw:137 - Job [VIP_test.sh-128782269736684] finished as "ERROR" (retried 3 times).
+2024-02-18 14:05:14,524 |ERROR | gasw:153 - [GASW Parser] Error finalising job VIP_test.sh-128782269736684
+fr.insalyon.creatis.gasw.GaswException: 
+	at fr.insalyon.creatis.gasw.plugin.executor.local.execution.LocalOutputParser.resubmit(LocalOutputParser.java:95)
+	at fr.insalyon.creatis.gasw.execution.GaswOutputParser.run(GaswOutputParser.java:138)
