@@ -64,13 +64,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
 <url>http://www.creatis.insa-lyon.fr/</url>
 </organization>
 <dependencies>
-<!--<dependency>
-<groupId>fr.insalyon.creatis</groupId>
-<artifactId>gasw</artifactId>
-<version>3.9.1</version>
-<scope>system</scope>
-<systemPath>/home/r/Documents/MoteurLite1/GASW-master/target/gasw-3.9.1-jar-with-dependencies.jar</systemPath>
-</dependency>-->
 <!--  <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>moteur2-workflowsdb-common</artifactId>
