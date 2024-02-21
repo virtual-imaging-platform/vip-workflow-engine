@@ -2,12 +2,17 @@
 <inputdata>
 <source name="results-directory" type="String">
 <array>
-<item><tag name="Group" value="0"/>file:///home/r/MoteurLite/moteurlite/output</item>
+<item><tag name="Group" value="0"/>file:///home/patil/winhome/projects/moteurlite_on_wsl/moteurlite/output</item>
 </array>
 </source>
 <source name="inname" type="String">
 <array>
-<item><tag name="Group" value="0"/>new</item>
+<item><tag name="Group" value="0"/>new1</item>
+</array>
+</source>
+<source name="inname2" type="String">
+<array>
+<item><tag name="Group" value="0"/>test1</item>
 </array>
 </source>
 </inputdata>

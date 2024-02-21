@@ -10,12 +10,17 @@ import java.io.InputStreamReader;
 import java.lang.System.Logger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import javax.sound.sampled.Port;
 
@@ -26,8 +31,6 @@ import fr.cnrs.i3s.moteur2.plugins.PluginException;
 import fr.cnrs.i3s.moteur2.execution.*;
 import fr.cnrs.i3s.moteur2.gui.NodeEditor;
 import fr.cnrs.i3s.moteur2.gui.ProcessorPanel;
-
-//import com.google.gwt.core.ext.typeinfo.ParseException;
 
 import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswConfiguration;
@@ -60,162 +63,136 @@ import fr.insalyon.creatis.moteurlite.JacksonParser.JacksonParser;
 import fr.insalyon.creatis.moteurlite.JacksonParser.InvalidBoutiquesDescriptorException;
 import javassist.bytecode.Descriptor.Iterator;
 
-
 public class MoteurLite {
     private boolean stop = false;
     Gasw gasw = Gasw.getInstance();
     GaswNotification gaswNotification;
     String R;
-    public static void main(String[] args) throws GaswException, SAXException, IOException, URISyntaxException, InvalidBoutiquesDescriptorException, FileNotFoundException, IOException, ParseException, PluginException{
-        File f= new File("/home/r/MoteurLite/moteurlite/input/new.tar.gz");           //file to be delete  (temporary lines-to be removed)
-        f.delete(); 
+    int sizeOfInputs;
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+
+    public static void main(String[] args) throws GaswException, SAXException, IOException, URISyntaxException,
+            InvalidBoutiquesDescriptorException, FileNotFoundException, IOException, ParseException, PluginException {
+        File f1 = new File("/home/r/MoteurLite/moteurlite/input/new.tar.gz");
+        File f2 = new File("/home/r/MoteurLite/moteurlite/output/new1.tar.gz"); // file to be delete (temporary lines-to be removed)
+        File f3 = new File("/home/r/MoteurLite/moteurlite/output/new1_1.tar.gz");
+        f1.delete();
+        f2.delete();
+        f3.delete();
         new MoteurLite(args);
     }
 
-    public MoteurLite(String[] args) throws GaswException, SAXException, IOException, URISyntaxException, InvalidBoutiquesDescriptorException, FileNotFoundException, IOException, ParseException, PluginException{
+    public MoteurLite(String[] args) throws GaswException, SAXException, IOException, URISyntaxException,
+            InvalidBoutiquesDescriptorException, FileNotFoundException, IOException, ParseException, PluginException {
         String gaswFilePath = args[0];
         String inputsFilePath = args[1];
         String boutiquesFilePath = args[2];
+        String workflowId = "55555555555"; // args[3];
         String value = "sandesh";
         value = "file://" + new URI(value + ".tar.gz").getPath();
         System.out.println("Value:" + value);
-
-
-
-        
-        String workflowId = String.valueOf(new Random().nextInt());
-        GaswParser gaswParser = new GaswParser();
-
-        //boutiques
-        
-        System.out.println(boutiquesFilePath);
-
-        //ParseBoutiquesFile parseBoutiquesFile = new ParseBoutiquesFile();
-        //String processor = parseBoutiquesFile.ParseBoutiquesFile(boutiquesFilePath);
         String processor = "r";
-        
-        
-       
-        
-        //gaswParser.parse(gaswFilePath);
-        Map<String, String> inputsMap = new DataSetParser(inputsFilePath).getInputValues();
-        System.out.println("inputsMap:" + inputsMap);
- 
-      
+        createWorkflow(workflowId, processor);
+        GaswParser gaswParser = new GaswParser();
+        System.out.println(boutiquesFilePath);
+        List<Map<String, String>> crossInputs = new DataSetParser(inputsFilePath).getInputValuesCross();
+        List<Map<String, String>> dotInputs = new DataSetParser(inputsFilePath).getInputValuesDot();
+        List<Map<String, String>> inputs = new ArrayList<>();
+        /*try (Scanner scanner = new Scanner(System.in)) {
+            System.out.print("Enter iteration Strategy:\n1. Cross Iteration\n2. Dot Iteration ");
+            int iteration = scanner.nextInt();
+            if (iteration == 1) {
+                inputs = crossInputs;
+            } else if (iteration == 2) {
+                inputs = dotInputs;
+            } else {
+                System.out.println("Invalid input");
+                return;
+            }
+        }*/
+        inputs = dotInputs;
         GaswMonitor gaswMonitor = new GaswMonitor();
         gasw.setNotificationClient(gaswMonitor);
         gaswMonitor.start();
-        GaswInput gaswInput = gaswParser.getGaswInput(inputsMap, boutiquesFilePath);
-        String jobID = gasw.submit(gaswInput);
-        createWorkflow(workflowId, processor);
-        
-        System.out.println("job launched : " + jobID);
+        Map<String, String> inputsMap = new HashMap<>();
+        for (Map<String, String> innerList : inputs) {
+            for (Map.Entry<String, String> entry : innerList.entrySet()) {
+                inputsMap.put(entry.getKey(), entry.getValue());
+            }
+            System.out.println(ANSI_GREEN + "inputsMap:" + inputsMap + ANSI_RESET);
+            GaswInput gaswInput = gaswParser.getGaswInput(inputsMap, boutiquesFilePath);
+            System.out.println(ANSI_GREEN + System.getProperty("user.dir") + ANSI_RESET);
+            String jobID = gasw.submit(gaswInput);
+            System.out.println("job launched : " + jobID);
+        }
         System.out.println("Waiting for Notification");
+        System.out.println(ANSI_RED + System.getProperty("user.dir") + "RRRRRRRRRRRRR" + ANSI_RESET);
+        System.out.println(ANSI_RED + "Navigating to directory: " + System.getProperty("user.dir") + ANSI_RESET);
+        File A = new File("temp");
+        A.mkdirs();
+        System.out.println(ANSI_RED + "Navigating to directory: " + A + ANSI_RESET);
     }
 
+    public static String test() {
+        return "e";
+    }
 
     public void createWorkflow(String workflowId, String processor) throws PluginException {
-
-
         try {
             WorkflowsDBDAOFactory workflowsDBDAOFactory = new WorkflowsDBDAOFactory();
             WorkflowDAO workflowDAO = workflowsDBDAOFactory.getWorkflowDAO();
             ProcessorDAO processorDAO = workflowsDBDAOFactory.getProcessorDAO();
-            WorkflowsDBListenerFactory workflowsDBListenerFactory = new WorkflowsDBListenerFactory();
-            
             Workflow workflow = new Workflow();
-            //fr.cnrs.i3s.moteur2.execution.Workflow wf = new fr.cnrs.i3s.moteur2.execution.Workflow();
-            //fr.cnrs.i3s.moteur2.processor.Processor pr = new fr.cnrs.i3s.moteur2.processor.Processor() {
-
-            //     @Override
-            //     public fr.cnrs.i3s.moteur2.processor.Processor duplicate() {
-            //         // TODO Auto-generated method stub
-            //         throw new UnsupportedOperationException("Unimplemented method 'duplicate'");
-            //     }
-
-            //     @Override
-            //     public Invoker getInvoker() {
-            //         // TODO Auto-generated method stub
-            //         throw new UnsupportedOperationException("Unimplemented method 'getInvoker'");
-            //     }
-
-            //     @Override
-            //     public ProcessorPanel getPanel(NodeEditor arg0) {
-            //         // TODO Auto-generated method stub
-            //         throw new UnsupportedOperationException("Unimplemented method 'getPanel'");
-            //     }
-                
-            // };
-
-            
-
-            //WorkflowsDBListener workflowsDBListener = new WorkflowsDBListener(wf);
-            //System.out.println(workflowsDBListener.getClass());
-            //workflowsDBListenerFactory.createWorkflowListner(wf);
-            //workflowsDBListener = new WorkflowsDBListener(workflow);
-            //workflowsDBListener.getClass();
-
+            System.out.println("workflowId:" + " " + workflowId);
             workflow.setId(workflowId);
             workflow.setUsername("sandesh");
             workflow.setStatus(WorkflowStatus.Queued);
             workflow.setStartedTime(new Date());
-
             Processor p = new Processor();
-            ProcessorID processorID = new ProcessorID("workflow-"+ workflowId, processor);
+            ProcessorID processorID = new ProcessorID(workflowId, processor);
             p.setProcessorID(processorID);
-            //p.setCompleted(1);
-
             processorDAO.add(p);
-
-           
-            
             System.out.println("adding workflow in workflowsdb : " + workflowId);
             workflowDAO.add(workflow);
             System.out.println("added workflow in workflowsdb : " + workflowId);
-
-        } catch (WorkflowsDBDAOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        
     }
 
-    public class GaswMonitor extends Thread {     
-        public GaswMonitor() {}
-        
-        public void run() {        
-            labelx:
-            while(!MoteurLite.this.stop) {
+    public class GaswMonitor extends Thread {
+        public GaswMonitor() {
+        }
+
+        public void run() {
+            labelx: while (!MoteurLite.this.stop) {
                 System.out.println("Waiting for Notification");
-                
-                synchronized(this) {
+                synchronized (this) {
                     try {
                         this.wait();
                     } catch (InterruptedException var10) {
                         var10.printStackTrace();
                     }
                 }
-            java.util.Iterator<GaswOutput> i$ = MoteurLite.this.gasw.getFinishedJobs().iterator();
-            System.out.println(gasw.getFinishedJobs());
-            GaswOutput gaswOutput;
-
-            System.out.println(i$);
-            //System.out.println(i$.next());  
-            
+                java.util.Iterator<GaswOutput> i$ = MoteurLite.this.gasw.getFinishedJobs().iterator();
+                System.out.println(gasw.getFinishedJobs());
+                GaswOutput gaswOutput;
+                System.out.println(i$);
                 if (!i$.hasNext()) {
                     MoteurLite.this.gasw.waitForNotification();
                     continue labelx;
-                } 
-            gaswOutput = (GaswOutput)i$.next();
-            
-            System.out.println("Status : " + gaswOutput.getExitCode());
-
-            
-            System.out.println("Output Path : " + gaswOutput.getUploadedResults());
-            MoteurLite.this.stop = true;
+                }
+                gaswOutput = (GaswOutput) i$.next();
+                System.out.println("Status : " + gaswOutput.getExitCode());
+                System.out.println("Output Path : " + gaswOutput.getUploadedResults());
+                MoteurLite.this.stop = true;
             }
             try {
                 gasw.terminate();
-
                 System.out.println("Exiting");
             } catch (GaswException e) {
                 e.printStackTrace();
@@ -223,6 +200,3 @@ public class MoteurLite {
         }
     }
 }
-
-
-

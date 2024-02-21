@@ -64,13 +64,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
 <url>http://www.creatis.insa-lyon.fr/</url>
 </organization>
 <dependencies>
-<dependency>
+<!--<dependency>
 <groupId>fr.insalyon.creatis</groupId>
 <artifactId>gasw</artifactId>
 <version>3.9.1</version>
 <scope>system</scope>
 <systemPath>/home/r/Documents/MoteurLite1/GASW-master/target/gasw-3.9.1-jar-with-dependencies.jar</systemPath>
-</dependency>
+</dependency>-->
 <!--  <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>moteur2-workflowsdb-common</artifactId>
@@ -78,11 +78,15 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <scope>provided</scope>
         </dependency>  -->
 <dependency>
-<groupId>fr.insalyon.creatis</groupId>
-<artifactId>moteur2-workflowsdb-plugin</artifactId>
-<version>1.6</version>
-<scope>system</scope>
-<systemPath>/home/r/Documents/MoteurLite1/Moteur2-WorkflowsDB-Plugin-master/target/moteur2-workflowsdb-plugin-1.6-jar-with-dependencies.jar</systemPath>
+    <groupId>com.github.sandepat</groupId>
+    <artifactId>GASW</artifactId>
+    <version>MoteurLite-SNAPSHOT</version>
+</dependency>
+
+<dependency>
+    <groupId>fr.insalyon.creatis</groupId>
+    <artifactId>moteur2-workflowsdb-plugin</artifactId>
+    <version>1.6</version>
 </dependency>
 <dependency>
 <groupId>fr.cnrs.i3s</groupId>
@@ -179,6 +183,10 @@ knowledge of the CeCILL-B license and that you accept its terms.
 <!--  highly available repository serving empty artifacts  -->
 <url>https://version99.qos.ch/</url>
 </repository>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
 </repositories>
 <distributionManagement>
 <repository>

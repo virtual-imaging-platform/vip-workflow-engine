@@ -1,0 +1,14 @@
+fr/insalyon/creatis/moteurlite/ParseBoutiquesFile.class
+fr/insalyon/creatis/moteurlite/JacksonParser/ToolTags.class
+fr/insalyon/creatis/moteurlite/JacksonParser/BoutiquesEntities.class
+fr/insalyon/creatis/moteurlite/JacksonParser/InvalidBoutiquesDescriptorException.class
+fr/insalyon/creatis/moteurlite/JacksonParser/ToolCustom.class
+fr/insalyon/creatis/moteurlite/JacksonParser/ToolSuggestedResources.class
+fr/insalyon/creatis/moteurlite/DataSetParser.class
+fr/insalyon/creatis/moteurlite/JacksonParser/ToolContainerImage.class
+fr/insalyon/creatis/moteurlite/JacksonParser/BoutiquesObjectParser.class
+fr/insalyon/creatis/moteurlite/JacksonParser/BoutiquesInput.class
+fr/insalyon/creatis/moteurlite/JacksonParser/ToolDeprecatedByDoi.class
+fr/insalyon/creatis/moteurlite/JacksonParser/BoutiquesOutput.class
+fr/insalyon/creatis/moteurlite/JacksonParser/JsonValues.class
+fr/insalyon/creatis/moteurlite/JacksonParser/ToolInvocationSchema.class

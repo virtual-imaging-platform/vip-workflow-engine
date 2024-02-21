@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: jenkins
+Build-Jdk: 11.0.15
+Main-Class: fr.insalyon.creatis.gasw.Gasw
+

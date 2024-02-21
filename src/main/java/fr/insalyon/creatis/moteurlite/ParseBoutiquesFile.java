@@ -26,7 +26,7 @@ public class ParseBoutiquesFile {
         public static final String ANSI_GREEN = "\u001B[32m";
         
     public String ParseBoutiquesFile(String boutiquesDescriptorString) throws FileNotFoundException, IOException,  InvalidBoutiquesDescriptorException, GaswException, ParseException {
-        System.out.println(ANSI_GREEN + "Inside Parse Boutiques File"+ ANSI_GREEN);
+        //System.out.println(ANSI_GREEN + "Inside Parse Boutiques File"+ ANSI_GREEN);
         JacksonParser jacksonParser = new JacksonParser();
         NameOfBoutiquesFile = jacksonParser.JsonJacksonParser(boutiquesDescriptorString).executableNameJackson+".sh";
         InputIdOfBoutiquesFile = jacksonParser.JsonJacksonParser(boutiquesDescriptorString).inputIDList;

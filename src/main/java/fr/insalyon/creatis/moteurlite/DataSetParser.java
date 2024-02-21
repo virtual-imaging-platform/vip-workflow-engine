@@ -6,15 +6,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Spliterator;
 import java.util.Vector;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
+import java.util.ArrayList; 
+import java.util.Arrays; 
 
 public class DataSetParser extends DefaultHandler {
    private boolean parsing = false;
@@ -29,19 +36,38 @@ public class DataSetParser extends DefaultHandler {
    private Vector<HashMap<String, String>> arrayTags = new Vector();
    private boolean isvoid = false;
    private boolean parsingItem = false;
-   private String currentSourceTag = "";
+   private String currentSourceTag = "";                  
    private int currentItemIndex = 0;
-   private Map<String, String> inputValues = new HashMap();
-
+   private Map<String, String> resultsDirectory = new HashMap();
+   private ArrayList<Map<String, String>> inputValues = new ArrayList<Map<String,String>>();
+   public static final String ANSI_GREEN = "\u001B[32m";
+   public static final String ANSI_RESET = "\u001B[0m";
+   public static final String ANSI_RED = "\u001B[31m";
+   public static final String ANSI_BLUE = "\u001B[34m";
+   public static final String ANSI_CYAN = "\u001B[36m";
+   List<List<Map<String, String>>> splitArrayList1 = new ArrayList<List<Map<String, String>>>();
+   private Map<String, List<String>> inputMapList = new HashMap<>();
    public DataSetParser(String filePath) throws SAXException, IOException {
       XMLReader reader = XMLReaderFactory.createXMLReader();
       reader.setContentHandler(this);
       reader.parse(filePath);
    }
 
-   public Map<String, String> getInputValues() {
-      return this.inputValues;
+   public List<Map<String, String>> getInputValuesCross() {
+      List<Map<String, String>> crossCombinations = crossIteration(inputMapList);
+      addResultsDir(crossCombinations, resultsDirectory);
+      System.out.println(ANSI_GREEN+ crossCombinations+ANSI_RESET);
+      return crossCombinations;
    }
+
+   public List<Map<String, String>> getInputValuesDot() {
+      List<Map<String, String>> dotCombinations = dotIteration(inputMapList);
+      addResultsDir(dotCombinations, resultsDirectory);
+      System.out.println(ANSI_BLUE+ dotCombinations + ANSI_RESET);
+      return dotCombinations;
+   }
+
+
 
    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if (!localName.equals("inputdata") && !localName.equals("d:inputdata")) {
@@ -95,11 +121,13 @@ public class DataSetParser extends DefaultHandler {
                   }
 
                   name = attributes.getValue("name");
+                  
                   if (name == null || name.length() == 0) {
                      throw new SAXException("<tag> tag has no \"name\" attribute.");
                   }
 
                   String value = attributes.getValue("value");
+                  
                   if (value == null || value.length() == 0) {
                      throw new SAXException("<tag> tag has no \"value\" attribute.");
                   }
@@ -189,16 +217,86 @@ public class DataSetParser extends DefaultHandler {
             }
          }
       } else {
+         List<String> listOfKeys = new ArrayList<>();
+         String values = new String();
          if (this.array != null) {
-            this.inputValues.put(this.input, (String)this.array.get(0));
+            if ("results-directory".equals(this.input)) {
+               this.resultsDirectory.put(this.input, array.get(0));
+            }
+            else {
+               for (int i=0; i<array.size(); i++) {
+                  String key = array.get(i);
+                  values = this.input;
+                  Map<String, String> pairMap = new HashMap<>();
+                  pairMap.put(values, key);
+                  inputValues.add(pairMap);
+                  listOfKeys.add(key);
+            }
+        
+            inputMapList.put(values, listOfKeys);
+            }
             this.array = null;
          }
-
          this.input = null;
       }
+  }
+      
+   public static List<Map<String, String>> crossIteration(Map<String, List<String>> inputMap) {
+      List<Map<String, String>> combinations = new ArrayList<>();
 
+      // Generate cross combinations
+      for (Map.Entry<String, List<String>> entry : inputMap.entrySet()) {
+         String key = entry.getKey();
+         List<String> values = entry.getValue();
+         if (combinations.isEmpty()) {
+            for (String value : values) {
+                  Map<String, String> combination = new HashMap<>();
+                  combination.put(key, value);
+                  combinations.add(combination);
+            }
+         } else {
+            List<Map<String, String>> temp = new ArrayList<>(combinations);
+            combinations.clear();
+            for (Map<String, String> combination : temp) {
+                  for (String value : values) {
+                     Map<String, String> newCombination = new HashMap<>(combination);
+                     newCombination.put(key, value);
+                     combinations.add(newCombination);
+                  }
+            }
+         }
+      }
+      return combinations;
    }
 
+   public static List<Map<String, String>> dotIteration(Map<String, List<String>> inputMap) {
+      List<Map<String, String>> combinations = new ArrayList<>();
+
+      // Generate dot combinations
+      int maxSize = inputMap.values().stream().mapToInt(List::size).min().orElse(0);
+      for (int i = 0; i < maxSize; i++) {
+         Map<String, String> combination = new HashMap<>();
+         for (Map.Entry<String, List<String>> entry : inputMap.entrySet()) { 
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+
+            if (i < values.size()) {
+                  combination.put(key, values.get(i));
+            }
+         }
+         combinations.add(combination);
+      }
+      return combinations;
+   }
+
+   private static void addResultsDir(List<Map<String, String>> combinations, Map<String, String> resultsDirectory) {
+      for (Map<String, String> map : combinations) {
+         resultsDirectory.putAll(map);
+         map.clear();
+         map.putAll(resultsDirectory);
+      }
+   }
+   
    public void characters(char[] ch, int start, int length) {
       if (this.parsingItem) {
          String chars = new String(ch);
