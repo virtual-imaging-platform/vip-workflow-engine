@@ -70,17 +70,19 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <version>1.5</version>
             <scope>provided</scope>
         </dependency>  -->
-<dependency>
-    <groupId>com.github.sandepat</groupId>
-    <artifactId>GASW</artifactId>
-    <version>MoteurLite-SNAPSHOT</version>
-</dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>gasw</artifactId>
+            <version>3.9.1</version>
+            <scope>system</scope>
+            <systemPath>/home/patil/winhome/projects/vip-workflow-engine/gasw-3.9.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>moteur2-workflowsdb-plugin</artifactId>
+            <version>1.6</version>
+        </dependency>
 
-<dependency>
-    <groupId>fr.insalyon.creatis</groupId>
-    <artifactId>moteur2-workflowsdb-plugin</artifactId>
-    <version>1.6</version>
-</dependency>
 <dependency>
 <groupId>fr.cnrs.i3s</groupId>
 <artifactId>moteur2-common</artifactId>
@@ -176,10 +178,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
 <!--  highly available repository serving empty artifacts  -->
 <url>https://version99.qos.ch/</url>
 </repository>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
 </repositories>
 <distributionManagement>
 <repository>
@@ -193,4 +191,48 @@ knowledge of the CeCILL-B license and that you accept its terms.
 <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/snapshots</url>
 </snapshotRepository>
 </distributionManagement>
+
+<build>
+    <plugins>
+
+        <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath> <mainClass>fr.insalyon.creatis.moteurlite.MoteurLite</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+        </plugin>
+        
+    
+ 
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.4</version> <!-- Use the latest version -->
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                        <createDependencyReducedPom>false</createDependencyReducedPom>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+    </plugins>
+
+</build>
+
+
 </project>
+
+
+
