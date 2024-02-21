@@ -71,11 +71,9 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <scope>provided</scope>
         </dependency>  -->
         <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>gasw</artifactId>
-            <version>3.9.1</version>
-            <scope>system</scope>
-            <systemPath>/home/patil/winhome/projects/vip-workflow-engine/gasw-3.9.1.jar</systemPath>
+	    <groupId>com.github.sandepat</groupId>
+	    <artifactId>GASW</artifactId>
+	    <version>MoteurLite-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
@@ -178,6 +176,10 @@ knowledge of the CeCILL-B license and that you accept its terms.
 <!--  highly available repository serving empty artifacts  -->
 <url>https://version99.qos.ch/</url>
 </repository>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
 </repositories>
 <distributionManagement>
 <repository>
