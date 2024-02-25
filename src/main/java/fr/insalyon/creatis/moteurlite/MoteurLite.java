@@ -139,7 +139,6 @@
                     for (Map.Entry<String, String> entry : innerList.entrySet()) {
                         inputsMap.put(entry.getKey(), entry.getValue());
                     }
-                    System.out.println(ANSI_GREEN + "inputsMap:" + inputsMap + ANSI_RESET);
                     //String executableName = getArgumentML(boutiquesFilePath);
         
                     GaswInput gaswInput = gaswParser.getGaswInput(inputsMap, boutiquesFilePath, executableName, inputid, outputid, download);

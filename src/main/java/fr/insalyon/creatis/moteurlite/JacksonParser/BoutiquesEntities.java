@@ -43,8 +43,6 @@ public class BoutiquesEntities {
         HashMap<Integer, String> inputidlist = new HashMap<Integer, String>();
         HashMap<Integer, String> outputidlist = new HashMap<Integer, String>();
         BoutiquesObjectParser boutiquesObjectParser;
-        public static final String ANSI_RESET = "\u001B[0m";
-        public static final String ANSI_RED = "\u001B[31m";
     
         @JsonProperty("author")
         public String getAuthor() {

@@ -20,7 +20,6 @@ public class JacksonParser {
     String executableNameJackson;
     HashMap<Integer, String> inputIDList;
     HashMap<Integer, String> outputIDList;
-    public static final String ANSI_RESET = "\u001B[0m";
     public JsonValues JsonJacksonParser(String JsonFileName) throws FileNotFoundException, IOException, ParseException {
         //String jsonString = JsonFileName; // Replace with your JSON input
         //JSONParser parser = new JSONParser();

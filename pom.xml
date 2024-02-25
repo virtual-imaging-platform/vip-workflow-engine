@@ -73,7 +73,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>com.github.sandepat</groupId>
             <artifactId>GASW</artifactId>
-            <version>MoteurLite-ad72c0aa8a-1</version>
+            <version>700de660e7</version>
         </dependency>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>

@@ -40,11 +40,6 @@ public class DataSetParser extends DefaultHandler {
    private int currentItemIndex = 0;
    private Map<String, String> resultsDirectory = new HashMap();
    private ArrayList<Map<String, String>> inputValues = new ArrayList<Map<String,String>>();
-   public static final String ANSI_GREEN = "\u001B[32m";
-   public static final String ANSI_RESET = "\u001B[0m";
-   public static final String ANSI_RED = "\u001B[31m";
-   public static final String ANSI_BLUE = "\u001B[34m";
-   public static final String ANSI_CYAN = "\u001B[36m";
    List<List<Map<String, String>>> splitArrayList1 = new ArrayList<List<Map<String, String>>>();
    private Map<String, List<String>> inputMapList = new HashMap<>();
    public DataSetParser(String filePath) throws SAXException, IOException {
@@ -56,14 +51,12 @@ public class DataSetParser extends DefaultHandler {
    public List<Map<String, String>> getInputValuesCross() {
       List<Map<String, String>> crossCombinations = crossIteration(inputMapList);
       addResultsDir(crossCombinations, resultsDirectory);
-      System.out.println(ANSI_GREEN+ crossCombinations+ANSI_RESET);
       return crossCombinations;
    }
 
    public List<Map<String, String>> getInputValuesDot() {
       List<Map<String, String>> dotCombinations = dotIteration(inputMapList);
       addResultsDir(dotCombinations, resultsDirectory);
-      System.out.println(ANSI_BLUE+ dotCombinations + ANSI_RESET);
       return dotCombinations;
    }
 

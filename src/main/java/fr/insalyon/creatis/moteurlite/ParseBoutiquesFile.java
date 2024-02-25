@@ -21,24 +21,17 @@ public class ParseBoutiquesFile {
         String downloadFile;
         java.util.HashMap<Integer, String> InputIdOfBoutiquesFile;
         java.util.HashMap<Integer, String> OutputIdOfBoutiquesFile;
-        public static final String ANSI_RESET = "\u001B[0m";
-        public static final String ANSI_RED = "\u001B[31m";
-        public static final String ANSI_GREEN = "\u001B[32m";
         
     public String ParseBoutiquesFile(String boutiquesDescriptorString) throws FileNotFoundException, IOException,  InvalidBoutiquesDescriptorException, GaswException, ParseException {
-        //System.out.println(ANSI_GREEN + "Inside Parse Boutiques File"+ ANSI_GREEN);
         JacksonParser jacksonParser = new JacksonParser();
         NameOfBoutiquesFile = jacksonParser.JsonJacksonParser(boutiquesDescriptorString).executableNameJackson+".sh";
         InputIdOfBoutiquesFile = jacksonParser.JsonJacksonParser(boutiquesDescriptorString).inputIDList;
         OutputIdOfBoutiquesFile = jacksonParser.JsonJacksonParser(boutiquesDescriptorString).outputIDList;
-        System.out.println(ANSI_RESET + "Executable File Name:" + NameOfBoutiquesFile);
-        System.out.println(ANSI_RESET + "Id:" + InputIdOfBoutiquesFile + " " + OutputIdOfBoutiquesFile);
         return NameOfBoutiquesFile;
     }
 
     public String getDownloadFile() {
         downloadFile = NameOfBoutiquesFile + ".tar.gz";
-        System.out.println(ANSI_RESET + "Download File Name:" + downloadFile);
         return downloadFile;
     }
 
