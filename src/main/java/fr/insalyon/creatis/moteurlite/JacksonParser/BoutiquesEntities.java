@@ -1,23 +1,20 @@
 package fr.insalyon.creatis.moteurlite.JacksonParser;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.json.simple.JSONObject;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 public class BoutiquesEntities {
         private String author;
         private String commandLine;
         private ToolContainerImage containerImage;
-        private ToolCustom custom;
+        //private ToolCustom custom;
+        private Map<String, Object> custom;
         private ToolDeprecatedByDoi deprecatedByDoi;
         private String description;
         private String descriptorUrl;
@@ -38,11 +35,22 @@ public class BoutiquesEntities {
         private String toolDoi;
         private String toolVersion;
         private String url;
-        Object inputid;
-        Object outputid;
-        HashMap<Integer, String> inputidlist = new HashMap<Integer, String>();
-        HashMap<Integer, String> outputidlist = new HashMap<Integer, String>();
+        Object inputId;
+        Object outputId;
+        Object inputType = new HashMap<>();
+        Object inputValueKey = new HashMap<>();
+        Object outputPathTemplate = new HashMap<>();
+
+        HashMap<Integer, String> inputIdList = new HashMap<Integer, String>();
+        HashMap<Integer, String> outputIdList = new HashMap<Integer, String>();
+        HashMap<String, String> inputTypelist = new HashMap<String, String>();
+        HashMap<String, String> inputValueKeylist = new HashMap<String, String>();
+        HashMap<String, String> outputPathTemplateList = new HashMap<String, String>();
         BoutiquesObjectParser boutiquesObjectParser;
+        Map<String, String> crossMap = new HashMap<>();
+        Map<String, String> dotMap = new HashMap<>();
+        private Set<String> crossSet = new HashSet<>();
+        private Set<String> dotSet = new HashSet<>();
     
         @JsonProperty("author")
         public String getAuthor() {
@@ -51,7 +59,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("author")
         public void setAuthor(String author) {
-            System.out.println("author:" + author);
+            //System.out.println("author:" + author);
             this.author = author;
         }
     
@@ -62,7 +70,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("command-line")
         public void setCommandLine(String commandLine) {
-            System.out.println("command-line:"+commandLine);
+            //System.out.println("command-line:"+commandLine);
             this.commandLine = commandLine;
         }
     
@@ -73,20 +81,48 @@ public class BoutiquesEntities {
     
         @JsonProperty("container-image")
         public void setContainerImage(ToolContainerImage containerImage) {
-            System.out.println("container-image:"+containerImage);
+            //System.out.println("container-image:"+containerImage);
             this.containerImage = containerImage;
         }
     
         @JsonProperty("custom")
-        public ToolCustom getCustom() {
-            return custom;
+        public void setCustom(Map<String, Object> custom) {
+            this.custom = custom;
+    
+            if (custom == null) {
+                return; // Return early if custom is null
+            }
+    
+            for (Map.Entry<String, Object> entry : custom.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+    
+                if (value instanceof String) {
+                    handleKeyValue(key, (String) value);
+                } else if (value instanceof Iterable) {
+                    for (Object item : (Iterable<?>) value) {
+                        handleKeyValue(key, item.toString());
+                    }
+                }
+            }
         }
     
-        @JsonProperty("custom")
-        public void setCustom(ToolCustom custom) {
-            System.out.println("custom:"+custom);
-            this.custom = custom;
+        private void handleKeyValue(String key, String value) {
+            if (key.contains("VIPcross")) {
+                crossSet.add(value);
+            } else if (key.contains("VIPdot")) {
+                dotSet.add(value);
+            }
         }
+    
+        public Set<String> getCrossMap() {
+            return crossSet;
+        }
+    
+        public Set<String> getDotMap() {
+            return dotSet;
+        }
+
     
         @JsonProperty("deprecated-by-doi")
         public ToolDeprecatedByDoi getDeprecatedByDoi() {
@@ -95,7 +131,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("deprecated-by-doi")
         public void setDeprecatedByDoi(ToolDeprecatedByDoi deprecatedByDoi) {
-            System.out.println("deprecated-by-doi:"+deprecatedByDoi);
+            //System.out.println("deprecated-by-doi:"+deprecatedByDoi);
             this.deprecatedByDoi = deprecatedByDoi;
         }
     
@@ -106,7 +142,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("description")
         public void setDescription(String description) {
-            System.out.println("description:"+description);
+            //System.out.println("description:"+description);
             this.description = description;
         }
     
@@ -117,7 +153,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("descriptor-url")
         public void setDescriptorUrl(String descriptorUrl) {
-            System.out.println("descriptor-url:"+descriptorUrl);
+            //System.out.println("descriptor-url:"+descriptorUrl);
             this.descriptorUrl = descriptorUrl;
         }
     
@@ -128,7 +164,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("doi")
         public void setDoi(String doi) {
-            System.out.println("doi:"+doi);
+            //System.out.println("doi:"+doi);
             this.doi = doi;
         }
     
@@ -139,7 +175,7 @@ public class BoutiquesEntities {
     
         @JsonSetter("environment-variables")
         public void setEnvironmentVariables(List<Map<String, Object>> environmentVariables) {
-            System.out.println("environment-variables:"+environmentVariables);
+            //System.out.println("environment-variables:"+environmentVariables);
             this.environmentVariables = environmentVariables;
         }
     
@@ -150,7 +186,7 @@ public class BoutiquesEntities {
     
         @JsonSetter("error-codes")
         public void setErrorCodes(List<Map<String, Object>> errorCodes) {
-            System.out.println("error-codes:"+errorCodes);
+            //System.out.println("error-codes:"+errorCodes);
             this.errorCodes = errorCodes;
         }
     
@@ -161,7 +197,7 @@ public class BoutiquesEntities {
     
         @JsonSetter("groups")
         public void setGroups(List<Map<String, Object>> groups) {
-            System.out.println("groups:"+groups);
+            //System.out.println("groups:"+groups);
             this.groups = groups;
         }
     
@@ -172,21 +208,32 @@ public class BoutiquesEntities {
     
         @JsonSetter("inputs")
         public void setInputs(List<Map<String, Object>> inputs) {
-            System.out.println("inputs:"+inputs);
+            //System.out.println("inputs:"+inputs);
 
             for(int inputNo =0; inputNo < inputs.size();inputNo++){
-                System.out.println("inputs:"+ inputNo+ inputs.get(inputNo));
+                //System.out.println("inputs:"+ inputNo+ inputs.get(inputNo));
                 boutiquesObjectParser = new BoutiquesObjectParser(inputs, BoutiquesInput.class);
-                inputid = inputs.get(inputNo).get("id");
-                inputidlist.put(inputNo,inputid.toString());
+                inputId = inputs.get(inputNo).get("id");
+                inputType = inputs.get(inputNo).get("type");
+                inputValueKey = inputs.get(inputNo).get("value-key");
+                inputIdList.put(inputNo,inputId.toString());
+                inputTypelist.put(inputId.toString(),inputType.toString());
+                inputValueKeylist.put(inputId.toString(),inputValueKey.toString());
             }
             this.inputs = inputs;
         }
 
-        public HashMap<Integer, String> getInputid(){
-            return inputidlist;
+        public HashMap<Integer, String> getInputId(){
+            return inputIdList;
         }
 
+        public HashMap<String, String> getInputTypes(){
+            return inputTypelist;
+        }
+
+        public HashMap<String, String> getInputValueKey(){
+            return inputValueKeylist;
+        }
     
         @JsonProperty("invocation-schema")
         public ToolInvocationSchema getInvocationSchema() {
@@ -195,7 +242,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("invocation-schema")
         public void setInvocationSchema(ToolInvocationSchema invocationSchema) {
-            System.out.println("invocation-schema:"+invocationSchema);
+            //System.out.println("invocation-schema:"+invocationSchema);
             this.invocationSchema = invocationSchema;
         }
     
@@ -206,7 +253,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("name")
         public void setName(String name) {
-            System.out.println("name:"+name);
+            //System.out.println("name:"+name);
             this.name = name;
         }
     
@@ -217,7 +264,7 @@ public class BoutiquesEntities {
     
         @JsonSetter("online-platform-urls")
         public void setOnlinePlatformUrls(List<String> onlinePlatformUrls) {
-            System.out.println("online-platform-urls:"+onlinePlatformUrls);
+            //System.out.println("online-platform-urls:"+onlinePlatformUrls);
             this.onlinePlatformUrls = onlinePlatformUrls;
         }
     
@@ -228,21 +275,27 @@ public class BoutiquesEntities {
     
         @JsonSetter("output-files")
         public void setOutputFiles(List<Map<String, Object>> outputFiles) {
-            System.out.println("output-files:"+outputFiles);
+            //System.out.println("output-files:"+outputFiles);
 
-               for(int outputNo =0; outputNo < outputFiles.size();outputNo++){
-                System.out.println("outputs:"+ outputNo+ outputFiles.get(outputNo));
+            for(int outputNo =0; outputNo < outputFiles.size();outputNo++){
+                //System.out.println("outputs:"+ outputNo+ outputFiles.get(outputNo));
                 boutiquesObjectParser = new BoutiquesObjectParser(outputFiles, BoutiquesOutput.class);
-                outputid = outputFiles.get(outputNo).get("id");
-                outputidlist.put(outputNo,outputid.toString());
+                outputId = outputFiles.get(outputNo).get("id");
+                outputIdList.put(outputNo,outputId.toString());
+                outputPathTemplate = outputFiles.get(outputNo).get("path-template");
+                outputPathTemplateList.put(outputId.toString(),outputPathTemplate.toString());
             }
 
             
             this.outputFiles = outputFiles;
         }
 
-            public HashMap<Integer, String> getOutputid(){
-            return outputidlist;
+        public HashMap<Integer, String> getOutputId(){
+            return outputIdList;
+        }
+
+        public HashMap<String, String> getOutputPathTemplateList(){
+            return outputPathTemplateList;
         }
     
         @JsonProperty("schema-version")
@@ -252,7 +305,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("schema-version")
         public void setSchemaVersion(String schemaVersion) {
-            System.out.println("schema-version:"+schemaVersion);
+            //System.out.println("schema-version:"+schemaVersion);
             this.schemaVersion = schemaVersion;
         }
     
@@ -263,7 +316,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("shell")
         public void setShell(String shell) {
-            System.out.println("shell:"+shell);
+            //System.out.println("shell:"+shell);
             this.shell = shell;
         }
     
@@ -274,7 +327,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("suggested-resources")
         public void setSuggestedResources(ToolSuggestedResources suggestedResources) {
-            System.out.println("suggested-resources:"+suggestedResources);
+            //System.out.println("suggested-resources:"+suggestedResources);
             this.suggestedResources = suggestedResources;
         }
     
@@ -285,7 +338,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("tags")
         public void setTags(ToolTags tags) {
-            System.out.println("tags:"+tags);
+            //System.out.println("tags:"+tags);
             this.tags = tags;
         }
     
@@ -297,7 +350,7 @@ public class BoutiquesEntities {
         @JsonSetter("tests")
         public void setTests(List<Map<String, Object>> tests) {
             this.tests = tests;
-            System.out.println("tests:"+tests);
+            //System.out.println("tests:"+tests);
         }
     
         @JsonProperty("tool-doi")
@@ -307,7 +360,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("tool-doi")
         public void setToolDoi(String toolDoi) {
-            System.out.println("tool-doi:"+toolDoi);
+            //System.out.println("tool-doi:"+toolDoi);
             this.toolDoi = toolDoi;
         }
     
@@ -318,7 +371,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("tool-version")
         public void setToolVersion(String toolVersion) {
-            System.out.println("tool-version:"+toolVersion);
+            //System.out.println("tool-version:"+toolVersion);
             this.toolVersion = toolVersion;
         }
     
@@ -329,7 +382,7 @@ public class BoutiquesEntities {
     
         @JsonProperty("url")
         public void setUrl(String url) {
-            System.out.println("url:"+url);
+            //System.out.println("url:"+url);
             this.url = url;
         }
     

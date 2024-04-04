@@ -1,0 +1,28 @@
+package fr.insalyon.creatis.moteurlite.JacksonParser;
+
+import java.util.HashMap;
+import java.util.Set;
+
+public class JsonValues {
+    
+
+public String executableNameJackson;
+public HashMap<Integer, String> inputIDList;
+public HashMap<Integer, String> outputIDList;
+public HashMap<String, String> inputTypeList;
+public HashMap<String, String> inputValueKey;
+public HashMap<String, String> outputPathTemplatelist;
+public Set<String> crossMap;
+public Set<String> dotMap;
+
+public JsonValues(String executableNameJackson, HashMap<Integer, String> inputIDList, HashMap<Integer, String> outputIDList, Set<String> crossMap, Set<String> dotMap, HashMap<String, String> inputTypeList, HashMap<String, String> inputValueKey, HashMap<String, String> outputPathTemplatelist) {
+                this.executableNameJackson = executableNameJackson;
+                this.inputIDList = inputIDList;
+                this.outputIDList = outputIDList;
+                this.crossMap = crossMap;
+                this.dotMap = dotMap;
+                this.inputTypeList = inputTypeList;
+                this.inputValueKey = inputValueKey;
+                this.outputPathTemplatelist = outputPathTemplatelist;
+    }
+}

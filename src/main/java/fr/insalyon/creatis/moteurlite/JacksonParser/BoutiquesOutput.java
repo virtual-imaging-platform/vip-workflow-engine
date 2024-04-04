@@ -28,7 +28,7 @@ public class BoutiquesOutput {
    }
 
    public void setCommandLineFlag(String commandLineFlag) {
-      System.out.println("command-line-flag:" + commandLineFlag);
+      //System.out.println("command-line-flag:" + commandLineFlag);
       this.commandLineFlag = commandLineFlag;
    }
 
@@ -38,7 +38,7 @@ public class BoutiquesOutput {
    }
 
    public void setCommandLineFlagSeparator(String commandLineFlagSeparator) {
-      System.out.println("command-line-flag-separator:" + commandLineFlagSeparator);
+      //System.out.println("command-line-flag-separator:" + commandLineFlagSeparator);
       this.commandLineFlagSeparator = commandLineFlagSeparator;
    }
 
@@ -48,7 +48,7 @@ public class BoutiquesOutput {
    }
 
    public void setConditionalPathTemplate(List<String> conditionalPathTemplate) {
-      System.out.println("conditional-path-template:" + conditionalPathTemplate);
+      //System.out.println("conditional-path-template:" + conditionalPathTemplate);
       this.conditionalPathTemplate = conditionalPathTemplate;
    }
 
@@ -58,7 +58,7 @@ public class BoutiquesOutput {
    }
 
    public void setDescription(String description) {
-      System.out.println("description:" + description);
+      //System.out.println("description:" + description);
       this.description = description;
    }
 
@@ -68,7 +68,7 @@ public class BoutiquesOutput {
    }
 
    public void setFileTemplate(List<String> fileTemplate) {
-      System.out.println("file-template:" + fileTemplate);
+      //System.out.println("file-template:" + fileTemplate);
       this.fileTemplate = fileTemplate;
    }
 
@@ -78,7 +78,7 @@ public class BoutiquesOutput {
    }
 
    public void setId(String id) {
-      System.out.println("id:" + id);
+      //System.out.println("id:" + id);
       this.id = id;
    }
 
@@ -88,7 +88,7 @@ public class BoutiquesOutput {
    }
 
    public void setIsList(Boolean isList) {
-      System.out.println("isList:" + isList);
+      //System.out.println("isList:" + isList);
       this.isList = isList;
    }
 
@@ -98,7 +98,7 @@ public class BoutiquesOutput {
    }
 
    public void setName(String name) {
-      System.out.println("name:" + name);
+      //System.out.println("name:" + name);
       this.name = name;
    }
 
@@ -108,7 +108,7 @@ public class BoutiquesOutput {
    }
 
    public void setOptional(Boolean optional) {
-      System.out.println("optional:" + optional);
+      //System.out.println("optional:" + optional);
       this.optional = optional;
    }
 
@@ -118,7 +118,7 @@ public class BoutiquesOutput {
    }
 
    public void setPathTemplate(String pathTemplate) {
-      System.out.println("path-template:" + pathTemplate);
+      //System.out.println("path-template:" + pathTemplate);
       this.pathTemplate = pathTemplate;
    }
 
@@ -128,7 +128,7 @@ public class BoutiquesOutput {
    }
 
    public void setPathTemplateStrippedExtensions(List<String> pathTemplateStrippedExtensions) {
-      System.out.println("path-template-stripped-extensions:" + pathTemplateStrippedExtensions);
+      //System.out.println("path-template-stripped-extensions:" + pathTemplateStrippedExtensions);
       this.pathTemplateStrippedExtensions = pathTemplateStrippedExtensions;
    }
 
@@ -138,7 +138,7 @@ public class BoutiquesOutput {
    }
 
    public void setUsesAbsolutePath(Boolean usesAbsolutePath) {
-      System.out.println("uses-absolute-path:" + usesAbsolutePath);
+      //System.out.println("uses-absolute-path:" + usesAbsolutePath);
       this.usesAbsolutePath = usesAbsolutePath;
    }
 
@@ -148,7 +148,7 @@ public class BoutiquesOutput {
    }
 
    public void setValueKey(String valueKey) {
-      System.out.println("value-key:" + valueKey);
+      //System.out.println("value-key:" + valueKey);
       this.valueKey = valueKey;
    }
 }

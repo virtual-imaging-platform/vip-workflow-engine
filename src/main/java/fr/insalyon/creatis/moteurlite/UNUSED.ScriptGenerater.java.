@@ -1,0 +1,76 @@
+package fr.insalyon.creatis.moteurlite;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ScriptGenerater {
+
+    public static Object standardVipScript (String JobId)  {
+        List<String> scriptPaths = new ArrayList<>();
+        // Add paths of all scripts to be merged
+        scriptPaths.add("src/main/resources/StandardVipScript/Configurations/JobConfigurations.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript/Configurations/GaswConfigurations.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript/Configurations/GaswConstants.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript/Functions/logFunctions.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/cleanup.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/checkCacheDownloadAndCacheLFN.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/refresh.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/downloadFunctions.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/addToCacheFunction.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/addToFailOverFunction.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/uploadFunctions.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/deleteFunctions.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/header.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/hostConfiguration.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/backgroundScript.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/inputs.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/variables.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/boutiques.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/results.sh");
+        scriptPaths.add("src/main/resources/StandardVipScript//Functions/footer.sh");
+
+        String jobId = JobId;
+        String scriptPath = "sh/" + jobId;
+        mergeScripts(scriptPaths, scriptPath, jobId);
+
+        return null;
+    }
+
+    public static void mergeScripts(List<String> scriptPaths, String outputPath, String jobId) {
+        try {
+            StringBuilder combinedContents = new StringBuilder();
+            for (String path : scriptPaths) {
+                combinedContents.append(readScript(path));
+                combinedContents.append("\n\n");
+            }
+
+            writeScript(outputPath, combinedContents.toString(), jobId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String readScript(String filePath) throws IOException {
+        StringBuilder contentBuilder = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                contentBuilder.append(line);
+                contentBuilder.append("\n");
+            }
+        }
+        return contentBuilder.toString();
+    }
+
+    public static void writeScript(String outputPath, String contents, String jobId) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))) {
+            writer.write(contents);
+        }
+    }
+
+}

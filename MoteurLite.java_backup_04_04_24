@@ -14,8 +14,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.ibm.icu.text.SimpleDateFormat;
-
 import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswInput;
@@ -84,8 +82,8 @@ public class MoteurLite {
         //System.out.println("Number of inputs: " + inputType);
 
         //set workflowsdb
-        //workflowsdb.persistInputs(workflowId, inputData, inputType, resultsDirectory);
-        //workflowsdb.persistProcessors(workflowId, inputType);
+        workflowsdb.persistInputs(workflowId, inputData, inputType, resultsDirectory);
+        workflowsdb.persistProcessors(workflowId, inputType);
 
 
         /*workflowsdb.Outputs(workflowId, outputBoutiquesId);
@@ -98,9 +96,6 @@ public class MoteurLite {
         List<Map<String, String>> crossCominations = iterationStrategy.getCrossCombinations();
         List<Map<String, String>> dotCombinations = iterationStrategy.getDotCombinations();
         List<Map<String, String>> jsonIterations = iterationStrategy.getJsonIterations();
-
-        System.out.println("Number of dot combinations: " + dotCombinations.size());
-        System.out.println(dotCombinations);
 
         /*List<Map<String, String>> crossCominations = xmlParser.getCrossCombinations();
         List<Map<String, String>> dotCombinations = xmlParser.getDotCombinations();
@@ -127,15 +122,14 @@ public class MoteurLite {
                 }
             }
             List<URI> DownloadFiles = ParseXMLFile.getDownloadFiles(inputsMap);
-            String outputDirName = outputDirectoryName(applicationName);
 
             outputName = getOutputPath(inputValueKey, outputPathTemplate, inputsMap);
-            //workflowsdb.persistOutputs(workflowId, outputBoutiquesId, outputName, outputDirName, resultsDirectory);
+            workflowsdb.persistOutputs(workflowId, outputBoutiquesId, outputName);
 
             String invocationString = CreateInvocation.convertMapToJson(invocation, inputType);
             String jobId = applicationName + "-" + System.nanoTime() + ".sh";
             GaswInput gaswInput = gaswParser.getGaswInput(applicationName, inputsMap, boutiquesFilePath, executableName,
-                    inputBoutiquesId, outputBoutiquesId, invocationString, resultsDirectory, jobId, bashScript, DownloadFiles, outputDirName);
+                    inputBoutiquesId, outputBoutiquesId, invocationString, resultsDirectory, jobId, bashScript, DownloadFiles);
             gasw.submit(gaswInput);
             System.out.println("job launched : " + jobId);
         }
@@ -318,10 +312,5 @@ public class MoteurLite {
                 e.printStackTrace();
             }
         }
-    }
-    public String outputDirectoryName(String applicationName) {
-        String folderName = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss").format(new Date());
-
-        return applicationName + "_" + folderName;
     }
 }

@@ -1,0 +1,78 @@
+## execution.vm
+
+## Variables
+## $minorStatusEnabled, $serviceCall, $executableName, $params
+
+
+#if( $minorStatusEnabled && $serviceCall )
+$serviceCall ${MOTEUR_WORKFLOWID} ${JOBID} 4
+#end
+
+#set($JSONFILE = $executableName.substring(0, $executableName.lastIndexOf('.')) + ".json")
+JSONFILE=$JSONFILE
+
+
+#set ( $tarFile = "${executableName}.tar.gz" )
+tar -zxf $tarFile
+echo
+
+chmod 755 *
+
+## the 1s delay is needed to ensure that the time between this file creation and the command line outputs
+## files creation is sufficient, and the subsequent "find -newer" call succeeds
+
+echo "BEFORE_EXECUTION_REFERENCE" > BEFORE_EXECUTION_REFERENCE_FILE
+sleep 1
+echo $params parameters
+#set( $parameters = "" )
+#foreach( $param in $params )
+    #set( $parameters = "$parameters $param" )
+#end
+
+export LD_LIBRARY_PATH=${PWD}:${LD_LIBRARY_PATH}
+
+## The command_line variable is an array to allow spaces in string inputs
+
+
+#set($COMMAND_LINE = (("./$!executableName" + "$!parameters")))
+
+COMMAND_LINE=($COMMAND_LINE)
+
+startLog application_execution
+
+
+#*
+#set($stringPart1 = '${COMMAND_LINE[@]}')
+#set($stringPart2 = '${lines[@]}')
+#set($line = '$line')
+#set($Boutiques_provenance_logs = '$Boutiques_provenance_logs')
+#set($stringPart3 = '${line#*"$Boutiques_provenance_logs"}')
+
+
+readarray -t lines < <(eval $stringPart1)
+Boutiques_provenance_logs="Provenance file:"
+for line in "$stringPart2"; do
+    echo "$line"
+    if [[ $line == "$Boutiques_provenance_logs"* ]];
+    then
+    Provenance_file=$stringPart3
+    fi
+done
+*#
+
+if [ $? -ne 0 ]
+then
+    error "Exiting with return value 6"
+    BEFOREUPLOAD=`date +%s`
+    info "Execution time: `expr ${BEFOREUPLOAD} - ${AFTERDOWNLOAD}` seconds"
+    stopLog application_execution
+    cleanup
+    exit 6
+fi
+BEFOREUPLOAD=`date +%s`
+stopLog application_execution
+
+info "Execution time was `expr ${BEFOREUPLOAD} - ${AFTERDOWNLOAD}`s"
+
+__MOTEUR_ARGS="$parameters"
+__MOTEUR_EXE="$executableName"
