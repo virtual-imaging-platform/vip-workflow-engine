@@ -36,12 +36,12 @@ applicationName=$(grep -Po '"applicationName": *\K"[^"]*"' "$configurationJson" 
 jobId=$(grep -Po '"jobId": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
 invocationJson=$(grep -Po '"invocationJson": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
 serviceCall=$(grep -Po '"serviceCall": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
-downloads=$(grep -Po '"downloads": *\[\s*\K"[^"]*"' "$configurationJson" | sed 's/"//g')
+downloads=$(grep -Po '"downloads": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
 invocationString=$(grep -Po '"invocationString": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
 envVariables=$(grep -Po '"envVariables": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
 parameters=$(grep -Po '"parameters": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
 uploads=$(grep -Po '"uploads": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
-DownloadFiles=$(grep -Po '"DownloadFiles": *\[\s*\K"[^"]*"' "$configurationJson" | sed 's/"//g')
+downloadFiles=$(grep -Po '"downloadFiles": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
 outputDirName=$(grep -Po '"outputDirName": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
 
 LAB_DEFAULT_BACKGROUD_SCRIPT=$(grep -Po '"LAB_DEFAULT_BACKGROUD_SCRIPT": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
@@ -113,14 +113,12 @@ config=$(grep -Po '"config": *\K"[^"]*"' "$configurationJson" | sed 's/"//g')
 
 
 
+
 # Now you have all variables assigned from the JSON file
 # You can use them as needed in your script
 
 
 #jsonFileName="../workflow.json" #temporary variable
-
-
-sleep 5
 
 function info {
   local D=`date`
@@ -196,39 +194,47 @@ function checkCacheDownloadAndCacheLFN {
     # this variable is true <=> the file has to be downloaded again
     local download="true"
     # first check if the file is already in cache
-    local LOCALPATH=$(awk -v L=${LFN} '$1==L {print $2}' "$cacheDir/$cacheFile")
-    if [ "${LOCALPATH}" != "" ]; then
+    local LOCALPATH=`awk -v L=${LFN} '$1==L {print $2}' ${BASEDIR}/cache/cache.txt`
+    if [ "${LOCALPATH}" != "" ]
+    then
         info "There is an entry in the cache: test if the local file still here"
         local TIMESTAMP_LOCAL=""
         local TIMESTAMP_GRID=""
         local date_local=""
-        if [ -f "${LOCALPATH}" ]; then
+        test -f ${LOCALPATH}
+        if [ $? = 0 ]
+        then
             info "The file exists: checking if it was modified since it was added to the cache"
-            local YEAR=$(date +%Y)
-            local YEARBEFORE=$(expr ${YEAR} - 1)
-            local currentDate=$(date +%s)
-            local TIMESTAMP_CACHE=$(awk -v L=${LFN} '$1==L {print $3}' "$cacheDir/$cacheFile")
-            local LOCALMONTH=$(ls -la "${LOCALPATH}" | awk -F' ' '{print $6}')
-            local MONTHTIME=$(date -d "${LOCALMONTH} 1 00:00" +%s)
-            date_local=$(ls -la "${LOCALPATH}" | awk -F' ' '{print $6, $7, $8}')
-            if [ "${MONTHTIME}" -gt "${currentDate}" ]; then
-                TIMESTAMP_LOCAL=$(date -d "${date_local} ${YEARBEFORE}" +%s)
+            local YEAR=`date +%Y`
+            local YEARBEFORE=`expr ${YEAR} - 1`
+            local currentDate=`date +%s`
+            local TIMESTAMP_CACHE=`awk -v L=${LFN} '$1==L {print $3}' ${BASEDIR}/cache/cache.txt`
+            local LOCALMONTH=`ls -la ${LOCALPATH} | awk -F' ' '{print $6}'`
+            local MONTHTIME=`date -d "${LOCALMONTH} 1 00:00" +%s`
+            date_local=`ls -la ${LOCALPATH} | awk -F' ' '{print $6, $7, $8}'`
+            if [ "${MONTHTIME}" -gt "${currentDate}" ]
+            then
+                TIMESTAMP_LOCAL=`date -d "${date_local} ${YEARBEFORE}" +%s`
             else
-                TIMESTAMP_LOCAL=$(date -d "${date_local} ${YEAR}" +%s)
+                TIMESTAMP_LOCAL=`date -d "${date_local} ${YEAR}" +%s`
             fi
-            if [ "${TIMESTAMP_CACHE}" = "${TIMESTAMP_LOCAL}" ]; then
+            if [ "${TIMESTAMP_CACHE}" = "${TIMESTAMP_LOCAL}" ]
+            then
                 info "The file was not touched since it was added to the cache: test if it is up up-to-date"
-                local date_grid_s=$(lfc-ls -l "${LFN}" | awk -F' ' '{print $6, $7, $8}')
-                local MONTHGRID=$(echo "${date_grid_s}" | awk -F' ' '{print $1}')
-                MONTHTIME=$(date -d "${MONTHGRID} 1 00:00" +%s)
-                if [ "${MONTHTIME}" != "" ] && [ "${date_grid_s}" != "" ]; then
-                    if [ "${MONTHTIME}" -gt "${currentDate}" ]; then
+                local date_grid_s=`lfc-ls -l ${LFN} | awk -F' ' '{print $6, $7, $8}'`
+                local MONTHGRID=`echo ${date_grid_s} | awk -F' ' '{print $1}'`
+                MONTHTIME=`date -d "${MONTHGRID} 1 00:00" +%s`
+                if [ "${MONTHTIME}" != "" ] && [ "${date_grid_s}" != "" ]
+                then
+                    if [ "${MONTHTIME}" -gt "${currentDate}" ]
+                    then
                         # it must be last year
-                        TIMESTAMP_GRID=$(date -d "${date_grid_s} ${YEARBEFORE}" +%s)
+                        TIMESTAMP_GRID=`date -d "${date_grid_s} ${YEARBEFORE}" +%s`
                     else
-                        TIMESTAMP_GRID=$(date -d "${date_grid_s} ${YEAR}" +%s)
+                        TIMESTAMP_GRID=`date -d "${date_grid_s} ${YEAR}" +%s`
                     fi
-                    if [ "${TIMESTAMP_LOCAL}" -gt "${TIMESTAMP_GRID}" ]; then
+                    if [ "${TIMESTAMP_LOCAL}" -gt "${TIMESTAMP_GRID}" ]
+                    then
                         info "The file is up-to-date ; there is no need to download it again"
                         download="false"
                     else
@@ -246,19 +252,25 @@ function checkCacheDownloadAndCacheLFN {
     else
         info "There is no entry in the cache"
     fi
-    if [ "${download}" = "false" ]; then
+    if [ "${download}" = "false" ]
+    echo FALSEEEEEEEE
+    downloadLFN ${LFN}
+    then
         info "Linking file from cache: ${LOCALPATH}"
-        BASE=$(basename "${LFN}")
+        BASE=`basename ${LFN}`
         info "ln -s ${LOCALPATH} ./${BASE}"
-        ln -s "${LOCALPATH}" "./${BASE}"
+        ln -s  ${LOCALPATH} ./${BASE}
         return 0
     fi
-    if [ "${download}" = "true" ]; then
-        #downloadLFN "${LFN}"
-        if [ $? != 0 ]; then
+    if [ "${download}" = "true" ]
+    echo TRUEEEEEE
+    then
+        downloadLFN ${LFN}
+        if  [ $? != 0 ]
+        then
             return 1
         fi
-        addToCache "${LFN}" $(basename "${LFN}")
+        addToCache ${LFN} `basename ${LFN}`
         return 0
     fi
 }
@@ -372,43 +384,43 @@ function downloadLFN {
     # - "//" are not accepted, neither by dirac-dms-*, nor by dmkdir.
     LFN=$(echo ${LFN} | sed -r -e 's/^lfn://' -e 's#//#/#g')
 
-    echo "getting file size and computing sendReceiveTimeout"
+    info "getting file size and computing sendReceiveTimeout"
     local size=$(dirac-dms-lfn-metadata ${LFN} | grep Size | sed -r 's/.* ([0-9]+)L,/\1/')
-    local sendReceiveTimeout=$((${size:-0} / ${minAvgDownloadThroughput} / 1024))
-    
-    if [ -z "$sendReceiveTimeout" ] || [ $sendReceiveTimeout -le 900 ]; then
-        echo "sendReceiveTimeout empty or too small, setting it to 900s"
+            local sendReceiveTimeout=`echo $[${size:-0}/150/1024]`
+    if [ "$sendReceiveTimeout" = "" ] || [ $sendReceiveTimeout -le 900 ]
+    then
+        info "sendReceiveTimeout empty or too small, setting it to 900s"
         sendReceiveTimeout=900
     else
-        echo "sendReceiveTimeout is $sendReceiveTimeout"
+        info "sendReceiveTimeout is $sendReceiveTimeout"
     fi
 
     local LOCAL=${PWD}/`basename ${LFN}`
-    echo "Removing file ${LOCAL} in case it is already here"
+    info "Removing file ${LOCAL} in case it is already here"
     \rm -f ${LOCAL}
 
-    local totalTimeout=$((${timeout} + ${srmTimeout} + ${sendReceiveTimeout}))
+    local totalTimeout=$((10 + 30 + ${sendReceiveTimeout}))
 
     local LINE="time -p dirac-dms-get-file -d -o /Resources/StorageElements/GFAL_TIMEOUT=${totalTimeout} ${LFN}"
-    echo ${LINE}
+    info ${LINE}
     (${LINE}) &> get-file.log
 
-    if [ $? = 0 ]; then
-        echo "dirac-dms-get-file worked fine"
+    if [ $? = 0 ]
+    then
+        info "dirac-dms-get-file worked fine"
         local source=$(grep "generating url" get-file.log | tail -1 | sed -r 's/^.* (.*)\.$/\1/')
         local duration=$(grep -P '^real[ \t]' get-file.log | sed -r 's/real[ \t]//')
-        echo "DownloadCommand=dirac-dms-get-file Source=${source} Destination=$(hostname) Size=${size} Time=${duration}"
+        info "DownloadCommand=dirac-dms-get-file Source=${source} Destination=$(hostname) Size=${size} Time=${duration}"
         RET_VAL=0
     else
-        echo "dirac-dms-get-file failed"
-        echo "`cat get-file.log`"
+        error "dirac-dms-get-file failed"
+        error "`cat get-file.log`"
         RET_VAL=1
     fi
 
     \rm get-file.log
     return ${RET_VAL}
 }
-
 export -f downloadLFN
 #
 # URI are of the form of the following example. A single "/", instead
@@ -552,49 +564,53 @@ function downloadShanoirFile {
 function downloadURI {
 
     local URI=$1
-    local URI_LOWER=$(echo $1 | awk '{print tolower($0)}')
+    local URI_LOWER=`echo $1 | awk '{print tolower($0)}'`
 
-    if [[ ${URI_LOWER} == lfn* ]] || [[ $URI_LOWER == /* ]]; then
-        ## Extract the path part from the uri, and remove // if
-        ## present in path.
-        LFN=$(echo "${URI}" | sed -r -e 's%^\w+://[^/]*(/[^?]+)(\?.*)?$%\1%' -e 's#//#/#g')
+    if [[ ${URI_LOWER} == lfn* ]] || [[ $URI_LOWER == /* ]]
+    then
+                        LFN=`echo "${URI}" | sed -r -e 's%^\w+://[^/]*(/[^?]+)(\?.*)?$%\1%' -e 's#//#/#g'`
 
         checkCacheDownloadAndCacheLFN $LFN
         validateDownload "Cannot download LFN file"
     fi
 
-    if [[ ${URI_LOWER} == file:/* ]]; then
-        local FILENAME=$(echo $URI | sed 's%file://*%/%')
+    if [[ ${URI_LOWER} == file:/* ]]
+    then
+        local FILENAME=`echo $URI | sed 's%file://*%/%'`
         cp $FILENAME .
         validateDownload "Cannot copy input file: $FILENAME"
     fi
 
-    if [[ ${URI_LOWER} == http://* ]]; then
+    if [[ ${URI_LOWER} == http://* ]]
+    then
         curl --insecure -O ${URI}
         validateDownload "Cannot download HTTP file"
     fi
 
-    if [[ ${URI_LOWER} == girder:/* ]]; then
+    if [[ ${URI_LOWER} == girder:/* ]]
+    then
         downloadGirderFile ${URI}
         validateDownload "Cannot download Girder file"
     fi
 
-    if [[ ${URI_LOWER} == shanoir:/* ]]; then
+    if [[ ${URI_LOWER} == shanoir:/* ]]
+    then
         if [[ "$REFRESHING_JOB_STARTED" == false ]]; then
-           #set( $D = '$' )
-           refresh_token ${URI} &
-           REFRESH_PID=${D}!
+                      refresh_token ${URI} & 
+           REFRESH_PID=$!  
            REFRESHING_JOB_STARTED=true
         fi
         downloadShanoirFile ${URI}
         validateDownload "Cannot download shanoir file"
     fi
 
-    if [[ ${URI_LOWER} == srm:/* ]]; then
-            if [[ $(mountGfal ${URI}) -eq 0 ]]; then
-                isGfalmountExec=0
-            else
-                echo "Cannot download gfal file"
+    if [[ ${URI_LOWER} == srm:/* ]] 
+    then
+            if [[ $(mountGfal ${URI}) -eq 0 ]]
+                then
+                    isGfalmountExec=0
+                else
+                    echo "Cannot download gfal file"
             fi
     fi
 }
@@ -610,7 +626,6 @@ function validateDownload() {
 
 function addToCache {
     cacheDir=${BASEDIR}/cache
-    echo $cacheDir TTTTTTTTTTTTTTTTTTTTTT
     mkdir -p "$cacheDir"
     touch "$cacheDir/$cacheFile"
     local LFN="$1"
@@ -1072,27 +1087,46 @@ touch ../DISABLE_WATCHDOG_CPU_WALLCLOCK_CHECK
 
 ###################################################################################
 #temporary lines
-cp /vip/grida/downloads/biomed/user/a/abonnet/vip-tutorial-sbg/users/localadminfirstname_localadminlastname/grep.json ./grep.json
-ls
 # Download each file specified in $downloads
-#downloads="lfn://biomed/user/a/abonnet/vip-tutorial-sbg/groups/Support/Applications/GrepTest/0.1/json/GrepTest.json"
+#dirac-dms-get-file "/biomed/user/a/abonnet/vip-tutorial-sbg/groups/Support/Applications/GrepTest/0.1/json/GrepTest.json"
+#dirac-dms-get-file "/biomed/user/a/abonnet/vip-tutorial-sbg/users/localadminfirstname_localadminlastname/grep.json"
+#dirac-dms-get-file "/biomed/user/a/abonnet/vip-tutorial-sbg/users/localadminfirstname_localadminlastname/grep_local.json"
 #uploads="file:///vip/grida/downloads/biomed/user/a/abonnet/vip-tutorial-sbg/users/localadminfirstname_localadminlastname/"
-for download in $DownloadFiles; do
-    download=$(echo "$download" | tr -d '[]"')
+
+# Remove square brackets and leading/trailing whitespace from downloads
+downloads="${downloads#[}"
+downloads="${downloads%]}"
+downloads="${downloads// /}"
+downloadFiles="${downloadFiles#[}"
+downloadFiles="${downloadFiles%]}"
+downloadFiles="${downloadFiles// /}"
+
+IFS=',' read -ra download_array <<< "$downloads" && IFS=',' read -ra downloadFiles_array <<< "$downloadFiles"
+
+# Iterate over each URL in the 'downloads' array
+for download in "${download_array[@]}"; do
+    # Remove leading and trailing whitespace
+    download="$(echo -e "${download}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    # Process the URL using downloadURI function
     downloadURI "$download"
-    echo $download
-    __MOTEUR_IN="${__MOTEUR_IN};$download"
+    # Print the processed URL
+    echo "$download"
 done
+
+# Iterate over each URL in the 'downloadFiles' array
+for download in "${downloadFiles_array[@]}"; do
+    # Remove leading and trailing whitespace
+    download="$(echo -e "${download}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    # Process the URL using downloadURI function
+    downloadURI "$download"
+    # Print the processed URL
+    echo "$download"
+done
+
+
+#downloadLFN "/biomed/user/a/abonnet/vip-tutorial-sbg/users/localadminfirstname_localadminlastname/grep.json"
 ###################################################################################
 #temporary lines
-
-
-for download in $downloads; do
-    download=$(echo "$download" | tr -d '[]"')
-    downloadURI "$download"
-    __MOTEUR_IN="${__MOTEUR_IN};$download"
-done
-
 
 
 
@@ -1191,7 +1225,7 @@ function checkBosh {
 checkBosh $BOSH_CVMFS_PATH
 ####################################################################################################
 function boutiques_exec {
-jsonFileName="../workflow.json"
+#jsonFileName="../workflow.json"
 echo "import sys; sys.setdefaultencoding(\"UTF8\")" > sitecustomize.py
 COMMAND_LINE="PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch -x --provenance_path ./provenance_file.json $jsonFileName ../inv/$invocationJson -v $PWD/../cache:$PWD/../cache"
 # Execute the command and store the output in a temporary file
@@ -1284,7 +1318,7 @@ fi
 
 # Iterate through output files to upload
 function createOutputDir() {
-    uploads=${uploads}/${outputDirName}
+    uploads=${uploads}
     input=$uploads
     path=$(echo "$input" | sed -E 's/(lfn|file):\/\///')
     dmkdir "$path"

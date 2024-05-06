@@ -1,77 +1,40 @@
-
-<!-- 
-Copyright and authors: see LICENSE.txt in base repository.
-
-This software is a web portal for pipeline execution on distributed systems.
-
-This software is governed by the CeCILL-B license under French law and
-abiding by the rules of distribution of free software.  You can  use,
-modify and/ or redistribute the software under the terms of the CeCILL-B
-license as circulated by CEA, CNRS and INRIA at the following URL
-"http://www.cecill.info".
-
-As a counterpart to the access to the source code and  rights to copy,
-modify and redistribute granted by the license, users are provided only
-with a limited warranty  and the software's author,  the holder of the
-economic rights,  and the successive licensors  have only  limited
-liability.
-
-In this respect, the user's attention is drawn to the risks associated
-with loading,  using,  modifying and/or developing or reproducing the
-software by the user in light of its specific status of free software,
-that may mean  that it is complicated to manipulate,  and  that  also
-therefore means  that it is reserved for developers  and  experienced
-professionals having in-depth computer knowledge. Users are therefore
-encouraged to load and test the software's suitability as regards their
-requirements in conditions enabling the security of their systems and/or
-data to be ensured and,  more generally, to use and operate it in the
-same conditions as regards security.
-
-The fact that you are presently reading this means that you have had
-knowledge of the CeCILL-B license and that you accept its terms.
-
- -->
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<modelVersion>4.0.0</modelVersion>
-<groupId>fr.insalyon.creatis</groupId>
-<artifactId>moteurlite</artifactId>
-<version>${revision}${sha1}${changelist}</version>
-<name>MoteurLite</name>
-<properties>
-<!--  project version. Only to change it here (and in CoreConstants.java
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>fr.insalyon.creatis</groupId>
+   <artifactId>moteurlite</artifactId>
+   <version>${revision}${sha1}${changelist}</version>
+   <name>MoteurLite</name>
+   <properties>
+      <!--  project version. Only to change it here (and in CoreConstants.java
            Follow this practice : https://maven.apache.org/maven-ci-friendly.html -->
-<revision>0.1</revision>
-<log4jdbc.log4j2.version>1.16</log4jdbc.log4j2.version>
-<changelist/>
-<sha1/>
-<!--  other maven config  -->
-<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-<maven.compiler.target>11</maven.compiler.target>
-<maven.compiler.source>11</maven.compiler.source>
-</properties>
-<description>VIP</description>
-<inceptionYear>2010</inceptionYear>
-<url>http://vip.creatis.insa-lyon.fr:9002/projects/vip</url>
-<licenses>
-<license>
-<name>CeCILL-B, Version 1.0</name>
-<url>http://www.cecill.info/</url>
-<distribution>repo</distribution>
-</license>
-</licenses>
-<organization>
-<name>CREATIS</name>
-<url>http://www.creatis.insa-lyon.fr/</url>
-</organization>
-<dependencies>
-    
-<!--  <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>moteur2-workflowsdb-common</artifactId>
-            <version>1.5</version>
-            <scope>provided</scope>
-        </dependency>  
-        <dependency>
+      <revision>0.1</revision>
+      <log4jdbc.log4j2.version>1.16</log4jdbc.log4j2.version>
+      <!-- VIP related dependencies version -->
+      <moteur2-workflowsdb-common.version>1.6</moteur2-workflowsdb-common.version>
+      <changelist />
+      <sha1 />
+      <!--  other maven config  -->
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <maven.compiler.target>11</maven.compiler.target>
+      <maven.compiler.source>11</maven.compiler.source>
+   </properties>
+   <description>VIP</description>
+   <inceptionYear>2010</inceptionYear>
+   <url>http://vip.creatis.insa-lyon.fr:9002/projects/vip</url>
+   <licenses>
+      <license>
+         <name>CeCILL-B, Version 1.0</name>
+         <url>http://www.cecill.info/</url>
+         <distribution>repo</distribution>
+      </license>
+   </licenses>
+   <organization>
+      <name>CREATIS</name>
+      <url>http://www.creatis.insa-lyon.fr/</url>
+   </organization>
+   <dependencies>
+      <!--  <dependency>
             <groupId>com.github.sandepat</groupId>
             <artifactId>GASW</artifactId>
             <version>377851c196</version>
@@ -84,214 +47,204 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <scope>system</scope>
             <systemPath>/mnt/c/Users/patil/projects/MoteurLite/Java_Packages_for_MoteurLite/MoteurLite/ZONE/GASW/target/gasw-3.10.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
         </dependency>-->
-
-        <dependency>
-            <groupId>com.github.sandepat</groupId>
-            <artifactId>GASW</artifactId>
-            <version>4463fc47a5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.8</version> <!-- or the latest version -->
-        </dependency>
-
-
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>moteur2-workflowsdb-plugin</artifactId>
-            <version>1.6</version>
-        </dependency>
-
-<dependency>
-<groupId>fr.cnrs.i3s</groupId>
-<artifactId>moteur2-common</artifactId>
-<version>0.9.21</version>
-<scope>provided</scope>
-<exclusions>
-<exclusion>
-<groupId>fr.cnrs.i3s</groupId>
-<artifactId>*</artifactId>
-</exclusion>
-<exclusion>
-<groupId>fr.insalyon.creatis.shiwapool</groupId>
-<artifactId>shiwa-pool-client</artifactId>
-</exclusion>
-</exclusions>
-</dependency>
-<dependency>
-<groupId>com.h2database</groupId>
-<artifactId>h2</artifactId>
-<!-- version>1.3.173</version -->
-<version>1.4.196</version>
-<scope>runtime</scope>
-</dependency>
-<dependency>
-<groupId>mysql</groupId>
-<artifactId>mysql-connector-java</artifactId>
-<version>5.1.36</version>
-</dependency>
-<dependency>
-<groupId>com.google.gwt</groupId>
-<artifactId>gwt-dev</artifactId>
-<version>2.8.0</version>
-</dependency>
-<dependency>
-<groupId>com.isomorphic.smartgwt.lgpl</groupId>
-<artifactId>smartgwt-lgpl</artifactId>
-<version>12.0p</version>
-</dependency>
-<dependency>
-<groupId>com.jayway.jsonpath</groupId>
-<artifactId>json-path</artifactId>
-<version>2.2.0</version>
-<scope>test</scope>
-</dependency>
-<dependency>
-<groupId>com.googlecode.json-simple</groupId>
-<artifactId>json-simple</artifactId>
-<version>1.1.1</version>
-</dependency>
-<dependency>
-<groupId>com.google.gwt</groupId>
-<artifactId>gwt-user</artifactId>
-<version>2.8.0</version>
-<exclusions>
-<!--  it is in conflict with jakarta.validation-api (aka validation api 2.0)
-                 that is needed in vip-api for validation within spring mvc  -->
-<exclusion>
-<artifactId>validation-api</artifactId>
-<groupId>javax.validation</groupId>
-</exclusion>
-</exclusions>
-</dependency>
-<dependency>
-<groupId>com.fasterxml.jackson.core</groupId>
-<artifactId>jackson-core</artifactId>
-<version>2.13.0</version>
-</dependency>
-<dependency>
-<groupId>com.fasterxml.jackson.core</groupId>
-<artifactId>jackson-annotations</artifactId>
-<version>2.13.0</version>
-</dependency>
-<dependency>
-<groupId>com.fasterxml.jackson.core</groupId>
-<artifactId>jackson-databind</artifactId>
-<version>2.13.0</version>
-</dependency>
-<dependency>
-    <groupId>log4j</groupId>
-    <artifactId>log4j</artifactId>
-    <version>1.2.17</version> <!-- Use the appropriate version -->
-</dependency>
-<dependency>
-    <groupId>net.xeoh.plugins</groupId>
-    <artifactId>jspf-core</artifactId>
-    <version>1.0.2</version>
-</dependency>
-<dependency>
-    <groupId>org.apache.jena</groupId>
-    <artifactId>jena-arq</artifactId>
-    <version>4.10.0</version>
-</dependency>
-<dependency>
-	<groupId>org.apache.ant</groupId>
-	<artifactId>ant-launcher</artifactId>
-	<version>1.10.14</version>
-</dependency>
-<dependency>
-    <groupId>org.apache.velocity</groupId>
-    <artifactId>velocity</artifactId>
-    <version>1.7</version>
-</dependency>
-
-</dependencies>
-<repositories>
-
-        <repository>
-            <id>central</id>
-            <url>https://repo.maven.apache.org/maven2</url>
-        </repository>
-
-    
-    <repository>
-        <id>custom-repo</id>
-        <url>https://korpling.german.hu-berlin.de/maven2</url>
-    </repository>
-<repository>
-<id>creatis</id>
-<name>Creatis Insa Lyon repository [creatis]</name>
-<url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
-</repository>
-<!--  repo used to get empty jar for commons logging and log4j  -->
-<repository>
-<id>version99</id>
-<!--  highly available repository serving empty artifacts  -->
-<url>https://version99.qos.ch/</url>
-</repository>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-</repositories>
-<distributionManagement>
-<repository>
-<id>creatis-releases</id>
-<name>Internal Releases</name>
-<url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/releases</url>
-</repository>
-<snapshotRepository>
-<id>creatis-snapshots</id>
-<name>Internal Snapshots</name>
-<url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/snapshots</url>
-</snapshotRepository>
-</distributionManagement>
-
-<build>
-    <plugins>
-
-        <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath> <mainClass>fr.insalyon.creatis.moteurlite.MoteurLite</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-        </plugin>
-        
-    
- 
-        <plugin>
+      <dependency>
+         <groupId>com.github.sandepat</groupId>
+         <artifactId>GASW</artifactId>
+         <version>a497bbd801</version>
+      </dependency>
+      <dependency>
+         <groupId>com.googlecode.json-simple</groupId>
+         <artifactId>json-simple</artifactId>
+         <version>1.1.1</version>
+      </dependency>
+      <dependency>
+         <groupId>com.google.code.gson</groupId>
+         <artifactId>gson</artifactId>
+         <version>2.8.8</version>
+         <!-- or the latest version -->
+      </dependency>
+            <dependency>
+         <groupId>fr.insalyon.creatis</groupId>
+         <artifactId>moteur2-workflowsdb-common</artifactId>
+         <version>1.6</version>
+      </dependency>
+      <dependency>
+         <groupId>fr.insalyon.creatis</groupId>
+         <artifactId>moteur2-workflowsdb-plugin</artifactId>
+         <version>1.6</version>
+      </dependency>
+      <dependency>
+         <groupId>fr.cnrs.i3s</groupId>
+         <artifactId>moteur2-common</artifactId>
+         <version>0.9.21</version>
+         <scope>provided</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>fr.cnrs.i3s</groupId>
+               <artifactId>*</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>fr.insalyon.creatis.shiwapool</groupId>
+               <artifactId>shiwa-pool-client</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>com.h2database</groupId>
+         <artifactId>h2</artifactId>
+         <!-- version>1.3.173</version -->
+         <version>1.4.196</version>
+         <scope>runtime</scope>
+      </dependency>
+      <dependency>
+         <groupId>mysql</groupId>
+         <artifactId>mysql-connector-java</artifactId>
+         <version>5.1.36</version>
+      </dependency>
+      <dependency>
+         <groupId>com.google.gwt</groupId>
+         <artifactId>gwt-dev</artifactId>
+         <version>2.8.0</version>
+      </dependency>
+      <dependency>
+         <groupId>com.isomorphic.smartgwt.lgpl</groupId>
+         <artifactId>smartgwt-lgpl</artifactId>
+         <version>12.0p</version>
+      </dependency>
+      <dependency>
+         <groupId>com.jayway.jsonpath</groupId>
+         <artifactId>json-path</artifactId>
+         <version>2.2.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>com.googlecode.json-simple</groupId>
+         <artifactId>json-simple</artifactId>
+         <version>1.1.1</version>
+      </dependency>
+      <dependency>
+         <groupId>com.google.gwt</groupId>
+         <artifactId>gwt-user</artifactId>
+         <version>2.8.0</version>
+         <exclusions>
+            <!--  it is in conflict with jakarta.validation-api (aka validation api 2.0) that is needed in vip-api for validation within spring mvc  -->
+            <exclusion>
+               <artifactId>validation-api</artifactId>
+               <groupId>javax.validation</groupId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-core</artifactId>
+         <version>2.13.0</version>
+      </dependency>
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-annotations</artifactId>
+         <version>2.13.0</version>
+      </dependency>
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-databind</artifactId>
+         <version>2.13.0</version>
+      </dependency>
+      <dependency>
+         <groupId>log4j</groupId>
+         <artifactId>log4j</artifactId>
+         <version>1.2.17</version>
+         <!-- Use the appropriate version -->
+      </dependency>
+      <dependency>
+         <groupId>net.xeoh.plugins</groupId>
+         <artifactId>jspf-core</artifactId>
+         <version>1.0.2</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.jena</groupId>
+         <artifactId>jena-arq</artifactId>
+         <version>4.10.0</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.ant</groupId>
+         <artifactId>ant-launcher</artifactId>
+         <version>1.10.14</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.velocity</groupId>
+         <artifactId>velocity</artifactId>
+         <version>1.7</version>
+      </dependency>
+   </dependencies>
+   <repositories>
+      <repository>
+         <id>central</id>
+         <url>https://repo.maven.apache.org/maven2</url>
+      </repository>
+      <repository>
+         <id>custom-repo</id>
+         <url>https://korpling.german.hu-berlin.de/maven2</url>
+      </repository>
+      <repository>
+         <id>creatis</id>
+         <name>Creatis Insa Lyon repository [creatis]</name>
+         <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
+      </repository>
+      <!--  repo used to get empty jar for commons logging and log4j  -->
+      <repository>
+         <id>version99</id>
+         <!--  highly available repository serving empty artifacts  -->
+         <url>https://version99.qos.ch/</url>
+      </repository>
+      <repository>
+         <id>jitpack.io</id>
+         <url>https://jitpack.io</url>
+      </repository>
+   </repositories>
+   <distributionManagement>
+      <repository>
+         <id>creatis-releases</id>
+         <name>Internal Releases</name>
+         <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/releases</url>
+      </repository>
+      <snapshotRepository>
+         <id>creatis-snapshots</id>
+         <name>Internal Snapshots</name>
+         <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/snapshots</url>
+      </snapshotRepository>
+   </distributionManagement>
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.4</version>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addClasspath>true</addClasspath>
+                     <mainClass>fr.insalyon.creatis.moteurlite.MoteurLite</mainClass>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.2.4</version> <!-- Use the latest version -->
+            <version>3.2.4</version>
+            <!-- Use the latest version -->
             <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>shade</goal>
-                    </goals>
-                    <configuration>
-                        <createDependencyReducedPom>false</createDependencyReducedPom>
-                    </configuration>
-                </execution>
+               <execution>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>shade</goal>
+                  </goals>
+                  <configuration>
+                     <createDependencyReducedPom>false</createDependencyReducedPom>
+                  </configuration>
+               </execution>
             </executions>
-        </plugin>
-
-    </plugins>
-
-</build>
-
-
+         </plugin>
+      </plugins>
+   </build>
 </project>

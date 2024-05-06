@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import fr.insalyon.creatis.moteurlite.Iteration.JsonIteration;
+import fr.insalyon.creatis.moteurlite.iterationStrategy.JsonIteration;
 
 public class JsonIterationTest {
 
@@ -20,6 +20,7 @@ public class JsonIterationTest {
     static Map<String, List<String>> inputMap = new HashMap<>();
     static Set<String> crossKeys = new HashSet<>();
     static Set<String> dotKeys = new HashSet<>();
+    static Set<String> inputOptional = new HashSet<>();
 
     @Test
     public void testJsonIteration() {
@@ -38,7 +39,7 @@ public class JsonIterationTest {
     public void testDotKeys() {
         System.out.println("Test 1: Dot keys provided");
         dotKeys.addAll(Arrays.asList("text", "flag"));
-        combinedCombinations = JsonIteration.jsonIteration(inputMap, crossKeys, dotKeys);
+        combinedCombinations = JsonIteration.jsonIteration(inputMap, crossKeys, dotKeys, inputOptional);
         String expectedOutput = getExpectedOutputForDotKeys();
         String actualOutput = combinedCombinations.toString();
         System.out.println("Combined Combinations: " + actualOutput);
@@ -50,7 +51,7 @@ public class JsonIterationTest {
     // Test 2: No keys provided. All keys should be considered cross
     public void testNoKeys() {
         System.out.println("Test 2: All keys should be considered cross");
-        combinedCombinations = JsonIteration.jsonIteration(inputMap, crossKeys, dotKeys);
+        combinedCombinations = JsonIteration.jsonIteration(inputMap, crossKeys, dotKeys, inputOptional);
         String expectedOutput = getExpectedOutputForNoKeys();
         String actualOutput = combinedCombinations.toString();
         System.out.println("Combined Combinations: " + actualOutput);
@@ -63,7 +64,7 @@ public class JsonIterationTest {
     public void testIncorrectKeys() {
         System.out.println("Test 3: Incorrect keys in dot and/or cross");
         dotKeys.addAll(Collections.singletonList("fil")); // Incorrect dot key
-        combinedCombinations = JsonIteration.jsonIteration(inputMap, crossKeys, dotKeys);
+        combinedCombinations = JsonIteration.jsonIteration(inputMap, crossKeys, dotKeys, inputOptional);
         String expectedOutput = getExpectedOutputForIncorrectKeys();
         String actualOutput = combinedCombinations.toString();
         System.out.println("Combined Combinations: " + actualOutput);
