@@ -1,76 +1,134 @@
 package fr.insalyon.creatis.moteurlite;
 
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import fr.insalyon.creatis.gasw.Gasw;
-import fr.insalyon.creatis.moteurlite.boutiquesParser.ParseBoutiquesFile;
+import fr.insalyon.creatis.gasw.GaswInput;
+import fr.insalyon.creatis.gasw.parser.GaswParser;
+import fr.insalyon.creatis.moteurlite.boutiquesParser.BoutiquesEntities;
+import fr.insalyon.creatis.moteurlite.boutiquesParser.BoutiquesService;
 import fr.insalyon.creatis.moteurlite.inputsParser.ParseInputsFile;
 import fr.insalyon.creatis.moteurlite.iterationStrategy.IterationStrategy;
 
 /**
  * 
- * @author Sandesh Patil [https://github.com/sandepat]
+ * Author: Sandesh Patil [https://github.com/sandepat]
  * 
  */
 
 public class MoteurLite {
     private Gasw gasw = Gasw.getInstance();
     private int sizeOfInputs;
-    private String bashScript;
-    IterationStrategy iterationStrategy = new IterationStrategy();
-    Workflowsdb workflowsdb = new Workflowsdb();
+    private IterationStrategy iterationStrategy = new IterationStrategy();
+    private Workflowsdb workflowsdb = new Workflowsdb();
+    private static ScriptLoader scriptLoader = new ScriptLoader();
 
     public static void main(String[] args) throws Exception {
         new MoteurLite(args);
     }
 
     public MoteurLite(String[] args) throws Exception {
+        // Verify arguments
+        if (args.length != 3) {
+            throw new IllegalArgumentException("Exactly 3 arguments are required: workflowId, boutiquesFilePath, inputsFilePath.");
+        }
+
         String workflowId = args[0];
         String boutiquesFilePath = args[1];
         String inputsFilePath = args[2];
 
-        //load bash script
-        bashScript = ScriptLoader.loadBashScript();
+        // Check if arguments are not null or empty
+        for (String arg : args) {
+            if (arg == null || arg.trim().isEmpty()) {
+                throw new IllegalArgumentException("Arguments cannot be null or empty.");
+            }
+        }
 
-        //parse boutiques file
-        ParseBoutiquesFile parseBoutiquesFile = new ParseBoutiquesFile(boutiquesFilePath);
-        String executableName = parseBoutiquesFile.getNameOfBoutiquesFile();
-        String applicationName = parseBoutiquesFile.getApplicationName();
-        HashMap<Integer, String> inputBoutiquesId = parseBoutiquesFile.getinputIdOfBoutiquesFile();
-        HashMap<Integer, String> outputBoutiquesId = parseBoutiquesFile.getoutputIdOfBoutiquesFile();
-        HashMap<String, String> inputBoutiquesType = parseBoutiquesFile.getinputTypeOfBoutiquesFile();
-        Set<String> getCrossMap = parseBoutiquesFile.getCrossMap();
-        Set<String> getDotMap = parseBoutiquesFile.getDotMap();
-        Set<String> inputOptional = parseBoutiquesFile.getinputOptionalOfBoutiquesFile();
+        // Validate workflowId as a non-empty string
+        if (!isValidWorkflowId(workflowId)) {
+            throw new IllegalArgumentException("Invalid workflowId. It should be a simple non-empty string.");
+        }
+
+        // Validate boutiquesFilePath as a JSON file
+        if (!boutiquesFilePath.endsWith(".json")) {
+            throw new IllegalArgumentException("Invalid boutiquesFilePath. It should be a JSON file.");
+        }
+
+        // Validate inputsFilePath as an XML file
+        if (!inputsFilePath.endsWith(".xml")) {
+            throw new IllegalArgumentException("Invalid inputsFilePath. It should be an XML file.");
+        }
+
+        // Parse boutiques file
+        BoutiquesService boutiquesService = new BoutiquesService();
+        BoutiquesEntities boutiquesEntities = boutiquesService.parseFile(boutiquesFilePath);
+        String executableName = boutiquesService.getNameOfBoutiquesFile();
+        String applicationName = boutiquesService.getApplicationName();
+        HashMap<Integer, String> inputBoutiquesId = boutiquesService.getInputIdOfBoutiquesFile();
+        HashMap<Integer, String> outputBoutiquesId = boutiquesService.getOutputIdOfBoutiquesFile();
+        HashMap<String, String> inputBoutiquesType = boutiquesService.getInputTypeOfBoutiquesFile();
+        Set<String> crossMap = boutiquesService.getCrossMap();
+        Set<String> dotMap = boutiquesService.getDotMap();
+        Set<String> inputOptional = boutiquesService.getInputOptionalOfBoutiquesFile();
         
-        //parse inputs
+        // Parse inputs
         ParseInputsFile inputsParser = new ParseInputsFile(inputsFilePath);
         List<Map<String, String>> inputData = inputsParser.getInputData();
-        //Map<String, String> inputType = inputsParser.getInputTypeMap();
         Map<String, String> inputType = inputBoutiquesType;
         Map<String, String> resultsDirectory = inputsParser.getResultDirectory();
 
-
-        //set workflowsdb
+        // Set workflowsdb
         workflowsdb.persistInputs(workflowId, inputData, inputType, resultsDirectory);
 
-        //set iteration strategy
-        iterationStrategy.IterationStratergy(inputData, resultsDirectory, getCrossMap, getDotMap, inputOptional);
+        // Set iteration strategy
+        iterationStrategy.IterationStratergy(inputData, resultsDirectory, crossMap, dotMap, inputOptional);
         List<Map<String, String>> jsonIterations = iterationStrategy.getJsonIterations();
-        List<Map<String, String>> inputs = new ArrayList<>();
-        inputs = jsonIterations;
-        sizeOfInputs = inputs.size();
+        sizeOfInputs = jsonIterations.size();
 
-        //set gasw monitoring
+        // Set gasw monitoring
         GaswMonitor gaswMonitor = new GaswMonitor(workflowId, applicationName, outputBoutiquesId, sizeOfInputs, gasw);
         gasw.setNotificationClient(gaswMonitor);
         gaswMonitor.start();
 
-        //create jobs
-        JobCreator.createJobs(inputs, applicationName, boutiquesFilePath, executableName, inputBoutiquesId, outputBoutiquesId, inputType, resultsDirectory, workflowId, gasw, bashScript);
+        // Create jobs
+        createJobs(jsonIterations, applicationName, boutiquesFilePath, executableName, inputBoutiquesId, outputBoutiquesId, inputType, resultsDirectory, workflowId, gasw, scriptLoader.loadBashScript());
+    }
+
+    public static void createJobs(List<Map<String, String>> inputs, String applicationName, String boutiquesFilePath, String executableName, HashMap<Integer, String> inputBoutiquesId, HashMap<Integer, String> outputBoutiquesId, Map<String, String> inputType, Map<String, String> resultsDirectory, String workflowId, Gasw gasw, String bashScript) throws Exception {
+        for (Map<String, String> innerList : inputs) {
+            Map<String, String> inputsMap = new HashMap<>();
+            Map<String, String> invocation = new HashMap<>();
+
+            for (Map.Entry<String, String> entry : innerList.entrySet()) {
+                inputsMap.put(entry.getKey(), entry.getValue());
+                if (!entry.getKey().equals("results-directory")) {
+                    invocation.put(entry.getKey(), entry.getValue());
+                }
+            }
+
+            List<URI> downloadFiles = ParseInputsFile.getDownloadFiles(inputsMap);
+            String outputDirName = "outputDirectoryName(applicationName)";
+
+            GaswParser gaswParser = new GaswParser();
+            String invocationString = CreateInvocation.convertMapToJson(invocation, inputType);
+            String jobId = applicationName + "-" + System.nanoTime() + ".sh";
+            GaswInput gaswInput = gaswParser.getGaswInput(applicationName, inputsMap, boutiquesFilePath, executableName,
+                    inputBoutiquesId, outputBoutiquesId, invocationString, resultsDirectory, jobId, scriptLoader.loadBashScript(), downloadFiles, outputDirName);
+            gasw.submit(gaswInput);
+            System.out.println("Job launched: " + jobId);
+        }
+    }
+
+    /**
+     * Validates the workflowId as a non-empty string.
+     * @param workflowId The workflow ID to validate.
+     * @return true if the workflowId is valid, false otherwise.
+     */
+    private boolean isValidWorkflowId(String workflowId) {
+        return workflowId != null && !workflowId.trim().isEmpty();
     }
 }

@@ -13,25 +13,36 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.gasw.GaswException;
 
-public class ParseBoutiquesFile {
-    String nameOfBoutiquesFile;
-    String applicationName;
-    java.util.HashMap<Integer, String> inputIdOfBoutiquesFile;
-    java.util.HashMap<Integer, String> outputIdOfBoutiquesFile;
-    HashMap<String, String> inputTypeOfBoutiquesFile;
-    HashMap<String, String> inputValueKeyOfBoutiquesFile;
-    HashMap<String, String> outputPathTemplateOfBoutiquesFile;
-    Set<String> crossMap;
-    Set<String> dotMap;
-    Set<String> inputOptionalOfBoutiquesFile;
+/**
+ * 
+ * @author Sandesh Patil [https://github.com/sandepat]
+ * 
+ */
 
-    public ParseBoutiquesFile(String boutiquesDescriptorString) throws FileNotFoundException, IOException,
+public class BoutiquesService {
+    private String nameOfBoutiquesFile;
+    private String applicationName;
+    private HashMap<Integer, String> inputIdOfBoutiquesFile;
+    private HashMap<Integer, String> outputIdOfBoutiquesFile;
+    private HashMap<String, String> inputTypeOfBoutiquesFile;
+    private HashMap<String, String> inputValueKeyOfBoutiquesFile;
+    private HashMap<String, String> outputPathTemplateOfBoutiquesFile;
+    private Set<String> crossMap;
+    private Set<String> dotMap;
+    private Set<String> inputOptionalOfBoutiquesFile;
+
+    public BoutiquesService() {
+        // Default constructor
+    }
+
+    public BoutiquesEntities parseFile(String boutiquesDescriptorString) throws FileNotFoundException, IOException,
             InvalidBoutiquesDescriptorException, GaswException, ParseException {
         Object object = new JSONParser().parse(new FileReader(boutiquesDescriptorString));
         String objeString = String.valueOf(object);
 
         ObjectMapper objectMapper = new ObjectMapper();
         BoutiquesEntities boutiquesEntities = objectMapper.readValue(objeString, BoutiquesEntities.class);
+        
         this.nameOfBoutiquesFile = boutiquesEntities.getName() + ".json";
         this.applicationName = nameOfBoutiquesFile.substring(0, nameOfBoutiquesFile.lastIndexOf('.'));
         this.inputIdOfBoutiquesFile = boutiquesEntities.getInputId();
@@ -42,6 +53,8 @@ public class ParseBoutiquesFile {
         this.inputValueKeyOfBoutiquesFile = boutiquesEntities.getInputValueKey();
         this.inputOptionalOfBoutiquesFile = boutiquesEntities.getInputOptional();
         this.outputPathTemplateOfBoutiquesFile = boutiquesEntities.getOutputPathTemplateList();
+
+        return boutiquesEntities;
     }
 
     public String getNameOfBoutiquesFile() {
@@ -52,27 +65,27 @@ public class ParseBoutiquesFile {
         return applicationName;
     }
 
-    public java.util.HashMap<Integer, String> getinputIdOfBoutiquesFile() {
+    public HashMap<Integer, String> getInputIdOfBoutiquesFile() {
         return inputIdOfBoutiquesFile;
     }
 
-    public java.util.HashMap<Integer, String> getoutputIdOfBoutiquesFile() {
+    public HashMap<Integer, String> getOutputIdOfBoutiquesFile() {
         return outputIdOfBoutiquesFile;
     }
 
-    public java.util.HashMap<String, String> getinputTypeOfBoutiquesFile() {
+    public HashMap<String, String> getInputTypeOfBoutiquesFile() {
         return inputTypeOfBoutiquesFile;
     }
 
-    public java.util.HashMap<String, String> getinputValueKeyOfBoutiquesFile() {
+    public HashMap<String, String> getInputValueKeyOfBoutiquesFile() {
         return inputValueKeyOfBoutiquesFile;
     }
 
-    public java.util.Set<String> getinputOptionalOfBoutiquesFile() {
+    public Set<String> getInputOptionalOfBoutiquesFile() {
         return inputOptionalOfBoutiquesFile;
     }
 
-    public java.util.HashMap<String, String> getoutputPathTemplateOfBoutiquesFile() {
+    public HashMap<String, String> getOutputPathTemplateOfBoutiquesFile() {
         return outputPathTemplateOfBoutiquesFile;
     }
 

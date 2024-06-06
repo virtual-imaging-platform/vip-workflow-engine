@@ -52,6 +52,7 @@ public class BoutiquesEntities {
         Map<String, String> dotMap = new HashMap<>();
         private Set<String> crossSet = new HashSet<>();
         private Set<String> dotSet = new HashSet<>();
+        private Set<String> containerSet = new HashSet<>();
         private Set<String> inputOptionalSet = new HashSet<>();
     
         @JsonProperty("author")
@@ -110,10 +111,14 @@ public class BoutiquesEntities {
         }
     
         private void handleKeyValue(String key, String value) {
-            if (key.contains("VIPcross")) {
+            if (key.contains("VIP:cross")) {
                 crossSet.add(value);
-            } else if (key.contains("VIPdot")) {
+            } 
+            else if (key.contains("VIP:dot-inputs")) {
                 dotSet.add(value);
+            }
+            else if (key.contains("VIP:imagepath")) {
+                containerSet.add(value);
             }
         }
     
@@ -140,6 +145,10 @@ public class BoutiquesEntities {
         @JsonProperty("description")
         public String getDescription() {
             return description;
+        }
+
+        public Set<String> getContainerSet() {
+            return containerSet;
         }
     
         @JsonProperty("description")
