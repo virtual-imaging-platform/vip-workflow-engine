@@ -22,6 +22,7 @@ import fr.insalyon.creatis.moteurlite.iterationStrategy.IterationStrategy;
 
 public class MoteurLite {
     private Gasw gasw = Gasw.getInstance();
+    private BoutiquesService boutiquesService = new BoutiquesService();
     private int sizeOfInputs;
     private IterationStrategy iterationStrategy = new IterationStrategy();
     private Workflowsdb workflowsdb = new Workflowsdb();
@@ -49,7 +50,7 @@ public class MoteurLite {
         }
 
         // Validate workflowId as a non-empty string
-        if (!isValidWorkflowId(workflowId)) {
+        if (workflowId == null || workflowId.trim().isEmpty()) {
             throw new IllegalArgumentException("Invalid workflowId. It should be a simple non-empty string.");
         }
 
@@ -64,7 +65,6 @@ public class MoteurLite {
         }
 
         // Parse boutiques file
-        BoutiquesService boutiquesService = new BoutiquesService();
         BoutiquesEntities boutiquesEntities = boutiquesService.parseFile(boutiquesFilePath);
         String executableName = boutiquesService.getNameOfBoutiquesFile();
         String applicationName = boutiquesService.getApplicationName();
@@ -128,7 +128,4 @@ public class MoteurLite {
      * @param workflowId The workflow ID to validate.
      * @return true if the workflowId is valid, false otherwise.
      */
-    private boolean isValidWorkflowId(String workflowId) {
-        return workflowId != null && !workflowId.trim().isEmpty();
-    }
 }
