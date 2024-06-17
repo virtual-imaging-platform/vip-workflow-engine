@@ -28,6 +28,15 @@ public class MoteurLite {
     private Workflowsdb workflowsdb = new Workflowsdb();
     private static ScriptLoader scriptLoader = new ScriptLoader();
 
+    private String applicationName;
+    private String boutiquesFilePath;
+    private String executableName;
+    private HashMap<Integer, String> inputBoutiquesId;
+    private HashMap<Integer, String> outputBoutiquesId;
+    private Map<String, String> inputType;
+    private Map<String, String> resultsDirectory;
+    private String workflowId;
+
     public static void main(String[] args) throws Exception {
         new MoteurLite(args);
     }
@@ -38,8 +47,8 @@ public class MoteurLite {
             throw new IllegalArgumentException("Exactly 3 arguments are required: workflowId, boutiquesFilePath, inputsFilePath.");
         }
 
-        String workflowId = args[0];
-        String boutiquesFilePath = args[1];
+        workflowId = args[0];
+        boutiquesFilePath = args[1];
         String inputsFilePath = args[2];
 
         // Check if arguments are not null or empty
@@ -64,22 +73,20 @@ public class MoteurLite {
             throw new IllegalArgumentException("Invalid inputsFilePath. It should be an XML file.");
         }
 
-        // Parse boutiques file
         BoutiquesEntities boutiquesEntities = boutiquesService.parseFile(boutiquesFilePath);
-        String executableName = boutiquesService.getNameOfBoutiquesFile();
-        String applicationName = boutiquesService.getApplicationName();
-        HashMap<Integer, String> inputBoutiquesId = boutiquesService.getInputIdOfBoutiquesFile();
-        HashMap<Integer, String> outputBoutiquesId = boutiquesService.getOutputIdOfBoutiquesFile();
-        HashMap<String, String> inputBoutiquesType = boutiquesService.getInputTypeOfBoutiquesFile();
-        Set<String> crossMap = boutiquesService.getCrossMap();
-        Set<String> dotMap = boutiquesService.getDotMap();
-        Set<String> inputOptional = boutiquesService.getInputOptionalOfBoutiquesFile();
+        executableName = boutiquesService.getNameOfBoutiquesFile(boutiquesEntities);
+        applicationName = boutiquesService.getApplicationName(boutiquesEntities);
+        inputBoutiquesId = boutiquesService.getInputIdOfBoutiquesFile(boutiquesEntities);
+        outputBoutiquesId = boutiquesService.getOutputIdOfBoutiquesFile(boutiquesEntities);
+        inputType = boutiquesService.getInputTypeOfBoutiquesFile(boutiquesEntities);
+        Set<String> crossMap = boutiquesService.getCrossMap(boutiquesEntities);
+        Set<String> dotMap = boutiquesService.getDotMap(boutiquesEntities);
+        Set<String> inputOptional = boutiquesService.getInputOptionalOfBoutiquesFile(boutiquesEntities);
         
         // Parse inputs
         ParseInputsFile inputsParser = new ParseInputsFile(inputsFilePath);
         List<Map<String, String>> inputData = inputsParser.getInputData();
-        Map<String, String> inputType = inputBoutiquesType;
-        Map<String, String> resultsDirectory = inputsParser.getResultDirectory();
+        resultsDirectory = inputsParser.getResultDirectory();
 
         // Set workflowsdb
         workflowsdb.persistInputs(workflowId, inputData, inputType, resultsDirectory);
@@ -95,10 +102,10 @@ public class MoteurLite {
         gaswMonitor.start();
 
         // Create jobs
-        createJobs(jsonIterations, applicationName, boutiquesFilePath, executableName, inputBoutiquesId, outputBoutiquesId, inputType, resultsDirectory, workflowId, gasw, scriptLoader.loadBashScript());
+        createJobs(jsonIterations, scriptLoader.loadBashScript());
     }
 
-    public static void createJobs(List<Map<String, String>> inputs, String applicationName, String boutiquesFilePath, String executableName, HashMap<Integer, String> inputBoutiquesId, HashMap<Integer, String> outputBoutiquesId, Map<String, String> inputType, Map<String, String> resultsDirectory, String workflowId, Gasw gasw, String bashScript) throws Exception {
+    public void createJobs(List<Map<String, String>> inputs, String bashScript) throws Exception {
         for (Map<String, String> innerList : inputs) {
             Map<String, String> inputsMap = new HashMap<>();
             Map<String, String> invocation = new HashMap<>();
@@ -112,20 +119,13 @@ public class MoteurLite {
 
             List<URI> downloadFiles = ParseInputsFile.getDownloadFiles(inputsMap);
             String outputDirName = "outputDirectoryName(applicationName)";
-
             GaswParser gaswParser = new GaswParser();
             String invocationString = CreateInvocation.convertMapToJson(invocation, inputType);
             String jobId = applicationName + "-" + System.nanoTime() + ".sh";
             GaswInput gaswInput = gaswParser.getGaswInput(applicationName, inputsMap, boutiquesFilePath, executableName,
-                    inputBoutiquesId, outputBoutiquesId, invocationString, resultsDirectory, jobId, scriptLoader.loadBashScript(), downloadFiles, outputDirName);
+                    inputBoutiquesId, outputBoutiquesId, invocationString, resultsDirectory, jobId, bashScript, downloadFiles, outputDirName);
             gasw.submit(gaswInput);
             System.out.println("Job launched: " + jobId);
         }
     }
-
-    /**
-     * Validates the workflowId as a non-empty string.
-     * @param workflowId The workflow ID to validate.
-     * @return true if the workflowId is valid, false otherwise.
-     */
 }
