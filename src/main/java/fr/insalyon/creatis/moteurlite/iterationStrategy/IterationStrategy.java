@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 
+ * Author: Sandesh Patil [https://github.com/sandepat]
+ * 
+ */
+
 public class IterationStrategy {
     private List<Map<String, String>> crossCombinations = new ArrayList<>();
     private List<Map<String, String>> dotCombinations = new ArrayList<>();
@@ -27,7 +33,6 @@ public class IterationStrategy {
             }
         }
         List<Map<String, String>> crossCombinations = CrossIteration.crossIteration(valuesMap);
-        //System.out.println("cross" + crossCombinations);
         addResultsDir(crossCombinations, resultDir);
         return crossCombinations;
     }
@@ -42,7 +47,6 @@ public class IterationStrategy {
             }
         }
         List<Map<String, String>> dotCombinations = DotIteration.dotIteration(valuesMap);
-        //System.out.println("dot" + dotCombinations);
         addResultsDir(dotCombinations, resultDir);
         return dotCombinations;
     }
@@ -57,14 +61,11 @@ public class IterationStrategy {
             }
         }
         List<Map<String, String>> jsonCombinations = JsonIteration.jsonIteration(valuesMap, crossJson, dotJson, inputOptional);
-        //System.out.println("json" + jsonCombinations);
         addResultsDir(jsonCombinations, resultDir);
         return jsonCombinations;
     }
     private static void addResultsDir(List<Map<String, String>> combinations, Map<String, String> resultsDirectory) {
         for (Map<String, String> map : combinations) {
-           resultsDirectory.putAll(map);
-           map.clear();
            map.putAll(resultsDirectory);
         }
      }
@@ -80,5 +81,4 @@ public class IterationStrategy {
     public List<Map<String, String>> getDotCombinations() {
         return dotCombinations;
     }
-
 }

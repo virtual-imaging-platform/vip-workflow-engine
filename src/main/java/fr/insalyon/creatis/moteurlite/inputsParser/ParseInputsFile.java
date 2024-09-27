@@ -25,7 +25,6 @@ public class ParseInputsFile {
     }
 
     public static List<URI> getDownloadFiles(Map<String, String> inputsMap) {
-        System.out.println("Download File URIs:");
         List<URI> downloads = new ArrayList<>();
         for (Map.Entry<String, String> entry : inputsMap.entrySet()) {
             if (InputDownloads.isFileURI(entry.getValue())) {
@@ -38,7 +37,6 @@ public class ParseInputsFile {
                     }
                     downloads.add(uri);
                 } catch (Exception e) {
-                    // Handle URI parsing exception
                     System.err.println("Error parsing URI: " + entry.getValue());
                 }
             }

@@ -85,7 +85,7 @@ public class GaswMonitor extends Thread {
             }
             finishedJobsNumber += finishedJobs.size();
             try {
-                workflowsdb.persistProcessors(workflowId, applicationName, sizeOfInputs-finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
+               workflowsdb.persistProcessors(workflowId, applicationName, sizeOfInputs-finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -98,7 +98,6 @@ public class GaswMonitor extends Thread {
             try {
                 workflowsdb.persistWorkflows(workflowId,finalStatus);
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
     
