@@ -18,6 +18,7 @@
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <maven.compiler.target>11</maven.compiler.target>
       <maven.compiler.source>11</maven.compiler.source>
+      <gasw-version>3.11.0-SNAPSHOT</gasw-version>
    </properties>
    <description>VIP</description>
    <inceptionYear>2010</inceptionYear>
@@ -36,8 +37,8 @@
    <dependencies>
       <dependency>
          <groupId>com.github.sandepat</groupId>
-         <artifactId>GASW</artifactId>
-         <version>aeba94bd7c</version>
+         <artifactId>gasw</artifactId>
+         <version>bd496cb3fe</version>
       </dependency>
       <dependency>
          <groupId>com.google.code.gson</groupId>

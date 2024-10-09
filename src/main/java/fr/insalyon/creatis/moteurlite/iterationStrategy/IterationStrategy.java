@@ -2,6 +2,7 @@ package fr.insalyon.creatis.moteurlite.iterationStrategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,11 +18,36 @@ public class IterationStrategy {
     private List<Map<String, String>> dotCombinations = new ArrayList<>();
     private List<Map<String, String>> jsonCombinations = new ArrayList<>();
 
-    public void IterationStratergy(List<Map<String, String>> inputsMap, Map<String, String> resultDir, Set<String> crossJson, Set<String> dotJson, Set<String> inputOptional) {
+    public List<Map<String, String>> IterationStratergy(List<Map<String, String>> inputsMap, Map<String, String> resultDir, Map<String, Object> customProperties, Set<String> inputOptional) {
+        // Create crossJson and dotJson from customProperties
+        Set<String> crossJson = extractCustomValues(customProperties, "VIPcross");
+        Set<String> dotJson = extractCustomValues(customProperties, "VIPdot");
+
         crossCombinations = setCrossIteration(inputsMap, resultDir);
         dotCombinations = setDotIteration(inputsMap, resultDir);
         jsonCombinations = setJsonIteration(inputsMap, resultDir, crossJson, dotJson, inputOptional);
+
+        return jsonCombinations;
     }
+
+    private Set<String> extractCustomValues(Map<String, Object> customProperties, String key) {
+        Set<String> values = new HashSet<>();
+        
+        // Check if the custom property contains the key (e.g., "VIPcross" or "VIPdot")
+        if (customProperties.containsKey(key)) {
+            Object customValue = customProperties.get(key);
+
+            if (customValue instanceof List<?>) {
+                for (Object value : (List<?>) customValue) {
+                    if (value instanceof String) {
+                        values.add((String) value);
+                    }
+                }
+            }
+        }
+        return values;
+    }
+
 
     private List<Map<String, String>> setCrossIteration(List<Map<String, String>> inputsMap, Map<String, String> resultDir) {
         Map<String, List<String>> valuesMap = new HashMap<>();
