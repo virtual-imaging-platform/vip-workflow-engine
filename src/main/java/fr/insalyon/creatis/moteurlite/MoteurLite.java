@@ -134,7 +134,6 @@ public class MoteurLite {
         InputsFileParser inputsFileParser = new InputsFileParser(inputsFilePath);
         inputData = inputsFileParser.getInputData();
         resultsDirectory = inputsFileParser.getResultDirectory();
-        inputMap = inputsFileParser.getInputData();
      }
 
     public void createJobs(List<Map<String, String>> inputs) throws Exception {

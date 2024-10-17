@@ -32,14 +32,6 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
 
 public class Workflowsdb {
 
-    public void Inputs(String workflowId, List<Map<String, String>> inputData, Map<String, String> inputType,
-            Map<String, String> resultsDirectory, HashMap<Integer, String> outputData, Map<String, String> outputName, String outputDirName, String applicationName, 
-            String jobId, Integer queued, Integer completed, Integer failed)
-            throws Exception {
-        persistInputs(workflowId, inputData, inputType, resultsDirectory);
-        persistProcessors(workflowId, applicationName, queued, completed, failed);
-    }
-
     public void persistInputs(String workflowId, List<Map<String, String>> inputData, Map<String, String> inputType,
             Map<String, String> resultsDirectory) throws Exception {
         WorkflowsDBDAOFactory workflowsDBDAOFactory = new WorkflowsDBDAOFactory();

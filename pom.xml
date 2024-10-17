@@ -20,9 +20,6 @@
       <maven.compiler.source>11</maven.compiler.source>
       <gasw-version>3.11.0-SNAPSHOT</gasw-version>
    </properties>
-   <description>VIP</description>
-   <inceptionYear>2010</inceptionYear>
-   <url>http://vip.creatis.insa-lyon.fr:9002/projects/vip</url>
    <licenses>
       <license>
          <name>CeCILL-B, Version 1.0</name>
@@ -36,9 +33,10 @@
    </organization>
    <dependencies>
       <dependency>
-         <groupId>com.github.sandepat</groupId>
+         <groupId>fr.insalyon.creatis</groupId>
          <artifactId>gasw</artifactId>
-         <version>bd496cb3fe</version>
+         <version>${gasw-version}</version>
+         <scope>provided</scope>
       </dependency>
       <dependency>
          <groupId>com.google.code.gson</groupId>
@@ -178,10 +176,6 @@
          <id>version99</id>
          <!--  highly available repository serving empty artifacts  -->
          <url>https://version99.qos.ch/</url>
-      </repository>
-      <repository>
-         <id>jitpack.io</id>
-         <url>https://jitpack.io</url>
       </repository>
    </repositories>
    <distributionManagement>
