@@ -2,7 +2,6 @@ package fr.insalyon.creatis.moteurlite.inputsParser;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,15 +12,11 @@ import java.util.Map;
  */
 
 public class InputsFileParser {
-    private Map<String, String> resultDir;
-    private List<Map<String, String>> inputsMap;
-    private Map<String, String> inputsTypeMap = new HashMap<>();
 
+    private Map<String, List<String>> inputsMap;
+    private Map<String, String> inputsTypeMap;
 
-    public InputsFileParser(String inputsFilePath) {
-        resultDir = setResultDirectory(inputsFilePath);
-        inputsMap = setInputData(inputsFilePath);
-        inputsTypeMap = setInputTypeMap(inputsFilePath);
+    public InputsFileParser() {
     }
 
     public static List<URI> getDownloadFiles(Map<String, String> inputsMap) {
@@ -44,24 +39,19 @@ public class InputsFileParser {
         return downloads;
     }
 
-    private List<Map<String, String>> setInputData(String inputsFilePath) {
-        return InputParser.parseInputData(inputsFilePath);
+    // New parse method to return a Map<String, List<String>> directly
+    public Map<String, List<String>> parse(String inputsFilePath) {
+        inputsMap = InputParser.parseInputData(inputsFilePath);
+        return inputsMap; // Return the parsed input data as Map<String, List<String>>
     }
 
-    public Map<String, String> setResultDirectory(String inputsFilePath) {
-        return InputParser.parseResultDir(inputsFilePath);
+    public Map<String, String> parseInputTypeMap(String inputsFilePath) {
+        inputsTypeMap = InputParser.parseInputType(inputsFilePath);
+        return inputsTypeMap;
     }
 
-    public Map<String, String> setInputTypeMap(String inputsFilePath) {
-        return InputParser.parseInputType(inputsFilePath);
-    }
-
-    public List<Map<String, String>> getInputData() {
+    public Map<String, List<String>> getInputData() {
         return inputsMap;
-    }
-
-    public Map<String, String> getResultDirectory() {
-        return resultDir;
     }
 
     public Map<String, String> getInputTypeMap() {

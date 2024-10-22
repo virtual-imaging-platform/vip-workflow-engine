@@ -20,7 +20,7 @@ public class GaswMonitor extends Thread {
     private String applicationName;
     private int sizeOfInputs;
     private Gasw gasw;
-    private Workflowsdb workflowsdb = new Workflowsdb();
+    private WorkflowsDbRepository workflowsDbRepository;
 
     public GaswMonitor(String workflowId, String applicationName, int sizeOfInputs, Gasw gasw) {
         this.workflowId = workflowId;
@@ -36,7 +36,7 @@ public class GaswMonitor extends Thread {
         Integer failedJobsNumber = 0;
         boolean hasSuccessfulJob = false; // Flag to track if at least one job is successful
         try {
-            workflowsdb.persistProcessors(workflowId, applicationName, sizeOfInputs, successfulJobsNumber, failedJobsNumber);
+            workflowsDbRepository.persistProcessors(workflowId, applicationName, sizeOfInputs, successfulJobsNumber, failedJobsNumber);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -72,7 +72,7 @@ public class GaswMonitor extends Thread {
                     }
                     List<URI> uploadedResults = gaswOutput.getUploadedResults();
                     if (uploadedResults != null) {
-                        workflowsdb.persistOutputs(workflowId, outputData, uploadedResults);
+                        workflowsDbRepository.persistOutputs(workflowId, outputData, uploadedResults);
                     }
                     
                 } catch (Exception e) {
@@ -81,7 +81,7 @@ public class GaswMonitor extends Thread {
             }
             finishedJobsNumber += finishedJobs.size();
             try {
-                workflowsdb.persistProcessors(workflowId, applicationName, sizeOfInputs-finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
+                workflowsDbRepository.persistProcessors(workflowId, applicationName, sizeOfInputs-finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -92,7 +92,7 @@ public class GaswMonitor extends Thread {
             GaswStatus finalStatus = hasSuccessfulJob ? GaswStatus.COMPLETED : GaswStatus.ERROR;
             // Persist the final processor status
             try {
-                workflowsdb.persistWorkflows(workflowId,finalStatus);
+                workflowsDbRepository.persistWorkflows(workflowId,finalStatus);
             } catch (Exception e) {
                 e.printStackTrace();
             }
