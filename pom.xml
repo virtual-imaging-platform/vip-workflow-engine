@@ -55,48 +55,9 @@
          <version>1.6</version>
       </dependency>
       <dependency>
-         <groupId>fr.cnrs.i3s</groupId>
-         <artifactId>moteur2-common</artifactId>
-         <version>0.9.21</version>
-         <scope>provided</scope>
-         <exclusions>
-            <exclusion>
-               <groupId>fr.cnrs.i3s</groupId>
-               <artifactId>*</artifactId>
-            </exclusion>
-            <exclusion>
-               <groupId>fr.insalyon.creatis.shiwapool</groupId>
-               <artifactId>shiwa-pool-client</artifactId>
-            </exclusion>
-         </exclusions>
-      </dependency>
-      <dependency>
-         <groupId>com.h2database</groupId>
-         <artifactId>h2</artifactId>
-         <!-- version>1.3.173</version -->
-         <version>1.4.196</version>
-         <scope>runtime</scope>
-      </dependency>
-      <dependency>
-         <groupId>mysql</groupId>
-         <artifactId>mysql-connector-java</artifactId>
-         <version>5.1.36</version>
-      </dependency>
-      <dependency>
          <groupId>com.google.gwt</groupId>
          <artifactId>gwt-dev</artifactId>
          <version>2.8.0</version>
-      </dependency>
-      <dependency>
-         <groupId>com.isomorphic.smartgwt.lgpl</groupId>
-         <artifactId>smartgwt-lgpl</artifactId>
-         <version>12.0p</version>
-      </dependency>
-      <dependency>
-         <groupId>com.jayway.jsonpath</groupId>
-         <artifactId>json-path</artifactId>
-         <version>2.2.0</version>
-         <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>com.googlecode.json-simple</groupId>
@@ -116,27 +77,6 @@
          </exclusions>
       </dependency>
       <dependency>
-         <groupId>com.fasterxml.jackson.core</groupId>
-         <artifactId>jackson-core</artifactId>
-         <version>2.13.0</version>
-      </dependency>
-      <dependency>
-         <groupId>com.fasterxml.jackson.core</groupId>
-         <artifactId>jackson-annotations</artifactId>
-         <version>2.13.0</version>
-      </dependency>
-      <dependency>
-         <groupId>com.fasterxml.jackson.core</groupId>
-         <artifactId>jackson-databind</artifactId>
-         <version>2.13.0</version>
-      </dependency>
-      <dependency>
-         <groupId>log4j</groupId>
-         <artifactId>log4j</artifactId>
-         <version>1.2.17</version>
-         <!-- Use the appropriate version -->
-      </dependency>
-      <dependency>
          <groupId>net.xeoh.plugins</groupId>
          <artifactId>jspf-core</artifactId>
          <version>1.0.2</version>
@@ -150,11 +90,6 @@
          <groupId>org.apache.ant</groupId>
          <artifactId>ant-launcher</artifactId>
          <version>1.10.14</version>
-      </dependency>
-      <dependency>
-         <groupId>org.apache.velocity</groupId>
-         <artifactId>velocity</artifactId>
-         <version>1.7</version>
       </dependency>
    </dependencies>
    <repositories>
