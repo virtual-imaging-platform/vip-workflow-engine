@@ -39,78 +39,31 @@
          <scope>provided</scope>
       </dependency>
       <dependency>
-         <groupId>com.google.code.gson</groupId>
-         <artifactId>gson</artifactId>
-         <version>2.8.8</version>
-         <!-- or the latest version -->
-      </dependency>
-            <dependency>
-         <groupId>fr.insalyon.creatis</groupId>
-         <artifactId>moteur2-workflowsdb-common</artifactId>
-         <version>1.6</version>
-      </dependency>
-      <dependency>
          <groupId>fr.insalyon.creatis</groupId>
          <artifactId>moteur2-workflowsdb-plugin</artifactId>
          <version>1.6</version>
       </dependency>
       <dependency>
-         <groupId>com.google.gwt</groupId>
-         <artifactId>gwt-dev</artifactId>
-         <version>2.8.0</version>
+         <groupId>javax.annotation</groupId>
+         <artifactId>javax.annotation-api</artifactId>
+         <version>1.3.2</version>
+      </dependency>
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-databind</artifactId>
+         <version>2.18.0</version>
       </dependency>
       <dependency>
          <groupId>com.googlecode.json-simple</groupId>
          <artifactId>json-simple</artifactId>
          <version>1.1.1</version>
       </dependency>
-      <dependency>
-         <groupId>com.google.gwt</groupId>
-         <artifactId>gwt-user</artifactId>
-         <version>2.8.0</version>
-         <exclusions>
-            <!--  it is in conflict with jakarta.validation-api (aka validation api 2.0) that is needed in vip-api for validation within spring mvc  -->
-            <exclusion>
-               <artifactId>validation-api</artifactId>
-               <groupId>javax.validation</groupId>
-            </exclusion>
-         </exclusions>
-      </dependency>
-      <dependency>
-         <groupId>net.xeoh.plugins</groupId>
-         <artifactId>jspf-core</artifactId>
-         <version>1.0.2</version>
-      </dependency>
-      <dependency>
-         <groupId>org.apache.jena</groupId>
-         <artifactId>jena-arq</artifactId>
-         <version>4.10.0</version>
-      </dependency>
-      <dependency>
-         <groupId>org.apache.ant</groupId>
-         <artifactId>ant-launcher</artifactId>
-         <version>1.10.14</version>
-      </dependency>
    </dependencies>
    <repositories>
-      <repository>
-         <id>central</id>
-         <url>https://repo.maven.apache.org/maven2</url>
-      </repository>
-      <repository>
-         <id>custom-repo</id>
-         <url>https://korpling.german.hu-berlin.de/maven2</url>
-      </repository>
       <repository>
          <id>creatis</id>
          <name>Creatis Insa Lyon repository [creatis]</name>
          <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
-      </repository>
-      <!--  repo used to get empty jar for commons logging and log4j  -->
-      <repository>
-         <id>version99</id>
-         <!--  highly available repository serving empty artifacts  -->
-         <url>https://version99.qos.ch/</url>
       </repository>
    </repositories>
    <distributionManagement>
