@@ -1,15 +1,11 @@
 package fr.insalyon.creatis.moteurlite.boutiques;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,12 +21,9 @@ public class BoutiquesService {
     }
 
     // Method to parse the boutiques descriptor file
-    public BoutiquesDescriptor parseFile(String boutiquesDescriptorString) throws FileNotFoundException, IOException, GaswException, ParseException {
-        Object object = new JSONParser().parse(new FileReader(boutiquesDescriptorString));
-        String objeString = String.valueOf(object);
-
+    public BoutiquesDescriptor parseFile(String boutiquesDescriptorString) throws IOException, GaswException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(objeString, BoutiquesDescriptor.class);
+        return objectMapper.readValue(new File(boutiquesDescriptorString), BoutiquesDescriptor.class);
     }
 
     public String getNameOfBoutiquesFile(BoutiquesDescriptor boutiquesDescriptor) {
