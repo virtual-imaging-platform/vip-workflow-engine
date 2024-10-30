@@ -3,22 +3,14 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>fr.insalyon.creatis</groupId>
    <artifactId>moteurlite</artifactId>
-   <version>${revision}${sha1}${changelist}</version>
+   <version>0.1-SNAPSHOT</version>
    <name>MoteurLite</name>
    <properties>
-      <!--  project version. Only to change it here (and in CoreConstants.java
-           Follow this practice : https://maven.apache.org/maven-ci-friendly.html -->
-      <revision>0.1</revision>
-      <log4jdbc.log4j2.version>1.16</log4jdbc.log4j2.version>
-      <!-- VIP related dependencies version -->
-      <moteur2-workflowsdb-common.version>1.6</moteur2-workflowsdb-common.version>
-      <changelist />
-      <sha1 />
       <!--  other maven config  -->
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <maven.compiler.target>11</maven.compiler.target>
       <maven.compiler.source>11</maven.compiler.source>
-      <gasw-version>3.11.0-SNAPSHOT</gasw-version>
+      <gasw-version>3.11.0</gasw-version>
    </properties>
    <licenses>
       <license>
