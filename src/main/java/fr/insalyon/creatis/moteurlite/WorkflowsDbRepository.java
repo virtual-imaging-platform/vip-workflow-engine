@@ -67,8 +67,8 @@ public class WorkflowsDbRepository {
             for (String value : values) {
                 // Set InputID
                 inputID.setWorkflowID(workflowId);
-                inputID.setPath(key);  // Use the key as the path
-                inputID.setProcessor(workflowId);  // If processor logic is different, modify this
+                inputID.setPath(value);  // Use the key as the path
+                inputID.setProcessor(key);  // If processor logic is different, modify this
     
                 // Set input properties
                 input.setInputID(inputID);
