@@ -21,6 +21,7 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.ProcessorDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
 
 /**
@@ -55,31 +56,37 @@ public class WorkflowsDbRepository {
         return instance;
     }
 
-    public void persistInputs(String workflowId, Map<String, List<String>> inputValues, Map<String, String> inputType) throws Exception {
+    public void persistInputs(String workflowId, Map<String, List<String>> inputValues, Map<String, fr.insalyon.creatis.moteurlite.boutiques.Input.Type> inputType) throws Exception {
         Input input = new Input();
         InputID inputID = new InputID();
     
         for (Map.Entry<String, List<String>> entry : inputValues.entrySet()) {
             String key = entry.getKey();  // This is the input key
             List<String> values = entry.getValue();  // List of values associated with the key
+            fr.insalyon.creatis.moteurlite.boutiques.Input.Type type = inputType.get(key);
             
             // Iterate over all values in the list
             for (String value : values) {
                 // Set InputID
                 inputID.setWorkflowID(workflowId);
-                inputID.setPath(value);  // Use the key as the path
-                inputID.setProcessor(key);  // If processor logic is different, modify this
-    
-                // Set input properties
+                inputID.setPath(value);
+                inputID.setProcessor(key);
+
+                // Set input properties based on type
+                if (type == fr.insalyon.creatis.moteurlite.boutiques.Input.Type.FILE) {
+                    input.setType(DataType.URI);
+                } else {
+                    input.setType(DataType.String);
+                }
+
                 input.setInputID(inputID);
-                input.setType(isURL(value) ? DataType.URI : DataType.String);
-    
+
                 // Add to InputDAO
                 inputDAO.add(input);
             }
         }
     }
-    
+
 
     public void persistOutputs(String workflowId, HashMap<Integer, String> outputData, List<URI> uploadList) throws Exception {
         Output output = new Output();
@@ -101,16 +108,33 @@ public class WorkflowsDbRepository {
     }
 
     public void persistProcessors(String workflowId, String applicationName, Integer queued, Integer completed, Integer failed) throws Exception {
-        Processor processors = new Processor();
-        ProcessorID processorID = new ProcessorID();
-        processorID.setWorkflowID(workflowId);
-        processorID.setProcessor(applicationName);
-        processors.setProcessorID(processorID);
-        processors.setQueued(queued);
-        processors.setCompleted(completed);
-        processors.setFailed(failed);
-        processorDAO.add(processors);
+        try {
+            // Fetch existing processor entity by workflowId and processor name (applicationName)
+            Processor existingProcessor = processorDAO.get(workflowId, applicationName);
+
+            if (existingProcessor != null) {
+                // Update the existing processor with new values
+                existingProcessor.setQueued(queued);
+                existingProcessor.setCompleted(completed);
+                existingProcessor.setFailed(failed);
+                processorDAO.update(existingProcessor);
+            } else {
+                // If the processor does not exist, add a new one
+                Processor processors = new Processor();
+                ProcessorID processorID = new ProcessorID();
+                processorID.setWorkflowID(workflowId);
+                processorID.setProcessor(applicationName);
+                processors.setProcessorID(processorID);
+                processors.setQueued(queued);
+                processors.setCompleted(completed);
+                processors.setFailed(failed);
+                processorDAO.add(processors);
+            }
+        } catch (WorkflowsDBDAOException e) {
+            throw new RuntimeException("Failed to persist processor: " + e.getMessage(), e);
+        }
     }
+
 
     public void persistWorkflows(String workflowId, GaswStatus status) throws Exception {
         // Determine the final status based on GaswStatus
@@ -137,9 +161,5 @@ public class WorkflowsDbRepository {
         } else {
             throw new Exception("Workflow with ID " + workflowId + " not found.");
         }
-    }
-
-    private boolean isURL(String urlString) {
-        return urlString.contains("/");
     }
 }

@@ -1,6 +1,9 @@
-package fr.insalyon.creatis.moteurlite.inputsParser;
+package fr.insalyon.creatis.moteurlite;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,18 +11,26 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * 
  * @author Sandesh Patil [https://github.com/sandepat]
  * 
  */
-public class InputParser {
+public class InputsFileService {
+
+    private Map<String, List<String>> inputsMap;
+
+
+    public InputsFileService() {
+    }
 
     /**
      * This method parses input data from an XML file and returns a Map where each key
@@ -59,38 +70,24 @@ public class InputParser {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new RuntimeException("Failed to parse input data from XML file: " + e.getMessage(), e);
         }
         return inputMap;
     }
 
-    /**
-     * This method parses the types of inputs from the XML file and returns a Map where the key is
-     * the source name and the value is the type of the input (e.g., String, URI).
-     */
-    public static Map<String, String> parseInputType(String fileName) {
-        Map<String, String> nameTypeMap = new HashMap<>();
+    public static boolean isFileURI(String uriString) {
         try {
-            File inputFile = new File(fileName);
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(inputFile);
-            doc.getDocumentElement().normalize();
-
-            NodeList sourceList = doc.getElementsByTagName("source");
-            for (int i = 0; i < sourceList.getLength(); i++) {
-                Node sourceNode = sourceList.item(i);
-                if (sourceNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element sourceElement = (Element) sourceNode;
-                    String name = sourceElement.getAttribute("name");
-                    String type = sourceElement.getAttribute("type");
-                    nameTypeMap.put(name, type);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            URI uri = new URI(uriString);
+            String path = uri.getPath();
+            return path.matches(".*\\.[^.]+$");
+        } catch (URISyntaxException e) {
+            return false;
         }
-        return nameTypeMap;
+    }
+
+    public Map<String, List<String>> parse(String inputsFilePath) {
+        inputsMap = parseInputData(inputsFilePath);
+        return inputsMap; // Return the parsed input data as Map<String, List<String>>
     }
 }

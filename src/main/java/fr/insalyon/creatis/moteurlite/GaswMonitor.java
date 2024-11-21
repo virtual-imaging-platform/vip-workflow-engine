@@ -3,6 +3,8 @@ package fr.insalyon.creatis.moteurlite;
 import java.net.URI;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswExitCode;
@@ -16,16 +18,18 @@ import fr.insalyon.creatis.gasw.execution.GaswStatus;
  */
 
 public class GaswMonitor extends Thread {
+    private static final Logger logger = Logger.getLogger(GaswMonitor.class);
+
     private String workflowId;
     private String applicationName;
-    private int sizeOfInputs;
+    private int numberOfInvocations;
     private Gasw gasw;
     private WorkflowsDbRepository workflowsDbRepository;
 
-    public GaswMonitor(String workflowId, String applicationName, int sizeOfInputs, Gasw gasw) {
+    public GaswMonitor(String workflowId, String applicationName, int numberOfInvocations, Gasw gasw) {
         this.workflowId = workflowId;
         this.applicationName = applicationName;
-        this.sizeOfInputs = sizeOfInputs;
+        this.numberOfInvocations = numberOfInvocations;
         this.gasw = gasw;
     }
 
@@ -34,24 +38,19 @@ public class GaswMonitor extends Thread {
         Integer finishedJobsNumber = 0;
         Integer successfulJobsNumber = 0;
         Integer failedJobsNumber = 0;
-        boolean hasSuccessfulJob = false; // Flag to track if at least one job is successful
-        try {
-            workflowsDbRepository.persistProcessors(workflowId, applicationName, sizeOfInputs, successfulJobsNumber, failedJobsNumber);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        while (finishedJobsNumber < sizeOfInputs) {
+
+        while (finishedJobsNumber < numberOfInvocations) {
             synchronized (this) {
                 try {
                     gasw.waitForNotification();
                     this.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error("Interrupted exception while waiting for notification: ", e);
                 }
             }
 
             List<GaswOutput> finishedJobs = gasw.getFinishedJobs();
-            System.out.println("Number of finished jobs: " + finishedJobs.size());
+            logger.info("Number of finished jobs: " + finishedJobs.size());
 
             if (finishedJobs.isEmpty()) {
                 gasw.waitForNotification();
@@ -59,48 +58,45 @@ public class GaswMonitor extends Thread {
             }
 
             for (GaswOutput gaswOutput : finishedJobs) {
-                System.out.println("Status: " + gaswOutput.getJobID() + " " + gaswOutput.getExitCode());
-                java.util.HashMap<Integer, String> outputData = null;
+                logger.info("Status: " + gaswOutput.getJobID() + " " + gaswOutput.getExitCode());
                 try {
                     GaswExitCode exitCode = gaswOutput.getExitCode();
                     if (exitCode == GaswExitCode.SUCCESS) {
                         successfulJobsNumber++;
-                        hasSuccessfulJob = true; // At least one job is successful
-                    }
-                    else {
+                    } else {
                         failedJobsNumber++;
                     }
+
                     List<URI> uploadedResults = gaswOutput.getUploadedResults();
-                    if (uploadedResults != null) {
-                        workflowsDbRepository.persistOutputs(workflowId, outputData, uploadedResults);
+                    if (uploadedResults != null && !uploadedResults.isEmpty()) {
+                        workflowsDbRepository.persistOutputs(workflowId, null, uploadedResults);
                     }
-                    
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Error while processing finished job output: ", e);
                 }
             }
+
             finishedJobsNumber += finishedJobs.size();
             try {
-                workflowsDbRepository.persistProcessors(workflowId, applicationName, sizeOfInputs-finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
+                workflowsDbRepository.persistProcessors(workflowId, applicationName, numberOfInvocations - finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error while persisting processors during processing: ", e);
             }
         }
 
         try {
             // Determine the final status of the processor based on the jobs' status
-            GaswStatus finalStatus = hasSuccessfulJob ? GaswStatus.COMPLETED : GaswStatus.ERROR;
-            // Persist the final processor status
-            try {
-                workflowsDbRepository.persistWorkflows(workflowId,finalStatus);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            GaswStatus finalStatus = successfulJobsNumber > 0 ? GaswStatus.COMPLETED : GaswStatus.ERROR;
+
+            // Persist the final workflow status
+            workflowsDbRepository.persistWorkflows(workflowId, finalStatus);
 
             gasw.terminate();
-            System.out.println("Completed execution of workflow");
+            logger.info("Completed execution of workflow");
         } catch (GaswException e) {
-            e.printStackTrace();
+            logger.error("Error while terminating Gasw: ", e);
+        } catch (Exception e) {
+            logger.error("Error while persisting final workflow status: ", e);
         }
     }
 }

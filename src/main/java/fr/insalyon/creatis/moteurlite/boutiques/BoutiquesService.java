@@ -30,11 +30,6 @@ public class BoutiquesService {
         return boutiquesDescriptor.getName() + ".json";
     }
 
-    public String getApplicationName(BoutiquesDescriptor boutiquesDescriptor) {
-        String nameOfBoutiquesFile = getNameOfBoutiquesFile(boutiquesDescriptor);
-        return nameOfBoutiquesFile.substring(0, nameOfBoutiquesFile.lastIndexOf('.'));
-    }
-
     // Method to extract input IDs
     public HashMap<Integer, String> getInputId(BoutiquesDescriptor boutiquesDescriptor) {
         HashMap<Integer, String> inputIds = new HashMap<>();
@@ -55,10 +50,11 @@ public class BoutiquesService {
         return outputIds;
     }
 
-    public HashMap<String, String> getInputType(BoutiquesDescriptor boutiquesDescriptor) {
-        HashMap<String, String> inputTypes = new HashMap<>();
+    // Updated method to keep Input.Type instead of converting to a String
+    public HashMap<String, Input.Type> getInputType(BoutiquesDescriptor boutiquesDescriptor) {
+        HashMap<String, Input.Type> inputTypes = new HashMap<>();
         for (Input input : boutiquesDescriptor.getInputs()) {
-            inputTypes.put(input.getId(), input.getType().toString());
+            inputTypes.put(input.getId(), input.getType());
         }
         return inputTypes;
     }
@@ -75,7 +71,7 @@ public class BoutiquesService {
     public Set<String> getInputOptionalOfBoutiquesFile(BoutiquesDescriptor boutiquesDescriptor) {
         Set<String> optionalInputs = new HashSet<>();
         for (Input input : boutiquesDescriptor.getInputs()) {
-            if (input.getOptional() != null && input.getOptional()) { 
+            if (input.getOptional() != null && input.getOptional()) {
                 optionalInputs.add(input.getId());
             }
         }
@@ -102,7 +98,7 @@ public class BoutiquesService {
 
         if (customMap != null && customMap.containsKey(key)) {
             Object value = customMap.get(key);
-            
+
             if (value instanceof String) {
                 resultSet.add((String) value);
             } else if (value instanceof Iterable) {
