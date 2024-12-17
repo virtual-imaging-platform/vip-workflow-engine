@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import fr.insalyon.creatis.gasw.GaswException;
+import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
 /**
  * Author: Sandesh Patil [https://github.com/sandepat]
@@ -21,37 +20,16 @@ public class BoutiquesService {
     }
 
     // Method to parse the boutiques descriptor file
-    public BoutiquesDescriptor parseFile(String boutiquesDescriptorString) throws IOException, GaswException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(new File(boutiquesDescriptorString), BoutiquesDescriptor.class);
-    }
-
-    public String getNameOfBoutiquesFile(BoutiquesDescriptor boutiquesDescriptor) {
-        return boutiquesDescriptor.getName() + ".json";
-    }
-
-    // Method to extract input IDs
-    public HashMap<Integer, String> getInputId(BoutiquesDescriptor boutiquesDescriptor) {
-        HashMap<Integer, String> inputIds = new HashMap<>();
-        int index = 0;
-        for (Input input : boutiquesDescriptor.getInputs()) {
-            inputIds.put(index++, input.getId());
+    public BoutiquesDescriptor parseFile(String boutiquesDescriptorFile) throws MoteurLiteException {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(new File(boutiquesDescriptorFile), BoutiquesDescriptor.class);
+        } catch (IOException e) {
+            throw new MoteurLiteException("Error parsing boutiques file " + boutiquesDescriptorFile, e);
         }
-        return inputIds;
     }
 
-    // Method to extract output IDs
-    public HashMap<Integer, String> getOutputId(BoutiquesDescriptor boutiquesDescriptor) {
-        HashMap<Integer, String> outputIds = new HashMap<>();
-        int index = 0;
-        for (OutputFile output : boutiquesDescriptor.getOutputFiles()) {
-            outputIds.put(index++, output.getId());
-        }
-        return outputIds;
-    }
-
-    // Updated method to keep Input.Type instead of converting to a String
-    public HashMap<String, Input.Type> getInputType(BoutiquesDescriptor boutiquesDescriptor) {
+    public HashMap<String, Input.Type> getInputTypes(BoutiquesDescriptor boutiquesDescriptor) {
         HashMap<String, Input.Type> inputTypes = new HashMap<>();
         for (Input input : boutiquesDescriptor.getInputs()) {
             inputTypes.put(input.getId(), input.getType());
@@ -59,12 +37,20 @@ public class BoutiquesService {
         return inputTypes;
     }
 
-    public HashMap<String, String> getInputValueKey(BoutiquesDescriptor boutiquesDescriptor) {
-        HashMap<String, String> inputValueKeys = new HashMap<>();
+    public HashMap<String, Input> getInputsMap(BoutiquesDescriptor boutiquesDescriptor) {
+        HashMap<String, Input> inputTypes = new HashMap<>();
         for (Input input : boutiquesDescriptor.getInputs()) {
-            inputValueKeys.put(input.getId(), input.getValueKey());
+            inputTypes.put(input.getId(), input);
         }
-        return inputValueKeys;
+        return inputTypes;
+    }
+
+    public HashMap<String, OutputFile> getOutputMap(BoutiquesDescriptor boutiquesDescriptor) {
+        HashMap<String, OutputFile> outputFiles = new HashMap<>();
+        for (OutputFile outputFile : boutiquesDescriptor.getOutputFiles()) {
+            outputFiles.put(outputFile.getId(), outputFile);
+        }
+        return outputFiles;
     }
 
     // Method to get optional inputs from the BoutiquesDescriptor

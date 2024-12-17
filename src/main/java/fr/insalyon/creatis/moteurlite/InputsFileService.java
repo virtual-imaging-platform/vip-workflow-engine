@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -26,17 +27,14 @@ import org.xml.sax.SAXException;
  */
 public class InputsFileService {
 
-    private Map<String, List<String>> inputsMap;
+    private static final Logger logger = Logger.getLogger(InputsFileService.class);
 
-
-    public InputsFileService() {
-    }
 
     /**
      * This method parses input data from an XML file and returns a Map where each key
      * corresponds to a source name and the value is a List of all items under that source.
      */
-    public static Map<String, List<String>> parseInputData(String filePath) {
+    public Map<String, List<String>> parseInputData(String filePath) throws MoteurLiteException {
         Map<String, List<String>> inputMap = new HashMap<>(); 
         
         try {
@@ -71,23 +69,9 @@ public class InputsFileService {
                 }
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw new RuntimeException("Failed to parse input data from XML file: " + e.getMessage(), e);
+            logger.error("Failed to parse input data from XML file: " + filePath, e);
+            throw new MoteurLiteException("Failed to parse input data from XML file: " + filePath, e);
         }
         return inputMap;
-    }
-
-    public static boolean isFileURI(String uriString) {
-        try {
-            URI uri = new URI(uriString);
-            String path = uri.getPath();
-            return path.matches(".*\\.[^.]+$");
-        } catch (URISyntaxException e) {
-            return false;
-        }
-    }
-
-    public Map<String, List<String>> parse(String inputsFilePath) {
-        inputsMap = parseInputData(inputsFilePath);
-        return inputsMap; // Return the parsed input data as Map<String, List<String>>
     }
 }

@@ -12,11 +12,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import fr.insalyon.creatis.gasw.Gasw;
+import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswInput;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
 import fr.insalyon.creatis.moteurlite.boutiques.Input;
+import fr.insalyon.creatis.moteurlite.boutiques.OutputFile;
 import fr.insalyon.creatis.moteurlite.iterationStrategy.IterationStrategyService;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -26,7 +30,9 @@ import fr.insalyon.creatis.moteurlite.iterationStrategy.IterationStrategyService
 
 public class MoteurLite {
 
-    public static void main(String[] args) throws Exception {
+    private static final Logger logger = Logger.getLogger(MoteurLite.class);
+
+    public static void main(String[] args) throws MoteurLiteException {
         // Verify arguments
         if (args.length != 3) {
             throw new IllegalArgumentException("Exactly 3 arguments are required: workflowId, boutiquesFilePath, inputsFilePath.");
@@ -37,34 +43,7 @@ public class MoteurLite {
 
         checkArguments(workflowId, boutiquesFilePath, inputsFilePath);
 
-        // Build dependencies
-        WorkflowsDbRepository workflowsDbRepo = WorkflowsDbRepository.getInstance();
-        BoutiquesService boutiquesService = new BoutiquesService();
-        IterationStrategyService iterationStrategyService = new IterationStrategyService(boutiquesService);
-
-        // Parse boutiques and inputs
-        BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
-        InputsFileService inputsFileService = new InputsFileService();
-        Map<String, List<String>> inputValues = inputsFileService.parse(inputsFilePath);
-
-        // Compute iteration strategy
-        List<Map<String, String>> jobsInputValues = iterationStrategyService.compute(descriptor, inputValues);
-
-        // Persist processors before persisting inputs
-        workflowsDbRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
-        workflowsDbRepo.persistInputs(workflowId, inputValues, boutiquesService.getInputType(descriptor));
-
-        // Persist inputs
-        workflowsDbRepo.persistInputs(workflowId, inputValues, boutiquesService.getInputType(descriptor));
-
-        // Initialize Gasw and GaswMonitor
-        Gasw gasw = Gasw.getInstance();
-        GaswMonitor gaswMonitor = new GaswMonitor(workflowId, descriptor.getName(), jobsInputValues.size(), gasw);
-        gasw.setNotificationClient(gaswMonitor);
-        gaswMonitor.start();
-
-        // Launch jobs
-        createJobs(descriptor, jobsInputValues, boutiquesFilePath, boutiquesService);
+        new MoteurLite().runWorkflow(workflowId, boutiquesFilePath, inputsFilePath);
     }
 
     private static void checkArguments(String workflowId, String boutiquesFilePath, String inputsFilePath) {
@@ -84,73 +63,120 @@ public class MoteurLite {
         }
     }
 
-    private static void createJobs(BoutiquesDescriptor descriptor, List<Map<String, String>> inputs, String boutiquesFilePath, BoutiquesService boutiquesService) throws Exception {
-        for (Map<String, String> inputMap : inputs) {
-            Map<String, String> inputsMap = new HashMap<>();
-            Map<String, String> invocation = new HashMap<>();
+    private final WorkflowsDbRepository workflowsDbRepo;
+    private final BoutiquesService boutiquesService;
+    private final InputsFileService inputsFileService;
+    private final IterationStrategyService iterationStrategyService;
 
-            for (Map.Entry<String, String> entry : inputMap.entrySet()) {
-                inputsMap.put(entry.getKey(), entry.getValue());
-                if (!entry.getKey().equals("results-directory")) {
-                    invocation.put(entry.getKey(), entry.getValue());
-                }
-            }
-
-            // Extract file inputs using BoutiquesDescriptor
-            List<URI> downloads = new ArrayList<>();
-            for (Input input : descriptor.getInputs()) {
-                if (input.getType() == Input.Type.FILE) {
-                    String inputId = input.getId();
-                    if (inputsMap.containsKey(inputId)) {
-                        try {
-                            URI fileUri = new URI(inputsMap.get(inputId));
-                            if (fileUri.getScheme() == null) {
-                                // Add "lfn://" prefix if URI has no scheme
-                                fileUri = new URI("lfn://" + inputsMap.get(inputId));
-                            }
-                            downloads.add(fileUri);
-                        } catch (URISyntaxException e) {
-                            System.err.println("Error parsing URI: " + inputsMap.get(inputId));
-                        }
-                    }
-                }
-            }
-
-            // Get the results directory
-            URI resultsDirectoryURI;
-            try {
-                resultsDirectoryURI = new URI(inputsMap.get("results-directory"));
-            } catch (URISyntaxException e) {
-                throw new RuntimeException("Invalid URI for results directory: " + e.getMessage(), e);
-            }
-
-            // Convert invocation map to JSON
-            String invocationString = convertMapToJson(invocation, boutiquesService.getInputType(descriptor));
-            String jobId = descriptor.getName() + "-" + System.nanoTime() + ".sh";
-
-            GaswInput gaswInput = new GaswInput(descriptor.getName(), descriptor.getName() + ".json", downloads, resultsDirectoryURI, invocationString, jobId);
-            Gasw.getInstance().submit(gaswInput);
+    public MoteurLite() throws MoteurLiteException {
+        // Build dependencies
+        boutiquesService = new BoutiquesService();
+        inputsFileService = new InputsFileService();
+        iterationStrategyService = new IterationStrategyService(boutiquesService);
+        try {
+            workflowsDbRepo = WorkflowsDbRepository.getInstance();
+        } catch (WorkflowsDBDAOException e) {
+            logger.error("Error creating workflows db repo", e);
+            throw new MoteurLiteException("Error creating workflows db repo", e);
         }
     }
 
-    private static String convertMapToJson(Map<String, String> invocationMap, Map<String, Input.Type> inputTypeMap) throws URISyntaxException {
+    public void runWorkflow(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
+        // Parse boutiques and inputs
+        Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
+        BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
+        HashMap<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
+        HashMap<String, OutputFile> boutiquesOutputs = boutiquesService.getOutputMap(descriptor);
+
+        // Compute iteration strategy
+        List<Map<String, String>> invocationsInputs = iterationStrategyService.compute(descriptor, allInputs);
+
+        // Persist processors before persisting inputs
+        workflowsDbRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
+
+        // Persist inputs
+        workflowsDbRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
+
+        // Initialize Gasw and GaswMonitor
+        Gasw gasw = null;
+        try {
+            gasw = Gasw.getInstance();
+            GaswMonitor gaswMonitor = new GaswMonitor(gasw, workflowsDbRepo, workflowId, descriptor.getName(), boutiquesOutputs, invocationsInputs.size());
+            gasw.setNotificationClient(gaswMonitor);
+            gaswMonitor.start();
+        } catch (GaswException e) {
+            logger.error("Error launching gasw", e);
+            throw new MoteurLiteException("Error launching gasw", e);
+        }
+
+        // Launch jobs
+        createJobs(gasw, descriptor.getName(), invocationsInputs, boutiquesInputs);
+
+    }
+
+    private void createJobs(Gasw gasw, String applicationName, List<Map<String, String>> allInvocationsInputs, HashMap<String, Input> boutiquesInputs) throws MoteurLiteException {
+        for (Map<String, String> invocationInputs : allInvocationsInputs) {
+
+            URI resultsDirectoryURI = null;
+            List<URI> downloads = new ArrayList<>();
+            Map<String, String> finalInvocationInputs = new HashMap<>();
+
+            for (String inputId : invocationInputs.keySet()) {
+                String inputValue = invocationInputs.get(inputId);
+                if ("results-directory".equals(inputId)) {
+                    resultsDirectoryURI = getURI(inputValue);
+                } else {
+                    if (Input.Type.FILE.equals(boutiquesInputs.get(inputId).getType())) {
+                        URI downloadURI = getURI(inputValue);
+                        String filename = Paths.get(downloadURI.getPath()).getFileName().toString();
+                        downloads.add(downloadURI);
+                        inputValue = filename;
+                    }
+                    finalInvocationInputs.put(inputId, inputValue);
+                }
+            }
+
+            // Convert invocation map to JSON
+            String invocationString = convertMapToJson(finalInvocationInputs, boutiquesInputs);
+            String jobId = applicationName + "-" + System.nanoTime() + ".sh";
+
+            GaswInput gaswInput = new GaswInput(applicationName, applicationName + ".json", downloads, resultsDirectoryURI, invocationString, jobId);
+            try {
+                gasw.submit(gaswInput);
+            } catch (GaswException e) {
+                logger.error("Error submitting gasw job", e);
+                throw new MoteurLiteException("Error submitting gasw job", e);
+            }
+        }
+    }
+
+    private URI getURI(String inputValue) throws MoteurLiteException {
+        try {
+            return new URI(inputValue);
+        } catch (URISyntaxException e) {
+            logger.error("Error parsing URI : " + inputValue, e);
+            throw new MoteurLiteException("Error parsing URI : " + inputValue, e);
+        }
+    }
+
+    private String convertMapToJson(Map<String, String> invocationInputs, HashMap<String, Input> boutiquesInputs) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode jsonNode = mapper.createObjectNode();
 
-        for (Map.Entry<String, String> entry : invocationMap.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            Input.Type type = inputTypeMap.get(key);
+        for (String inputId : invocationInputs.keySet()) {
+            String value = invocationInputs.get(inputId);
+            Input.Type type = boutiquesInputs.get(inputId).getType();
 
-            if (type == Input.Type.NUMBER) {
-                jsonNode.put(key, Float.parseFloat(value));
+            if (type == Input.Type.NUMBER ) {
+                if (boutiquesInputs.get(inputId).getInteger() != null && boutiquesInputs.get(inputId).getInteger()) {
+                    jsonNode.put(inputId, Integer.parseInt(value));
+                } else {
+                    jsonNode.put(inputId, Float.parseFloat(value));
+                }
             } else if (type == Input.Type.FLAG) {
-                jsonNode.put(key, Boolean.parseBoolean(value));
-            } else if (type == Input.Type.FILE) {
-                value = Paths.get(new URI(value).getPath()).getFileName().toString();
-                jsonNode.put(key, value);
+                jsonNode.put(inputId, Boolean.parseBoolean(value));
             } else {
-                jsonNode.put(key, value);
+                jsonNode.put(inputId, value);
             }
         }
         return jsonNode.toString();

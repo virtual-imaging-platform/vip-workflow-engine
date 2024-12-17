@@ -1,8 +1,10 @@
 package fr.insalyon.creatis.moteurlite;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 
+import fr.insalyon.creatis.moteurlite.boutiques.OutputFile;
 import org.apache.log4j.Logger;
 
 import fr.insalyon.creatis.gasw.Gasw;
@@ -22,15 +24,18 @@ public class GaswMonitor extends Thread {
 
     private String workflowId;
     private String applicationName;
+    private HashMap<String, OutputFile> boutiquesOutputs;
     private int numberOfInvocations;
     private Gasw gasw;
     private WorkflowsDbRepository workflowsDbRepository;
 
-    public GaswMonitor(String workflowId, String applicationName, int numberOfInvocations, Gasw gasw) {
+    public GaswMonitor(Gasw gasw, WorkflowsDbRepository workflowsDbRepository, String workflowId, String applicationName, HashMap<String, OutputFile> boutiquesOutputs, int numberOfInvocations) {
+        this.gasw = gasw;
+        this.workflowsDbRepository = workflowsDbRepository;
         this.workflowId = workflowId;
         this.applicationName = applicationName;
+        this.boutiquesOutputs = boutiquesOutputs;
         this.numberOfInvocations = numberOfInvocations;
-        this.gasw = gasw;
     }
 
     @Override
@@ -69,7 +74,7 @@ public class GaswMonitor extends Thread {
 
                     List<URI> uploadedResults = gaswOutput.getUploadedResults();
                     if (uploadedResults != null && !uploadedResults.isEmpty()) {
-                        workflowsDbRepository.persistOutputs(workflowId, null, uploadedResults);
+                        workflowsDbRepository.persistOutputs(workflowId, boutiquesOutputs, uploadedResults);
                     }
                 } catch (Exception e) {
                     logger.error("Error while processing finished job output: ", e);
