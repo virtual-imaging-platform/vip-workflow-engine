@@ -1,6 +1,6 @@
 package fr.insalyon.creatis.moteurlite;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import fr.insalyon.creatis.moteurlite.iterationStrategy.JsonIteration;
 
@@ -43,7 +43,7 @@ public class JsonIterationTest {
         String expectedOutput = getExpectedOutputForDotKeys();
         String actualOutput = combinedCombinations.toString();
         System.out.println("Combined Combinations: " + actualOutput);
-        assertEquals("Size of combined combinations with dot keys should be 8", expectedOutput, actualOutput);
+        assertEquals(expectedOutput, actualOutput,"Size of combined combinations with dot keys should be 8");
         crossKeys.clear();
         dotKeys.clear();
     }
@@ -55,7 +55,7 @@ public class JsonIterationTest {
         String expectedOutput = getExpectedOutputForNoKeys();
         String actualOutput = combinedCombinations.toString();
         System.out.println("Combined Combinations: " + actualOutput);
-        assertEquals("Size of combined combinations with empty keys should be 16", expectedOutput, actualOutput);
+        assertEquals(expectedOutput, actualOutput, "Size of combined combinations with empty keys should be 16");
         crossKeys.clear();
         dotKeys.clear();
     }
@@ -68,7 +68,7 @@ public class JsonIterationTest {
         String expectedOutput = getExpectedOutputForIncorrectKeys();
         String actualOutput = combinedCombinations.toString();
         System.out.println("Combined Combinations: " + actualOutput);
-        assertEquals("Size of combined combinations with incorrect keys should be 16", expectedOutput, actualOutput);
+        assertEquals(expectedOutput, actualOutput, "Size of combined combinations with incorrect keys should be 16");
         crossKeys.clear();
         dotKeys.clear();
     }
