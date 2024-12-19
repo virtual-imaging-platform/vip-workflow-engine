@@ -13,7 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.source>21</maven.compiler.source>
-        <gasw-version>3.11.0</gasw-version>
+        <gasw-version>3.12.0-SNAPSHOT</gasw-version>
         <revision>0.1</revision>
         <changelist>-SNAPSHOT</changelist>
         <sha1 />
@@ -70,12 +70,11 @@
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>gasw</artifactId>
             <version>${gasw-version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>moteur2-workflowsdb-plugin</artifactId>
-            <version>1.6</version>
+            <artifactId>moteur2-workflowsdb-common</artifactId>
+            <version>1.8.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -93,6 +92,12 @@
             <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>

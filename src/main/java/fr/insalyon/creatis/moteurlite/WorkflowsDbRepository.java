@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.*;
 
 import fr.insalyon.creatis.gasw.execution.GaswStatus;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.WorkflowsDBException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.DataType;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Input;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.InputID;
@@ -40,7 +41,7 @@ public class WorkflowsDbRepository {
     private final WorkflowDAO workflowDAO;
 
     // Private constructor for Singleton
-    private WorkflowsDbRepository() throws WorkflowsDBDAOException {
+    private WorkflowsDbRepository() throws WorkflowsDBDAOException, WorkflowsDBException {
         WorkflowsDBDAOFactory workflowsDBDAOFactory = new WorkflowsDBDAOFactory();
         this.inputDAO = workflowsDBDAOFactory.getInputDAO();
         this.outputDAO = workflowsDBDAOFactory.getOutputDAO();
@@ -49,7 +50,7 @@ public class WorkflowsDbRepository {
     }
 
     // Get the Singleton instance
-    public static WorkflowsDbRepository getInstance() throws WorkflowsDBDAOException {
+    public static WorkflowsDbRepository getInstance() throws WorkflowsDBDAOException, WorkflowsDBException {
         if (instance == null) {
             instance = new WorkflowsDbRepository();
         }
@@ -63,27 +64,18 @@ public class WorkflowsDbRepository {
         InputID inputID = new InputID();
 
         for (Map.Entry<String, List<String>> entry : inputValues.entrySet()) {
-            String key = entry.getKey();  // This is the input key
-            List<String> values = entry.getValue();  // List of values associated with the key
-            fr.insalyon.creatis.moteurlite.boutiques.Input.Type type = boutiquesInputs.get(key).getType();
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
 
-            // Iterate over all values in the list
             for (String value : values) {
-                // Set InputID
                 inputID.setWorkflowID(workflowId);
                 inputID.setPath(value);
                 inputID.setProcessor(key);
 
-                // Set input properties based on type
-                if (type == fr.insalyon.creatis.moteurlite.boutiques.Input.Type.FILE) {
-                    input.setType(DataType.URI);
-                } else {
-                    input.setType(DataType.String);
-                }
+                input.setType(getWorkflowsDBType(key, boutiquesInputs));
 
                 input.setInputID(inputID);
 
-                // Add to InputDAO
                 try {
                     inputDAO.add(input);
                 } catch (WorkflowsDBDAOException e) {
@@ -94,6 +86,13 @@ public class WorkflowsDbRepository {
         }
     }
 
+    private DataType getWorkflowsDBType(String boutiquesInputID, Map<String, fr.insalyon.creatis.moteurlite.boutiques.Input> boutiquesInputs) {
+        if (MoteurLite.RESULTS_DIRECTORY.equals(boutiquesInputID)) {
+            return DataType.URI;
+        } else {
+            return fr.insalyon.creatis.moteurlite.boutiques.Input.Type.FILE.equals(boutiquesInputs.get(boutiquesInputID).getType()) ? DataType.URI : DataType.String;
+        }
+    }
 
     public void persistOutputs(String workflowId, HashMap<String, OutputFile> boutiquesOutputs, List<URI> uploadList) throws MoteurLiteException {
         Output output = new Output();

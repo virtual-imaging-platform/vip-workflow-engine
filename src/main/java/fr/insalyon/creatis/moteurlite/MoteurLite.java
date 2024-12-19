@@ -8,19 +8,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswInput;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.WorkflowsDBException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
 import fr.insalyon.creatis.moteurlite.boutiques.Input;
 import fr.insalyon.creatis.moteurlite.boutiques.OutputFile;
 import fr.insalyon.creatis.moteurlite.iterationStrategy.IterationStrategyService;
-import org.apache.log4j.Logger;
 
 /**
  * 
@@ -30,6 +32,7 @@ import org.apache.log4j.Logger;
 
 public class MoteurLite {
 
+    public static final String RESULTS_DIRECTORY = "results-directory";
     private static final Logger logger = Logger.getLogger(MoteurLite.class);
 
     public static void main(String[] args) throws MoteurLiteException {
@@ -75,7 +78,7 @@ public class MoteurLite {
         iterationStrategyService = new IterationStrategyService(boutiquesService);
         try {
             workflowsDbRepo = WorkflowsDbRepository.getInstance();
-        } catch (WorkflowsDBDAOException e) {
+        } catch (WorkflowsDBDAOException | WorkflowsDBException e) {
             logger.error("Error creating workflows db repo", e);
             throw new MoteurLiteException("Error creating workflows db repo", e);
         }
@@ -123,7 +126,7 @@ public class MoteurLite {
 
             for (String inputId : invocationInputs.keySet()) {
                 String inputValue = invocationInputs.get(inputId);
-                if ("results-directory".equals(inputId)) {
+                if (RESULTS_DIRECTORY.equals(inputId)) {
                     resultsDirectoryURI = getURI(inputValue);
                 } else {
                     if (Input.Type.FILE.equals(boutiquesInputs.get(inputId).getType())) {
