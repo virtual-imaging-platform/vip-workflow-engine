@@ -13,7 +13,7 @@ import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
  */
 
 public class IterationStrategyService {
-    
+
     private final BoutiquesService boutiquesService;
 
     public IterationStrategyService(BoutiquesService boutiquesService) {
@@ -22,16 +22,16 @@ public class IterationStrategyService {
 
     public List<Map<String, String>> compute(BoutiquesDescriptor descriptor, Map<String, List<String>> inputValues) {
         IterationStrategy iterationStrategy = new IterationStrategy();
-        
+
         // handle custom properties if they do not exist
-        Map<String, Object> customProperties = descriptor.getCustom() != null 
-                ? descriptor.getCustom().getAdditionalProperties() 
+        Map<String, Object> customProperties = descriptor.getCustom() != null
+                ? descriptor.getCustom().getAdditionalProperties()
                 : Collections.emptyMap();
 
         // Get optional inputs (if applicable)
         Set<String> inputOptional = boutiquesService.getInputOptionalOfBoutiquesFile(descriptor);
 
         // Pass inputValues, customProperties, and inputOptional to IterationStrategy
-        return iterationStrategy.IterationStratergy(inputValues, customProperties, inputOptional);
+        return iterationStrategy.doStrategy(inputValues, customProperties, inputOptional);
     }
 }

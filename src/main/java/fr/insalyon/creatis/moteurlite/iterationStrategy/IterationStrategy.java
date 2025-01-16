@@ -16,7 +16,7 @@ public class IterationStrategy {
     private List<Map<String, String>> dotCombinations = new ArrayList<>();
     private List<Map<String, String>> jsonCombinations = new ArrayList<>();
 
-    public List<Map<String, String>> IterationStratergy(Map<String, List<String>> inputsMap, Map<String, Object> customProperties, Set<String> inputOptional) {
+    public List<Map<String, String>> doStrategy(Map<String, List<String>> inputsMap, Map<String, Object> customProperties, Set<String> inputOptional) {
         // Extract result-directory from inputsMap
         Map<String, String> resultDir = new HashMap<>();
         if (inputsMap.containsKey("results-directory")) {
@@ -56,37 +56,22 @@ public class IterationStrategy {
     }
 
     private List<Map<String, String>> setCrossIteration(Map<String, List<String>> inputsMap, Map<String, String> resultDir) {
-        Map<String, List<String>> valuesMap = new HashMap<>();
-        for (Map.Entry<String, List<String>> entry : inputsMap.entrySet()) {
-            String key = entry.getKey();
-            List<String> values = entry.getValue();
-            valuesMap.put(key, values);
-        }
-        List<Map<String, String>> crossCombinations = CrossIteration.crossIteration(valuesMap);
+        List<Map<String, String>> crossCombinations = CrossIteration.crossIteration(inputsMap);
+
         addResultsDir(crossCombinations, resultDir);
         return crossCombinations;
     }
 
     private List<Map<String, String>> setDotIteration(Map<String, List<String>> inputsMap, Map<String, String> resultDir) {
-        Map<String, List<String>> valuesMap = new HashMap<>();
-        for (Map.Entry<String, List<String>> entry : inputsMap.entrySet()) {
-            String key = entry.getKey();
-            List<String> values = entry.getValue();
-            valuesMap.put(key, values);
-        }
-        List<Map<String, String>> dotCombinations = DotIteration.dotIteration(valuesMap);
+        List<Map<String, String>> dotCombinations = DotIteration.dotIteration(inputsMap);
+
         addResultsDir(dotCombinations, resultDir);
         return dotCombinations;
     }
 
     private List<Map<String, String>> setJsonIteration(Map<String, List<String>> inputsMap, Map<String, String> resultDir, Set<String> crossJson, Set<String> dotJson, Set<String> inputOptional) {
-        Map<String, List<String>> valuesMap = new HashMap<>();
-        for (Map.Entry<String, List<String>> entry : inputsMap.entrySet()) {
-            String key = entry.getKey();
-            List<String> values = entry.getValue();
-            valuesMap.put(key, values);
-        }
-        List<Map<String, String>> jsonCombinations = JsonIteration.jsonIteration(valuesMap, crossJson, dotJson, inputOptional);
+        List<Map<String, String>> jsonCombinations = JsonIteration.jsonIteration(inputsMap, crossJson, dotJson, inputOptional);
+
         addResultsDir(jsonCombinations, resultDir);
         return jsonCombinations;
     }
