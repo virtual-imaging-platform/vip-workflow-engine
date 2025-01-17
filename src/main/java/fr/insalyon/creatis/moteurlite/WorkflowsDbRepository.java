@@ -40,7 +40,6 @@ public class WorkflowsDbRepository {
     private final ProcessorDAO processorDAO;
     private final WorkflowDAO workflowDAO;
 
-    // Private constructor for Singleton
     private WorkflowsDbRepository() throws WorkflowsDBDAOException, WorkflowsDBException {
         WorkflowsDBDAOFactory workflowsDBDAOFactory = new WorkflowsDBDAOFactory();
         this.inputDAO = workflowsDBDAOFactory.getInputDAO();
@@ -49,7 +48,6 @@ public class WorkflowsDbRepository {
         this.workflowDAO = workflowsDBDAOFactory.getWorkflowDAO();
     }
 
-    // Get the Singleton instance
     public static WorkflowsDbRepository getInstance() throws WorkflowsDBDAOException, WorkflowsDBException {
         if (instance == null) {
             instance = new WorkflowsDbRepository();
@@ -124,17 +122,14 @@ public class WorkflowsDbRepository {
 
     public void persistProcessors(String workflowId, String applicationName, Integer queued, Integer completed, Integer failed) throws MoteurLiteException {
         try {
-            // Fetch existing processor entity by workflowId and processor name (applicationName)
             Processor existingProcessor = processorDAO.get(workflowId, applicationName);
 
             if (existingProcessor != null) {
-                // Update the existing processor with new values
                 existingProcessor.setQueued(queued);
                 existingProcessor.setCompleted(completed);
                 existingProcessor.setFailed(failed);
                 processorDAO.update(existingProcessor);
             } else {
-                // If the processor does not exist, add a new one
                 Processor processors = new Processor();
                 ProcessorID processorID = new ProcessorID();
                 processorID.setWorkflowID(workflowId);

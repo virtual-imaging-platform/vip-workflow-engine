@@ -36,7 +36,6 @@ public class MoteurLite {
     private static final Logger logger = Logger.getLogger(MoteurLite.class);
 
     public static void main(String[] args) throws MoteurLiteException {
-        // Verify arguments
         if (args.length != 3) {
             throw new IllegalArgumentException("Exactly 3 arguments are required: workflowId, boutiquesFilePath, inputsFilePath.");
         }
@@ -50,18 +49,15 @@ public class MoteurLite {
     }
 
     private static void checkArguments(String workflowId, String boutiquesFilePath, String inputsFilePath) {
-        // Validate workflowId as a non-empty string
-        if (workflowId == null || workflowId.trim().isEmpty()) {
+        if (workflowId.trim().isEmpty()) {
             throw new IllegalArgumentException("Invalid workflowId. It should be a simple non-empty string.");
         }
 
-        // Validate boutiquesFilePath as a JSON file
-        if (!boutiquesFilePath.endsWith(".json")) {
+        if ( ! boutiquesFilePath.endsWith(".json")) {
             throw new IllegalArgumentException("Invalid boutiquesFilePath. It should be a JSON file.");
         }
 
-        // Validate inputsFilePath as an XML file
-        if (!inputsFilePath.endsWith(".xml")) {
+        if ( ! inputsFilePath.endsWith(".xml")) {
             throw new IllegalArgumentException("Invalid inputsFilePath. It should be an XML file.");
         }
     }
@@ -72,10 +68,10 @@ public class MoteurLite {
     private final IterationStrategyService iterationStrategyService;
 
     public MoteurLite() throws MoteurLiteException {
-        // Build dependencies
         boutiquesService = new BoutiquesService();
         inputsFileService = new InputsFileService();
         iterationStrategyService = new IterationStrategyService(boutiquesService);
+
         try {
             workflowsDbRepo = WorkflowsDbRepository.getInstance();
         } catch (WorkflowsDBDAOException | WorkflowsDBException e) {
@@ -85,22 +81,16 @@ public class MoteurLite {
     }
 
     public void runWorkflow(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
-        // Parse boutiques and inputs
         Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
         BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
         HashMap<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
         HashMap<String, OutputFile> boutiquesOutputs = boutiquesService.getOutputMap(descriptor);
 
-        // Compute iteration strategy
         List<Map<String, String>> invocationsInputs = iterationStrategyService.compute(descriptor, allInputs);
 
-        // Persist processors before persisting inputs
         workflowsDbRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
-
-        // Persist inputs
         workflowsDbRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
 
-        // Initialize Gasw and GaswMonitor
         Gasw gasw = null;
         try {
             gasw = Gasw.getInstance();
@@ -112,9 +102,7 @@ public class MoteurLite {
             throw new MoteurLiteException("Error launching gasw", e);
         }
 
-        // Launch jobs
         createJobs(gasw, descriptor.getName(), invocationsInputs, boutiquesInputs);
-
     }
 
     private void createJobs(Gasw gasw, String applicationName, List<Map<String, String>> allInvocationsInputs, HashMap<String, Input> boutiquesInputs) throws MoteurLiteException {
@@ -139,7 +127,6 @@ public class MoteurLite {
                 }
             }
 
-            // Convert invocation map to JSON
             String invocationString = convertMapToJson(finalInvocationInputs, boutiquesInputs);
             String jobId = applicationName + "-" + System.nanoTime() + ".sh";
 

@@ -17,16 +17,15 @@ public class IterationStrategy {
     private List<Map<String, String>> jsonCombinations = new ArrayList<>();
 
     public List<Map<String, String>> doStrategy(Map<String, List<String>> inputsMap, Map<String, Object> customProperties, Set<String> inputOptional) {
-        // Extract result-directory from inputsMap
         Map<String, String> resultDir = new HashMap<>();
+
         if (inputsMap.containsKey("results-directory")) {
             List<String> resultDirs = inputsMap.get("results-directory");
             if (resultDirs != null && !resultDirs.isEmpty()) {
-                resultDir.put("results-directory", resultDirs.get(0));  // Assuming there is only one result-directory
+                resultDir.put("results-directory", resultDirs.get(0));
             }
         }
 
-        // Create crossJson and dotJson from customProperties
         Set<String> crossJson = extractCustomValues(customProperties, "VIPcross");
         Set<String> dotJson = extractCustomValues(customProperties, "VIPdot");
 
@@ -39,8 +38,7 @@ public class IterationStrategy {
 
     private Set<String> extractCustomValues(Map<String, Object> customProperties, String key) {
         Set<String> values = new HashSet<>();
-        
-        // Check if the custom property contains the key (e.g., "VIPcross" or "VIPdot")
+
         if (customProperties.containsKey(key)) {
             Object customValue = customProperties.get(key);
 
@@ -53,6 +51,14 @@ public class IterationStrategy {
             }
         }
         return values;
+    }
+
+    private void addResultsDir(List<Map<String, String>> combinations, Map<String, String> resultDir) {
+        if (resultDir != null && !resultDir.isEmpty()) {
+            for (Map<String, String> map : combinations) {
+                map.putAll(resultDir);
+            }
+        }
     }
 
     private List<Map<String, String>> setCrossIteration(Map<String, List<String>> inputsMap, Map<String, String> resultDir) {
@@ -74,14 +80,6 @@ public class IterationStrategy {
 
         addResultsDir(jsonCombinations, resultDir);
         return jsonCombinations;
-    }
-
-    private static void addResultsDir(List<Map<String, String>> combinations, Map<String, String> resultDir) {
-        if (resultDir != null && !resultDir.isEmpty()) {
-            for (Map<String, String> map : combinations) {
-                map.putAll(resultDir);
-            }
-        }
     }
 
     public List<Map<String, String>> getJsonIterations() {
