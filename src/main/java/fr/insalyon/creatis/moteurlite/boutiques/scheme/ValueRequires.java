@@ -1,23 +1,26 @@
 
-package fr.insalyon.creatis.moteurlite.boutiques;
+package fr.insalyon.creatis.moteurlite.boutiques.scheme;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import javax.annotation.Generated;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+
+/**
+ * Ids of the inputs that are required when the corresponding value choice is selected.
+ * 
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
 
 })
 @Generated("jsonschema2pojo")
-public class Custom {
+public class ValueRequires {
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();

@@ -1,5 +1,5 @@
 
-package fr.insalyon.creatis.moteurlite.boutiques;
+package fr.insalyon.creatis.moteurlite.boutiques.scheme;
 
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
