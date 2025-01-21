@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.moteurlite;
+package fr.insalyon.creatis.moteurlite.runner;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,10 +18,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import fr.insalyon.creatis.moteurlite.MoteurLiteException;
+
 public class InputsFileService {
 
     private static final Logger logger = Logger.getLogger(InputsFileService.class);
-
 
     /**
      * This method parses input data from an XML file and returns a Map where each key

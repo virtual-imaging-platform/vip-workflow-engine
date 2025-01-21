@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.moteurlite;
+package fr.insalyon.creatis.moteurlite.gasw;
 
 import java.net.URI;
 import java.util.*;
@@ -20,22 +20,24 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.ProcessorDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
+import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
+import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.scheme.OutputFile;
 
 import org.apache.log4j.Logger;
 
-public class WorkflowsDbRepository {
+public class WorkflowsDBRepository {
 
-    private static final Logger logger = Logger.getLogger(WorkflowsDbRepository.class);
+    private static final Logger logger = Logger.getLogger(WorkflowsDBRepository.class);
 
-    private static WorkflowsDbRepository instance;
+    private static WorkflowsDBRepository instance;
 
     private final InputDAO inputDAO;
     private final OutputDAO outputDAO;
     private final ProcessorDAO processorDAO;
     private final WorkflowDAO workflowDAO;
 
-    private WorkflowsDbRepository() throws WorkflowsDBDAOException, WorkflowsDBException {
+    private WorkflowsDBRepository() throws WorkflowsDBDAOException, WorkflowsDBException {
         WorkflowsDBDAOFactory workflowsDBDAOFactory = new WorkflowsDBDAOFactory();
         this.inputDAO = workflowsDBDAOFactory.getInputDAO();
         this.outputDAO = workflowsDBDAOFactory.getOutputDAO();
@@ -43,9 +45,9 @@ public class WorkflowsDbRepository {
         this.workflowDAO = workflowsDBDAOFactory.getWorkflowDAO();
     }
 
-    public static WorkflowsDbRepository getInstance() throws WorkflowsDBDAOException, WorkflowsDBException {
+    public static WorkflowsDBRepository getInstance() throws WorkflowsDBDAOException, WorkflowsDBException {
         if (instance == null) {
-            instance = new WorkflowsDbRepository();
+            instance = new WorkflowsDBRepository();
         }
         return instance;
     }
@@ -79,7 +81,7 @@ public class WorkflowsDbRepository {
     }
 
     private DataType getWorkflowsDBType(String boutiquesInputID, Map<String, fr.insalyon.creatis.moteurlite.boutiques.scheme.Input> boutiquesInputs) {
-        if (MoteurLite.RESULTS_DIRECTORY.equals(boutiquesInputID)) {
+        if (MoteurLiteConstants.RESULTS_DIRECTORY.equals(boutiquesInputID)) {
             return DataType.URI;
         } else {
             return fr.insalyon.creatis.moteurlite.boutiques.scheme.Input.Type.FILE.equals(boutiquesInputs.get(boutiquesInputID).getType()) ? DataType.URI : DataType.String;
