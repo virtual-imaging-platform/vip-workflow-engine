@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 
-import fr.insalyon.creatis.moteurlite.boutiques.OutputFile;
 import org.apache.log4j.Logger;
 
 import fr.insalyon.creatis.gasw.Gasw;
@@ -12,12 +11,7 @@ import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswExitCode;
 import fr.insalyon.creatis.gasw.GaswOutput;
 import fr.insalyon.creatis.gasw.execution.GaswStatus;
-
-/**
- * 
- * @author Sandesh Patil [https://github.com/sandepat]
- * 
- */
+import fr.insalyon.creatis.moteurlite.boutiques.scheme.OutputFile;
 
 public class GaswMonitor extends Thread {
     private static final Logger logger = Logger.getLogger(GaswMonitor.class);
@@ -90,10 +84,8 @@ public class GaswMonitor extends Thread {
         }
 
         try {
-            // Determine the final status of the processor based on the jobs' status
             GaswStatus finalStatus = successfulJobsNumber > 0 ? GaswStatus.COMPLETED : GaswStatus.ERROR;
 
-            // Persist the final workflow status
             workflowsDbRepository.persistWorkflows(workflowId, finalStatus);
 
             gasw.terminate();

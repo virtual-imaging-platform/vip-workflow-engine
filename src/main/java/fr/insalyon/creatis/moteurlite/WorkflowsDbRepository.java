@@ -20,14 +20,9 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.ProcessorDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
-import fr.insalyon.creatis.moteurlite.boutiques.OutputFile;
-import org.apache.log4j.Logger;
+import fr.insalyon.creatis.moteurlite.boutiques.scheme.OutputFile;
 
-/**
- * 
- * @author Sandesh Patil [https://github.com/sandepat]
- * 
- */
+import org.apache.log4j.Logger;
 
 public class WorkflowsDbRepository {
 
@@ -57,7 +52,7 @@ public class WorkflowsDbRepository {
 
     public void persistInputs(
             String workflowId, Map<String, List<String>> inputValues,
-            Map<String, fr.insalyon.creatis.moteurlite.boutiques.Input> boutiquesInputs) throws MoteurLiteException {
+            Map<String, fr.insalyon.creatis.moteurlite.boutiques.scheme.Input> boutiquesInputs) throws MoteurLiteException {
         Input input = new Input();
         InputID inputID = new InputID();
 
@@ -71,7 +66,6 @@ public class WorkflowsDbRepository {
                 inputID.setProcessor(key);
 
                 input.setType(getWorkflowsDBType(key, boutiquesInputs));
-
                 input.setInputID(inputID);
 
                 try {
@@ -84,11 +78,11 @@ public class WorkflowsDbRepository {
         }
     }
 
-    private DataType getWorkflowsDBType(String boutiquesInputID, Map<String, fr.insalyon.creatis.moteurlite.boutiques.Input> boutiquesInputs) {
+    private DataType getWorkflowsDBType(String boutiquesInputID, Map<String, fr.insalyon.creatis.moteurlite.boutiques.scheme.Input> boutiquesInputs) {
         if (MoteurLite.RESULTS_DIRECTORY.equals(boutiquesInputID)) {
             return DataType.URI;
         } else {
-            return fr.insalyon.creatis.moteurlite.boutiques.Input.Type.FILE.equals(boutiquesInputs.get(boutiquesInputID).getType()) ? DataType.URI : DataType.String;
+            return fr.insalyon.creatis.moteurlite.boutiques.scheme.Input.Type.FILE.equals(boutiquesInputs.get(boutiquesInputID).getType()) ? DataType.URI : DataType.String;
         }
     }
 
@@ -149,7 +143,6 @@ public class WorkflowsDbRepository {
 
     public void persistWorkflows(String workflowId, GaswStatus status) throws MoteurLiteException {
         try {
-            // Determine the final status based on GaswStatus
             WorkflowStatus finalStatus = WorkflowStatus.Unknown;
             if (status.equals(GaswStatus.COMPLETED)) {
                 finalStatus = WorkflowStatus.Completed;
@@ -157,12 +150,10 @@ public class WorkflowsDbRepository {
                 finalStatus = WorkflowStatus.Failed;
             }
 
-            // Fetch the existing Workflow entity by its ID
             Workflow workflow = workflowDAO.get(workflowId);
 
             Date currentDate = new Date();
 
-            // Update only the status of the Workflow entity
             if (workflow != null) {
                 workflow.setStatus(finalStatus);
                 workflow.setFinishedTime(currentDate);
