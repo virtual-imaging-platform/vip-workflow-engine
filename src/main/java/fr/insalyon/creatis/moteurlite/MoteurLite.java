@@ -13,7 +13,7 @@ public class MoteurLite {
         } else if ( ! args[2].endsWith(".xml")) {
             throw new IllegalArgumentException("Invalid inputsFilePath. It should be an XML file.");
         } else {
-            new MoteurLiteRunner().run(args[1], args[2], args[3]);
+            new MoteurLiteRunner().run(args[0], args[1], args[2]);
         }
     }
 }

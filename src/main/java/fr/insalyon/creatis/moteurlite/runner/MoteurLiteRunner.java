@@ -51,6 +51,7 @@ public class MoteurLiteRunner {
     }
 
     public void run(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
+        Gasw gasw;
         Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
         BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
         Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
@@ -61,7 +62,6 @@ public class MoteurLiteRunner {
         workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
         workflowsDBRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
 
-        Gasw gasw = null;
         try {
             gasw = Gasw.getInstance();
             GaswMonitor gaswMonitor = new GaswMonitor(gasw, workflowsDBRepo, workflowId, descriptor.getName(), boutiquesOutputs, invocationsInputs.size());
@@ -77,7 +77,6 @@ public class MoteurLiteRunner {
 
     private void createJobs(Gasw gasw, String applicationName, List<Map<String, String>> allInvocationsInputs, Map<String, Input> boutiquesInputs) throws MoteurLiteException {
         for (Map<String, String> invocationInputs : allInvocationsInputs) {
-
             URI resultsDirectoryURI = null;
             List<URI> downloads = new ArrayList<>();
             Map<String, String> finalInvocationInputs = new HashMap<>();
@@ -127,7 +126,7 @@ public class MoteurLiteRunner {
             String value = invocationInputs.get(inputId);
             Input.Type type = boutiquesInputs.get(inputId).getType();
 
-            if (type == Input.Type.NUMBER ) {
+            if (type == Input.Type.NUMBER) {
                 if (boutiquesInputs.get(inputId).getInteger() != null && boutiquesInputs.get(inputId).getInteger()) {
                     jsonNode.put(inputId, Integer.parseInt(value));
                 } else {

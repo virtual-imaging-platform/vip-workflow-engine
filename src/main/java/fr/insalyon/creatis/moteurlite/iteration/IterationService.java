@@ -7,12 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
+
+import fr.insalyon.creatis.moteurlite.MoteurLite;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
 import fr.insalyon.creatis.moteurlite.boutiques.scheme.BoutiquesDescriptor;
 
 public class IterationService {
-
     private final BoutiquesService boutiquesService;
     private final IterationTypes iterationTypes;
 
@@ -41,6 +43,7 @@ public class IterationService {
 
         dotKeys.retainAll(inputsMap.keySet());
         crossKeys.retainAll(inputsMap.keySet());
+        crossKeys.addAll(allKeys);
 
         List<Map<String, String>> dotCombinations = iterationTypes.dot(getSelectedMap(inputsMap, dotKeys));
         List<Map<String, String>> crossCombinations = iterationTypes.cross(getSelectedMap(inputsMap, crossKeys));
