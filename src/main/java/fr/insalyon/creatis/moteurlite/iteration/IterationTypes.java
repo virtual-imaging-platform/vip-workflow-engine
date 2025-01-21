@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.moteurlite.iterationStrategy;
+package fr.insalyon.creatis.moteurlite.iteration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +38,9 @@ public class IterationTypes {
      */
     public List<Map<String, String>> dot(Map<String, List<String>> inputs) throws MoteurLiteException {
         List<Map<String, String>> combinations = new ArrayList<>();
+
+        if (inputs.size() == 0)
+            return combinations;
 
         boolean sameSize = inputs.values().stream().mapToInt(List::size).distinct().count() == 1;
         int size = inputs.values().stream().mapToInt(List::size).min().getAsInt();
@@ -86,10 +89,10 @@ public class IterationTypes {
      * ]
      * </pre>
      */
-    public List<Map<String, String>> cross(Map<String, List<String>> inputMap) {
+    public List<Map<String, String>> cross(Map<String, List<String>> inputs) {
         List<Map<String, String>> combinations = new ArrayList<>();
 
-        for (Map.Entry<String, List<String>> entry : inputMap.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : inputs.entrySet()) {
             String key = entry.getKey();
             List<String> values = entry.getValue();
 
@@ -112,5 +115,31 @@ public class IterationTypes {
             }
         }
         return combinations;
+    }
+
+    /**
+     * <p>
+     * This fonction does exactly the same than the previous one, the only difference is the inputs types. 
+     * This used to cross existing dot and cross combinations.   
+     * </p>
+     */
+    public List<Map<String, String>> cross(List<Map<String, String>> combinationsA, List<Map<String, String>> combinationsB) {
+        List<Map<String, String>> result = new ArrayList<>();
+
+        if (combinationsA.isEmpty()) {
+            return combinationsB;
+        } else if (combinationsB.isEmpty()) {
+            return combinationsA;
+        } else {
+            for (Map<String, String> mapA : combinationsA) {
+                for (Map<String, String> mapB : combinationsB) {
+                    Map<String, String> combined = new HashMap<>(mapA);
+    
+                    combined.putAll(mapB);
+                    result.add(combined);
+                }
+            }
+            return result;
+        }
     }
 }

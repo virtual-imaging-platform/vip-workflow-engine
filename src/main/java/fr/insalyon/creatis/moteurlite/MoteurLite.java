@@ -18,17 +18,11 @@ import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswInput;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.WorkflowsDBException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
-import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
-import fr.insalyon.creatis.moteurlite.boutiques.Input;
-import fr.insalyon.creatis.moteurlite.boutiques.OutputFile;
-import fr.insalyon.creatis.moteurlite.iterationStrategy.IterationStrategyService;
-
-/**
- * 
- * Author: Sandesh Patil [https://github.com/sandepat]
- * 
- */
+import fr.insalyon.creatis.moteurlite.boutiques.scheme.BoutiquesDescriptor;
+import fr.insalyon.creatis.moteurlite.boutiques.scheme.Input;
+import fr.insalyon.creatis.moteurlite.boutiques.scheme.OutputFile;
+import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 
 public class MoteurLite {
 
@@ -65,12 +59,12 @@ public class MoteurLite {
     private final WorkflowsDbRepository workflowsDbRepo;
     private final BoutiquesService boutiquesService;
     private final InputsFileService inputsFileService;
-    private final IterationStrategyService iterationStrategyService;
+    private final IterationService iterationService;
 
     public MoteurLite() throws MoteurLiteException {
         boutiquesService = new BoutiquesService();
         inputsFileService = new InputsFileService();
-        iterationStrategyService = new IterationStrategyService(boutiquesService);
+        iterationService = new IterationService(boutiquesService);
 
         try {
             workflowsDbRepo = WorkflowsDbRepository.getInstance();
@@ -83,10 +77,10 @@ public class MoteurLite {
     public void runWorkflow(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
         Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
         BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
-        HashMap<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
-        HashMap<String, OutputFile> boutiquesOutputs = boutiquesService.getOutputMap(descriptor);
+        Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
+        HashMap<String, OutputFile> boutiquesOutputs = new HashMap<>(boutiquesService.getOutputMap(descriptor));
 
-        List<Map<String, String>> invocationsInputs = iterationStrategyService.compute(descriptor, allInputs);
+        List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
         workflowsDbRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
         workflowsDbRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
@@ -105,7 +99,7 @@ public class MoteurLite {
         createJobs(gasw, descriptor.getName(), invocationsInputs, boutiquesInputs);
     }
 
-    private void createJobs(Gasw gasw, String applicationName, List<Map<String, String>> allInvocationsInputs, HashMap<String, Input> boutiquesInputs) throws MoteurLiteException {
+    private void createJobs(Gasw gasw, String applicationName, List<Map<String, String>> allInvocationsInputs, Map<String, Input> boutiquesInputs) throws MoteurLiteException {
         for (Map<String, String> invocationInputs : allInvocationsInputs) {
 
             URI resultsDirectoryURI = null;
@@ -149,7 +143,7 @@ public class MoteurLite {
         }
     }
 
-    private String convertMapToJson(Map<String, String> invocationInputs, HashMap<String, Input> boutiquesInputs) {
+    private String convertMapToJson(Map<String, String> invocationInputs, Map<String, Input> boutiquesInputs) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode jsonNode = mapper.createObjectNode();
 

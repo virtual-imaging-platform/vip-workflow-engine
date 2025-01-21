@@ -45,13 +45,10 @@ public class BoutiquesService {
     }
 
     public Set<String> getInputOptionalOfBoutiquesFile(BoutiquesDescriptor boutiquesDescriptor) {
-        Set<String> optionalInputs = new HashSet<>();
-        for (Input input : boutiquesDescriptor.getInputs()) {
-            if (input.getOptional() != null && input.getOptional()) {
-                optionalInputs.add(input.getId());
-            }
-        }
-        return optionalInputs;
+        return boutiquesDescriptor.getInputs().stream()
+            .filter((i) -> i.getOptional() != null && i.getOptional())
+            .map((i) -> i.getId())
+            .collect(Collectors.toSet());
     }
 
     public Set<String> getCrossMap(BoutiquesDescriptor boutiquesDescriptor) {
@@ -63,7 +60,7 @@ public class BoutiquesService {
     }
 
     public Set<String> getContainerSet(BoutiquesDescriptor boutiquesDescriptor) {
-        return extractCustomField(boutiquesDescriptor, "vuo:imagepath");
+        return extractCustomField(boutiquesDescriptor, "vip:imagepath");
     }
 
     private Set<String> extractCustomField(BoutiquesDescriptor boutiquesDescriptor, String key) {
