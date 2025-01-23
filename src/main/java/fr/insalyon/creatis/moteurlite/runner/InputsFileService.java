@@ -48,7 +48,7 @@ public class InputsFileService {
                     NodeList itemNodeList = element.getElementsByTagName("item");
                     
                     // Create the list for the items if it's not already in the map
-                    if (!inputMap.containsKey(name)) {
+                    if ( ! inputMap.containsKey(name)) {
                         inputMap.put(name, new ArrayList<>());
                     }
                     

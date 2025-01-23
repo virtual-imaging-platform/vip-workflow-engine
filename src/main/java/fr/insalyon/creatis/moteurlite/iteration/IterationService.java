@@ -7,9 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
-
-import fr.insalyon.creatis.moteurlite.MoteurLite;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
 import fr.insalyon.creatis.moteurlite.boutiques.scheme.BoutiquesDescriptor;
@@ -24,16 +21,6 @@ public class IterationService {
     }
 
     public List<Map<String, String>> compute(Map<String, List<String>> inputsMap, BoutiquesDescriptor boutiquesDescriptor) throws MoteurLiteException {
-        Map<String, String> resultDir = new HashMap<>();
-
-        // a tester c'est etrange
-        if (inputsMap.containsKey("results-directory")) {
-            List<String> resultDirs = inputsMap.get("results-directory");
-            if (resultDirs != null && !resultDirs.isEmpty()) {
-                resultDir.put("results-directory", resultDirs.get(0));
-            }
-        }
-
         Set<String> crossKeys = boutiquesService.getCrossMap(boutiquesDescriptor);
         Set<String> dotKeys = boutiquesService.getDotMap(boutiquesDescriptor);
         Set<String> allKeys = new HashSet<>(inputsMap.keySet());
@@ -49,7 +36,6 @@ public class IterationService {
         List<Map<String, String>> crossCombinations = iterationTypes.cross(getSelectedMap(inputsMap, crossKeys));
         List<Map<String, String>> resultCombinations = iterationTypes.cross(dotCombinations, crossCombinations);
 
-        resultCombinations.forEach((r) -> r.putAll(resultDir));
         return resultCombinations;
     }
 
