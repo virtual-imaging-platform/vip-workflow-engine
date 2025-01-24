@@ -98,11 +98,6 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
-        <dependency>
-            <groupId>net.xeoh.plugins</groupId>
-            <artifactId>jspf-core</artifactId>
-            <version>1.0.2</version>
-        </dependency>
     </dependencies>
 
     <repositories>
@@ -110,11 +105,6 @@
             <id>creatis</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
             <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
-        </repository>
-        <repository>
-            <id>korpling</id>
-            <name>Korpling Repository</name>
-            <url>https://korpling.german.hu-berlin.de/maven2/</url>
         </repository>
     </repositories>
 
