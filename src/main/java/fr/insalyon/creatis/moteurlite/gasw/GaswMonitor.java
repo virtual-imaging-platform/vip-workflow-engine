@@ -97,7 +97,7 @@ public class GaswMonitor extends Thread {
         try {
             GaswStatus finalStatus = successfulJobsNumber > 0 ? GaswStatus.COMPLETED : GaswStatus.ERROR;
 
-            workflowsDbRepository.persistWorkflows(workflowId, finalStatus);
+            workflowsDbRepository.persistWorkflow(workflowId, finalStatus);
             gasw.terminate();
             logger.info("Completed execution of workflow");
         } catch (GaswException e) {

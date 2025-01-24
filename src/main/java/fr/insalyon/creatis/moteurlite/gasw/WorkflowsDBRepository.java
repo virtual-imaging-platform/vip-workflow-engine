@@ -143,7 +143,7 @@ public class WorkflowsDBRepository {
     }
 
 
-    public void persistWorkflows(String workflowId, GaswStatus status) throws MoteurLiteException {
+    public void persistWorkflow(String workflowId, GaswStatus status) throws MoteurLiteException {
         try {
             WorkflowStatus finalStatus = WorkflowStatus.Unknown;
             if (status.equals(GaswStatus.COMPLETED)) {

@@ -100,6 +100,9 @@ public class MoteurLiteRunner {
             String jobId = applicationName + "-" + System.nanoTime() + ".sh";
 
             GaswInput gaswInput = new GaswInput(applicationName, applicationName + ".json", downloads, resultsDirectoryURI, invocationString, jobId);
+            for (String v : invocationInputs.values()) {
+                gaswInput.addParameter(v);
+            }
             try {
                 gasw.submit(gaswInput);
             } catch (GaswException e) {
