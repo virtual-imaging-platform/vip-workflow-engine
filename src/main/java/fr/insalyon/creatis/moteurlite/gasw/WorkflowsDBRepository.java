@@ -22,7 +22,6 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOExceptio
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
-import fr.insalyon.creatis.moteurlite.boutiques.scheme.OutputFile;
 
 import org.apache.log4j.Logger;
 
@@ -88,22 +87,14 @@ public class WorkflowsDBRepository {
         }
     }
 
-    public void persistOutputs(String workflowId, HashMap<String, OutputFile> boutiquesOutputs, List<URI> uploadList) throws MoteurLiteException {
+    public void persistOutputs(String workflowId, Map<String, URI> uploadMap) throws MoteurLiteException {
         Output output = new Output();
         OutputID outputID = new OutputID();
 
-        // at the moment, we do not know which output corresponds to which upload, so we do that randomly
-
-        List<OutputFile> boutiquesOutputList = new ArrayList<>(boutiquesOutputs.values());
-        int currentIndex = -1;
-        for (URI upload : uploadList) {
-            currentIndex++;
-            OutputFile outputFile = currentIndex < boutiquesOutputList.size() ?
-                    boutiquesOutputList.get(currentIndex) :
-                    boutiquesOutputList.get(0);
+        for (String outputId : uploadMap.keySet()) {
             outputID.setWorkflowID(workflowId);
-            outputID.setProcessor(outputFile.getId());
-            outputID.setPath(upload.toString());
+            outputID.setProcessor(outputId);
+            outputID.setPath(uploadMap.get(outputId).toString());
             output.setOutputID(outputID);
             output.setType(DataType.URI);
 

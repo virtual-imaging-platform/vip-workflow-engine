@@ -3,6 +3,7 @@ package fr.insalyon.creatis.moteurlite.gasw;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -12,14 +13,12 @@ import fr.insalyon.creatis.gasw.GaswExitCode;
 import fr.insalyon.creatis.gasw.GaswOutput;
 import fr.insalyon.creatis.gasw.execution.GaswStatus;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
-import fr.insalyon.creatis.moteurlite.boutiques.scheme.OutputFile;
 
 public class GaswMonitor extends Thread {
     private static final Logger logger = Logger.getLogger(GaswMonitor.class);
 
     private String workflowId;
     private String applicationName;
-    private HashMap<String, OutputFile> boutiquesOutputs;
     private int numberOfInvocations;
     private Gasw gasw;
     private WorkflowsDBRepository workflowsDbRepository;
@@ -28,12 +27,11 @@ public class GaswMonitor extends Thread {
     private Integer successfulJobsNumber = 0;
     private Integer failedJobsNumber = 0;
 
-    public GaswMonitor(Gasw gasw, WorkflowsDBRepository workflowsDbRepository, String workflowId, String applicationName, HashMap<String, OutputFile> boutiquesOutputs, int numberOfInvocations) {
+    public GaswMonitor(Gasw gasw, WorkflowsDBRepository workflowsDbRepository, String workflowId, String applicationName, int numberOfInvocations) {
         this.gasw = gasw;
         this.workflowsDbRepository = workflowsDbRepository;
         this.workflowId = workflowId;
         this.applicationName = applicationName;
-        this.boutiquesOutputs = boutiquesOutputs;
         this.numberOfInvocations = numberOfInvocations;
     }
 
@@ -70,7 +68,7 @@ public class GaswMonitor extends Thread {
 
     private void processFinishedJobs(List<GaswOutput> finishedJobs) {
         GaswExitCode exitCode;
-        List<URI> uploadedResults;
+        Map<String, URI> uploadedResults;
 
         for (GaswOutput gaswOutput : finishedJobs) {
             logger.info("Status: " + gaswOutput.getJobID() + " " + gaswOutput.getExitCode());
@@ -82,9 +80,9 @@ public class GaswMonitor extends Thread {
                     failedJobsNumber++;
                 }
 
-                uploadedResults = gaswOutput.getUploadedResults();
+                uploadedResults = gaswOutput.getUploadedResultsAsMap();
                 if (uploadedResults != null && !uploadedResults.isEmpty()) {
-                    workflowsDbRepository.persistOutputs(workflowId, boutiquesOutputs, uploadedResults);
+                    workflowsDbRepository.persistOutputs(workflowId, uploadedResults);
                 }
             } catch (MoteurLiteException e) {
                 logger.error("Error while processing finished job output: ", e);

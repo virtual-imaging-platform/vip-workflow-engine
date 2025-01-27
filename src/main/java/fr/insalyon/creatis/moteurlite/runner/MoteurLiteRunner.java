@@ -55,7 +55,6 @@ public class MoteurLiteRunner {
         Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
         BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
         Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
-        HashMap<String, OutputFile> boutiquesOutputs = new HashMap<>(boutiquesService.getOutputMap(descriptor));
 
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
@@ -64,7 +63,7 @@ public class MoteurLiteRunner {
 
         try {
             gasw = Gasw.getInstance();
-            GaswMonitor gaswMonitor = new GaswMonitor(gasw, workflowsDBRepo, workflowId, descriptor.getName(), boutiquesOutputs, invocationsInputs.size());
+            GaswMonitor gaswMonitor = new GaswMonitor(gasw, workflowsDBRepo, workflowId, descriptor.getName(), invocationsInputs.size());
             gasw.setNotificationClient(gaswMonitor);
             gaswMonitor.start();
         } catch (GaswException e) {
@@ -100,9 +99,6 @@ public class MoteurLiteRunner {
             String jobId = applicationName + "-" + System.nanoTime() + ".sh";
 
             GaswInput gaswInput = new GaswInput(applicationName, applicationName + ".json", downloads, resultsDirectoryURI, invocationString, jobId);
-            for (String v : invocationInputs.values()) {
-                gaswInput.addParameter(v);
-            }
             try {
                 gasw.submit(gaswInput);
             } catch (GaswException e) {
