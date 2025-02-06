@@ -1,9 +1,7 @@
-package fr.insalyon.creatis.moteurlite;
+package fr.insalyon.creatis.moteurlite.runner;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,15 +18,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-/**
- * 
- * @author Sandesh Patil [https://github.com/sandepat]
- * 
- */
+import fr.insalyon.creatis.moteurlite.MoteurLiteException;
+
 public class InputsFileService {
 
     private static final Logger logger = Logger.getLogger(InputsFileService.class);
-
 
     /**
      * This method parses input data from an XML file and returns a Map where each key
@@ -54,7 +48,7 @@ public class InputsFileService {
                     NodeList itemNodeList = element.getElementsByTagName("item");
                     
                     // Create the list for the items if it's not already in the map
-                    if (!inputMap.containsKey(name)) {
+                    if ( ! inputMap.containsKey(name)) {
                         inputMap.put(name, new ArrayList<>());
                     }
                     

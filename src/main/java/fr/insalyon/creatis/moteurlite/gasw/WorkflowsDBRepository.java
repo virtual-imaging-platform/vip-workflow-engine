@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.moteurlite;
+package fr.insalyon.creatis.moteurlite.gasw;
 
 import java.net.URI;
 import java.util.*;
@@ -20,28 +20,23 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.ProcessorDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
-import fr.insalyon.creatis.moteurlite.boutiques.OutputFile;
+import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
+import fr.insalyon.creatis.moteurlite.MoteurLiteException;
+
 import org.apache.log4j.Logger;
 
-/**
- * 
- * @author Sandesh Patil [https://github.com/sandepat]
- * 
- */
+public class WorkflowsDBRepository {
 
-public class WorkflowsDbRepository {
+    private static final Logger logger = Logger.getLogger(WorkflowsDBRepository.class);
 
-    private static final Logger logger = Logger.getLogger(WorkflowsDbRepository.class);
-
-    private static WorkflowsDbRepository instance;
+    private static WorkflowsDBRepository instance;
 
     private final InputDAO inputDAO;
     private final OutputDAO outputDAO;
     private final ProcessorDAO processorDAO;
     private final WorkflowDAO workflowDAO;
 
-    // Private constructor for Singleton
-    private WorkflowsDbRepository() throws WorkflowsDBDAOException, WorkflowsDBException {
+    private WorkflowsDBRepository() throws WorkflowsDBDAOException, WorkflowsDBException {
         WorkflowsDBDAOFactory workflowsDBDAOFactory = new WorkflowsDBDAOFactory();
         this.inputDAO = workflowsDBDAOFactory.getInputDAO();
         this.outputDAO = workflowsDBDAOFactory.getOutputDAO();
@@ -49,17 +44,16 @@ public class WorkflowsDbRepository {
         this.workflowDAO = workflowsDBDAOFactory.getWorkflowDAO();
     }
 
-    // Get the Singleton instance
-    public static WorkflowsDbRepository getInstance() throws WorkflowsDBDAOException, WorkflowsDBException {
+    public static WorkflowsDBRepository getInstance() throws WorkflowsDBDAOException, WorkflowsDBException {
         if (instance == null) {
-            instance = new WorkflowsDbRepository();
+            instance = new WorkflowsDBRepository();
         }
         return instance;
     }
 
     public void persistInputs(
             String workflowId, Map<String, List<String>> inputValues,
-            Map<String, fr.insalyon.creatis.moteurlite.boutiques.Input> boutiquesInputs) throws MoteurLiteException {
+            Map<String, fr.insalyon.creatis.moteurlite.boutiques.model.Input> boutiquesInputs) throws MoteurLiteException {
         Input input = new Input();
         InputID inputID = new InputID();
 
@@ -73,7 +67,6 @@ public class WorkflowsDbRepository {
                 inputID.setProcessor(key);
 
                 input.setType(getWorkflowsDBType(key, boutiquesInputs));
-
                 input.setInputID(inputID);
 
                 try {
@@ -86,30 +79,22 @@ public class WorkflowsDbRepository {
         }
     }
 
-    private DataType getWorkflowsDBType(String boutiquesInputID, Map<String, fr.insalyon.creatis.moteurlite.boutiques.Input> boutiquesInputs) {
-        if (MoteurLite.RESULTS_DIRECTORY.equals(boutiquesInputID)) {
+    private DataType getWorkflowsDBType(String boutiquesInputID, Map<String, fr.insalyon.creatis.moteurlite.boutiques.model.Input> boutiquesInputs) {
+        if (MoteurLiteConstants.RESULTS_DIRECTORY.equals(boutiquesInputID)) {
             return DataType.URI;
         } else {
-            return fr.insalyon.creatis.moteurlite.boutiques.Input.Type.FILE.equals(boutiquesInputs.get(boutiquesInputID).getType()) ? DataType.URI : DataType.String;
+            return fr.insalyon.creatis.moteurlite.boutiques.model.Input.Type.FILE.equals(boutiquesInputs.get(boutiquesInputID).getType()) ? DataType.URI : DataType.String;
         }
     }
 
-    public void persistOutputs(String workflowId, HashMap<String, OutputFile> boutiquesOutputs, List<URI> uploadList) throws MoteurLiteException {
+    public void persistOutputs(String workflowId, Map<String, URI> uploadMap) throws MoteurLiteException {
         Output output = new Output();
         OutputID outputID = new OutputID();
 
-        // at the moment, we do not know which output corresponds to which upload, so we do that randomly
-
-        List<OutputFile> boutiquesOutputList = new ArrayList<>(boutiquesOutputs.values());
-        int currentIndex = -1;
-        for (URI upload : uploadList) {
-            currentIndex++;
-            OutputFile outputFile = currentIndex < boutiquesOutputList.size() ?
-                    boutiquesOutputList.get(currentIndex) :
-                    boutiquesOutputList.get(0);
+        for (String outputId : uploadMap.keySet()) {
             outputID.setWorkflowID(workflowId);
-            outputID.setProcessor(outputFile.getId());
-            outputID.setPath(upload.toString());
+            outputID.setProcessor(outputId);
+            outputID.setPath(uploadMap.get(outputId).toString());
             output.setOutputID(outputID);
             output.setType(DataType.URI);
 
@@ -124,17 +109,14 @@ public class WorkflowsDbRepository {
 
     public void persistProcessors(String workflowId, String applicationName, Integer queued, Integer completed, Integer failed) throws MoteurLiteException {
         try {
-            // Fetch existing processor entity by workflowId and processor name (applicationName)
             Processor existingProcessor = processorDAO.get(workflowId, applicationName);
 
             if (existingProcessor != null) {
-                // Update the existing processor with new values
                 existingProcessor.setQueued(queued);
                 existingProcessor.setCompleted(completed);
                 existingProcessor.setFailed(failed);
                 processorDAO.update(existingProcessor);
             } else {
-                // If the processor does not exist, add a new one
                 Processor processors = new Processor();
                 ProcessorID processorID = new ProcessorID();
                 processorID.setWorkflowID(workflowId);
@@ -152,9 +134,8 @@ public class WorkflowsDbRepository {
     }
 
 
-    public void persistWorkflows(String workflowId, GaswStatus status) throws MoteurLiteException {
+    public void persistWorkflow(String workflowId, GaswStatus status) throws MoteurLiteException {
         try {
-            // Determine the final status based on GaswStatus
             WorkflowStatus finalStatus = WorkflowStatus.Unknown;
             if (status.equals(GaswStatus.COMPLETED)) {
                 finalStatus = WorkflowStatus.Completed;
@@ -162,12 +143,10 @@ public class WorkflowsDbRepository {
                 finalStatus = WorkflowStatus.Failed;
             }
 
-            // Fetch the existing Workflow entity by its ID
             Workflow workflow = workflowDAO.get(workflowId);
 
             Date currentDate = new Date();
 
-            // Update only the status of the Workflow entity
             if (workflow != null) {
                 workflow.setStatus(finalStatus);
                 workflow.setFinishedTime(currentDate);
