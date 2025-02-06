@@ -1,5 +1,5 @@
 
-package fr.insalyon.creatis.moteurlite.boutiques.scheme;
+package fr.insalyon.creatis.moteurlite.boutiques.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 })
 @Generated("jsonschema2pojo")
-public class InvocationSchema {
+public class Invocation {
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();

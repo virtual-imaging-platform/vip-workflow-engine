@@ -1,5 +1,5 @@
 
-package fr.insalyon.creatis.moteurlite.boutiques.scheme;
+package fr.insalyon.creatis.moteurlite.boutiques.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,28 +10,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-
-/**
- * A set of key-value pairs specifying tags describing the pipeline. The tag names are open, they might be more constrained in the future.
- * 
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
 
 })
 @Generated("jsonschema2pojo")
-public class Tags {
+public class InvocationSchema {
 
     @JsonIgnore
-    private Map<String, String> additionalProperties = new LinkedHashMap<String, String>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     @JsonAnyGetter
-    public Map<String, String> getAdditionalProperties() {
+    public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, String value) {
+    public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
 

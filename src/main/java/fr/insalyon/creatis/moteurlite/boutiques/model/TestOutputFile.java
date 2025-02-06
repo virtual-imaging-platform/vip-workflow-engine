@@ -1,5 +1,5 @@
 
-package fr.insalyon.creatis.moteurlite.boutiques.scheme;
+package fr.insalyon.creatis.moteurlite.boutiques.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

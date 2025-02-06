@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
-import fr.insalyon.creatis.moteurlite.boutiques.scheme.BoutiquesDescriptor;
+import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
 
 public class IterationService {
     private final BoutiquesService boutiquesService;

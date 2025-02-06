@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
-import fr.insalyon.creatis.moteurlite.boutiques.scheme.BoutiquesDescriptor;
-import fr.insalyon.creatis.moteurlite.boutiques.scheme.Input;
-import fr.insalyon.creatis.moteurlite.boutiques.scheme.OutputFile;
+import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.moteurlite.boutiques.model.Input;
+import fr.insalyon.creatis.moteurlite.boutiques.model.OutputFile;
 
 
 public class BoutiquesService {
