@@ -65,16 +65,19 @@ public class BoutiquesService {
 
     private Set<String> extractCustomField(BoutiquesDescriptor boutiquesDescriptor, String key) {
         Set<String> resultSet = new HashSet<>();
-        Map<String, Object> customMap = boutiquesDescriptor.getCustom().getAdditionalProperties();
 
-        if (customMap != null && customMap.containsKey(key)) {
-            Object value = customMap.get(key);
+        if (boutiquesDescriptor.getCustom() != null) {
+            Map<String, Object> customMap = boutiquesDescriptor.getCustom().getAdditionalProperties();
 
-            if (value instanceof String) {
-                resultSet.add((String) value);
-            } else if (value instanceof Iterable) {
-                for (Object item : (Iterable<?>) value) {
-                    resultSet.add(item.toString());
+            if (customMap != null && customMap.containsKey(key)) {
+                Object value = customMap.get(key);
+
+                if (value instanceof String) {
+                    resultSet.add((String) value);
+                } else if (value instanceof Iterable) {
+                    for (Object item : (Iterable<?>) value) {
+                        resultSet.add(item.toString());
+                    }
                 }
             }
         }
