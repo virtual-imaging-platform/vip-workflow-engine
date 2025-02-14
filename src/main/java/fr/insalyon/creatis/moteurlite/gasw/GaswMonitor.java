@@ -93,6 +93,7 @@ public class GaswMonitor extends Thread {
 
     private void terminate() {
         try {
+            // We decided to use that instead of the old version based on the presence of output file to determine if the job was successful.
             GaswStatus finalStatus = successfulJobsNumber > 0 ? GaswStatus.COMPLETED : GaswStatus.ERROR;
 
             workflowsDbRepository.persistWorkflow(workflowId, finalStatus);
