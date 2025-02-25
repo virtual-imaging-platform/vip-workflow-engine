@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
 import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
-import fr.insalyon.creatis.moteurlite.custom.ListDir;
 
 public class IterationService {
     private final BoutiquesService boutiquesService;
@@ -21,9 +20,6 @@ public class IterationService {
     }
 
     public List<Map<String, String>> compute(Map<String, List<String>> inputsMap, BoutiquesDescriptor boutiquesDescriptor) throws MoteurLiteException {
-        // expand vip:listDir
-        inputsMap = ListDir.listDir(inputsMap, boutiquesDescriptor);
-        // expand vip:dot/cross
         Set<String> crossKeys = boutiquesService.getCrossMap(boutiquesDescriptor);
         Set<String> dotKeys = boutiquesService.getDotMap(boutiquesDescriptor);
         Set<String> allKeys = new HashSet<>(inputsMap.keySet());

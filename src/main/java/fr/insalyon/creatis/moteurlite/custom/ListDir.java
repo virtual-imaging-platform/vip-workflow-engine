@@ -14,6 +14,8 @@ import fr.insalyon.creatis.grida.common.bean.GridPathInfo;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.boutiques.model.Custom;
+import fr.insalyon.creatis.moteurlite.boutiques.model.CustomListDir;
+import fr.insalyon.creatis.moteurlite.boutiques.model.CustomListDirItem;
 
 import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
@@ -37,34 +39,35 @@ public class ListDir {
     public static Map<String, List<String>> listDir(Map<String, List<String>> inputsMap,
                                                     BoutiquesDescriptor boutiquesDescriptor)
             throws MoteurLiteException {
-        logger.info("XXX entering listDir");
         // Get vip:listDir items, leave inputsMap unchanged if key is missing or empty
         Custom custom = boutiquesDescriptor.getCustom();
         if (custom == null)
             return inputsMap;
-        Custom.VipListDir vipListDir = custom.vipListDir;
-        if (vipListDir == null)
+        CustomListDir listDir = custom.vipListDir;
+        if (listDir == null)
             return inputsMap;
-        Map<String, Custom.VipListDir.VipListDirItem> dirItems = vipListDir.inputs;
+        Map<String, CustomListDirItem> dirItems = listDir.inputs;
         if (dirItems == null)
             return inputsMap;
-        // Load GRIDAClient for file access
+        // Load GRIDAClient for directory listing
         // XXX TODO use grida standalone, get settings from settings.conf
-        // GRIDAClient client = new GRIDAClient("localhost", 9006, "/var/www/html/workflows/x509up_server");
+        //GRIDAClient client = new GRIDAClient("localhost", 9006, "/var/www/html/workflows/x509up_server");
         GRIDAClient client = new StandaloneGridaClient("/var/www/html/workflows/x509up_server",
                 new File("/var/www/prod/grida/grida-server.conf"));
-        logger.info("XXX GRIDAClient="+client);
+        if (client == null) {
+            throw new MoteurLiteException("Can't get GRIDAClient");
+        }
         // Expand inputsMap into result
         Map<String, List<String>> result = new HashMap<>();
         for (String inputId : inputsMap.keySet()) {
             List<String> values = inputsMap.get(inputId);
-            Custom.VipListDir.VipListDirItem dirItem = dirItems.get(inputId);
+            CustomListDirItem dirItem = dirItems.get(inputId);
             if (dirItem != null) { // process vip:listDir for inputId
                 List<String> files = new ArrayList<>();
                 for (String pathName : values) {
                     try {
                         if (pathIsDirectory(client, pathName)) { // expand directory into a list of files
-                            files.addAll(expandDirToFiles(client, inputId, pathName, dirItem));
+                            files.addAll(expandDirToFiles(client, pathName, dirItem));
                         } else { // path is a file, keep as is
                             files.add(pathName);
                         }
@@ -83,36 +86,41 @@ public class ListDir {
         return result;
     }
 
+    private static String toGridaPath(String pathName) {
+        return pathName.replaceFirst("^file:", "");
+    }
+
     private static boolean pathIsDirectory(GRIDAClient client, String pathName)
             throws GRIDAClientException {
         if (!(pathName.startsWith("lfn:") || pathName.startsWith("file:")))
             return false;
-        GridPathInfo pathInfo = client.getPathInfo(pathName);
-        return pathInfo.getType() == GridData.Type.Folder;
+        GridPathInfo pathInfo = client.getPathInfo(toGridaPath(pathName));
+        return pathInfo.exist() && pathInfo.getType() == GridData.Type.Folder;
     }
 
-    private static List<String> expandDirToFiles(GRIDAClient client, String inputId, String pathName,
-                                                 Custom.VipListDir.VipListDirItem dirItem)
+    private static List<String> expandDirToFiles(GRIDAClient client, String pathName,
+                                                 CustomListDirItem dirItem)
             throws GRIDAClientException {
-        // get all files in directory
-        List<GridData> allFiles = client.getFolderData(pathName, true);
-        // build list of pattern matchers. A missing or empty "patterns" list generate no matches.
+        // Get all files in directory
+        List<GridData> allFiles = client.getFolderData(toGridaPath(pathName), true);
+        // Build list of pattern matchers. A missing or empty "patterns" list generate no matches.
         List<PathMatcher> matchers = new ArrayList<>();
         if (dirItem.patterns != null) {
             for (String pattern : dirItem.patterns) {
                 matchers.add(FileSystems.getDefault().getPathMatcher("glob:" + pattern));
             }
         }
-        // filter files that match at least one pattern
+        // Filter files that match at least one pattern
+        Path dirname = Paths.get(pathName);
         List<String> matchingFiles = new ArrayList<>();
         for (GridData file : allFiles) {
             if (file.getType() == GridData.Type.File) {
-                String filename = file.getName();
+                String basename = file.getName();
                 for (PathMatcher matcher : matchers) {
-                    Path dirname = Paths.get(filename);
-                    if (matcher.matches(dirname)) {
-                        // XXX preserve lfn/file prefix and proper append dirname+filename
-                        matchingFiles.add(dirname.resolve(filename).toString());
+                    if (matcher.matches(Paths.get(basename))) {
+                        // Build absolute filename, preserving prefix
+                        String filename = dirname.resolve(basename).toString();
+                        matchingFiles.add(filename);
                         break;
                     }
                 }

@@ -28,6 +28,7 @@ import fr.insalyon.creatis.moteurlite.boutiques.model.OutputFile;
 import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
 import fr.insalyon.creatis.moteurlite.gasw.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
+import fr.insalyon.creatis.moteurlite.custom.ListDir;
 
 public class MoteurLiteRunner {
     private static final Logger logger = Logger.getLogger(MoteurLite.class);
@@ -56,10 +57,11 @@ public class MoteurLiteRunner {
         BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
         Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
 
+        // vip:listDir inputs are expanded here rather than in compute, so that they can be saved
+        allInputs = ListDir.listDir(allInputs, descriptor);
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
         workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
-        // XXX should allInputs be expanded or not at this point ?
         workflowsDBRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
 
         try {

@@ -2,7 +2,6 @@
 package fr.insalyon.creatis.moteurlite.boutiques.model;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Generated;
@@ -20,16 +19,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 @Generated("jsonschema2pojo")
 public class Custom {
-    public class VipListDir {
-        public class VipListDirItem {
-            @JsonProperty("patterns")
-            public List<String> patterns;
-        }
-        @JsonProperty("inputs")
-        public Map<String, VipListDirItem> inputs;
-    };
     @JsonProperty("vip:listDir")
-    public VipListDir vipListDir;
+    public CustomListDir vipListDir;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
