@@ -8,5 +8,8 @@ import java.util.List;
 @Generated("jsonschema2pojo")
 public class CustomListDirItem {
     @JsonProperty("patterns")
-    public List<String> patterns;
+    private List<String> patterns;
+
+    @JsonProperty("patterns")
+    public List<String> getPatterns() { return patterns; }
 }

@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.moteurlite.runner;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -8,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,10 +41,24 @@ public class MoteurLiteRunner {
     private final InputsFileService inputsFileService;
     private final IterationService iterationService;
 
+    private String gridaServerConf;
+    private String gridaProxy;
+
     public MoteurLiteRunner() throws MoteurLiteException {
         boutiquesService = new BoutiquesService();
         inputsFileService = new InputsFileService();
         iterationService = new IterationService(boutiquesService);
+
+        try {
+            PropertiesConfiguration config = new PropertiesConfiguration(new File("conf/settings.conf"));
+            gridaServerConf = config.getString("moteurlite.grida.serverconf");
+            gridaProxy = config.getString("moteurlite.grida.proxy");
+            if (gridaServerConf == null || gridaProxy == null) {
+                throw new MoteurLiteException("Missing parameters");
+            }
+        } catch (ConfigurationException e) {
+            throw new MoteurLiteException("Error parsing configuration", e);
+        }
 
         try {
             workflowsDBRepo = WorkflowsDBRepository.getInstance();
@@ -57,8 +74,9 @@ public class MoteurLiteRunner {
         BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
         Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
 
-        // vip:listDir inputs are expanded here rather than in compute, so that they can be saved
-        allInputs = ListDir.listDir(allInputs, descriptor);
+        // expand vip:listDir inputs
+        allInputs = ListDir.listDir(gridaServerConf, gridaProxy, allInputs, descriptor);
+        // compute vip:dot and cross combinations
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
         workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);

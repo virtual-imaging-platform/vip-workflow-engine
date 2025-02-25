@@ -36,24 +36,22 @@ public class ListDir {
      * "vip:listDir":{"inputs":{"input1":{"patterns":["*.nii","*.nii.gz"],...}}}
      * </pre>
      */
-    public static Map<String, List<String>> listDir(Map<String, List<String>> inputsMap,
+    public static Map<String, List<String>> listDir(String gridaServerConf, String gridaProxy,
+                                                    Map<String, List<String>> inputsMap,
                                                     BoutiquesDescriptor boutiquesDescriptor)
             throws MoteurLiteException {
         // Get vip:listDir items, leave inputsMap unchanged if key is missing or empty
         Custom custom = boutiquesDescriptor.getCustom();
         if (custom == null)
             return inputsMap;
-        CustomListDir listDir = custom.vipListDir;
+        CustomListDir listDir = custom.getListDir();
         if (listDir == null)
             return inputsMap;
-        Map<String, CustomListDirItem> dirItems = listDir.inputs;
+        Map<String, CustomListDirItem> dirItems = listDir.getInputs();
         if (dirItems == null)
             return inputsMap;
         // Load GRIDAClient for directory listing
-        // XXX TODO use grida standalone, get settings from settings.conf
-        //GRIDAClient client = new GRIDAClient("localhost", 9006, "/var/www/html/workflows/x509up_server");
-        GRIDAClient client = new StandaloneGridaClient("/var/www/html/workflows/x509up_server",
-                new File("/var/www/prod/grida/grida-server.conf"));
+        GRIDAClient client = new StandaloneGridaClient(gridaProxy, new File(gridaServerConf));
         if (client == null) {
             throw new MoteurLiteException("Can't get GRIDAClient");
         }
@@ -105,8 +103,9 @@ public class ListDir {
         List<GridData> allFiles = client.getFolderData(toGridaPath(pathName), true);
         // Build list of pattern matchers. A missing or empty "patterns" list generate no matches.
         List<PathMatcher> matchers = new ArrayList<>();
-        if (dirItem.patterns != null) {
-            for (String pattern : dirItem.patterns) {
+        List<String> patterns = dirItem.getPatterns();
+        if (patterns != null) {
+            for (String pattern : patterns) {
                 matchers.add(FileSystems.getDefault().getPathMatcher("glob:" + pattern));
             }
         }

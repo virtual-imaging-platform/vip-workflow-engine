@@ -9,5 +9,10 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class CustomListDir {
     @JsonProperty("inputs")
-    public Map<String, CustomListDirItem> inputs;
+    private Map<String, CustomListDirItem> inputs;
+
+    @JsonProperty("inputs")
+    public Map<String, CustomListDirItem> getInputs() {
+        return inputs;
+    }
 }
