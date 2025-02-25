@@ -59,6 +59,7 @@ public class MoteurLiteRunner {
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
         workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
+        // XXX should allInputs be expanded or not at this point ?
         workflowsDBRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
 
         try {
