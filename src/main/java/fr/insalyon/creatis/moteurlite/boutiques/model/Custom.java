@@ -26,6 +26,11 @@ public class Custom {
         return vipListDir;
     }
 
+    @JsonProperty("vip:outDir")
+    private String vipOutDir;
+
+    public String getOutDir() { return vipOutDir; };
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 

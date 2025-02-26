@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.insalyon.creatis.moteurlite.custom.OutDirService;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +30,7 @@ import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
 import fr.insalyon.creatis.moteurlite.gasw.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.custom.ListDirService;
+import fr.insalyon.creatis.moteurlite.custom.OutDirService;
 
 public class MoteurLiteRunner {
     private static final Logger logger = Logger.getLogger(MoteurLite.class);
@@ -39,6 +41,7 @@ public class MoteurLiteRunner {
     private final InputsFileService inputsFileService;
     private final IterationService iterationService;
     private final ListDirService listDirService;
+    private final OutDirService outDirService;
 
     public MoteurLiteRunner() throws MoteurLiteException {
         config = new MoteurLiteConfiguration();
@@ -46,6 +49,7 @@ public class MoteurLiteRunner {
         inputsFileService = new InputsFileService();
         iterationService = new IterationService(boutiquesService);
         listDirService = new ListDirService(config);
+        outDirService = new OutDirService();
 
         try {
             workflowsDBRepo = WorkflowsDBRepository.getInstance();
@@ -63,11 +67,15 @@ public class MoteurLiteRunner {
 
         // expand vip:listDir inputs
         allInputs = listDirService.listDir(allInputs, descriptor);
+        // save reference input values for future storage
+        Map<String, List<String>> storeInputs = allInputs;
+        // apply vip:outDir suffix to results-directory
+        allInputs = outDirService.resultsDirectory(allInputs, descriptor);
         // compute vip:dot and cross combinations
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
         workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
-        workflowsDBRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
+        workflowsDBRepo.persistInputs(workflowId, storeInputs, boutiquesInputs);
 
         try {
             gasw = Gasw.getInstance();
