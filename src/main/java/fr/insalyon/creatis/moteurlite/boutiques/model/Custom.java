@@ -20,10 +20,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Generated("jsonschema2pojo")
 public class Custom {
     @JsonProperty("vip:listDir")
-    private CustomListDir vipListDir;
+    private Map<String, CustomListDirItem> vipListDir;
 
-    @JsonProperty("vip:listDir")
-    public CustomListDir getListDir() {
+    public Map<String, CustomListDirItem> getListDir() {
         return vipListDir;
     }
 

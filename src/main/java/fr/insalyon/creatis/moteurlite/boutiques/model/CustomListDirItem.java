@@ -10,6 +10,5 @@ public class CustomListDirItem {
     @JsonProperty("patterns")
     private List<String> patterns;
 
-    @JsonProperty("patterns")
     public List<String> getPatterns() { return patterns; }
 }

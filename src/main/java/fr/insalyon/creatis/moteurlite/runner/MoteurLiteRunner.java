@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.moteurlite.runner;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -9,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,42 +20,32 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.WorkflowsDBException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteurlite.MoteurLite;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
+import fr.insalyon.creatis.moteurlite.MoteurLiteConfiguration;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
 import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.boutiques.model.Input;
-import fr.insalyon.creatis.moteurlite.boutiques.model.OutputFile;
 import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
 import fr.insalyon.creatis.moteurlite.gasw.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
-import fr.insalyon.creatis.moteurlite.custom.ListDir;
+import fr.insalyon.creatis.moteurlite.custom.ListDirService;
 
 public class MoteurLiteRunner {
     private static final Logger logger = Logger.getLogger(MoteurLite.class);
 
+    private final MoteurLiteConfiguration config;
     private final WorkflowsDBRepository workflowsDBRepo;
     private final BoutiquesService boutiquesService;
     private final InputsFileService inputsFileService;
     private final IterationService iterationService;
-
-    private String gridaServerConf;
-    private String gridaProxy;
+    private final ListDirService listDirService;
 
     public MoteurLiteRunner() throws MoteurLiteException {
+        config = new MoteurLiteConfiguration();
         boutiquesService = new BoutiquesService();
         inputsFileService = new InputsFileService();
         iterationService = new IterationService(boutiquesService);
-
-        try {
-            PropertiesConfiguration config = new PropertiesConfiguration(new File("conf/settings.conf"));
-            gridaServerConf = config.getString("moteurlite.grida.serverconf");
-            gridaProxy = config.getString("moteurlite.grida.proxy");
-            if (gridaServerConf == null || gridaProxy == null) {
-                throw new MoteurLiteException("Missing parameters");
-            }
-        } catch (ConfigurationException e) {
-            throw new MoteurLiteException("Error parsing configuration", e);
-        }
+        listDirService = new ListDirService(config);
 
         try {
             workflowsDBRepo = WorkflowsDBRepository.getInstance();
@@ -75,7 +62,7 @@ public class MoteurLiteRunner {
         Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
 
         // expand vip:listDir inputs
-        allInputs = ListDir.listDir(gridaServerConf, gridaProxy, allInputs, descriptor);
+        allInputs = listDirService.listDir(allInputs, descriptor);
         // compute vip:dot and cross combinations
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
