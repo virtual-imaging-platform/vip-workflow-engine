@@ -60,7 +60,6 @@ public class MoteurLiteRunner {
     }
 
     public void run(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
-        Gasw gasw;
         Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
         BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
         Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
@@ -74,9 +73,18 @@ public class MoteurLiteRunner {
         // compute vip:dot and cross combinations
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
+        // check maxJobs limit
+        int plannedJobs = invocationsInputs.size(), maxJobs = config.getMaxJobsPerWorkflow();
+        if (plannedJobs > maxJobs) {
+            throw new MoteurLiteException("Too many jobs (max:" + maxJobs + ", got:" + plannedJobs + ")");
+        }
+
+        // store inputs and create processors in workflowsdb
         workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
         workflowsDBRepo.persistInputs(workflowId, storeInputs, boutiquesInputs);
 
+        // init gasw
+        Gasw gasw;
         try {
             gasw = Gasw.getInstance();
             GaswMonitor gaswMonitor = new GaswMonitor(gasw, workflowsDBRepo, workflowId, descriptor.getName(), invocationsInputs.size());
@@ -87,6 +95,7 @@ public class MoteurLiteRunner {
             throw new MoteurLiteException("Error launching gasw", e);
         }
 
+        // launch jobs
         createJobs(gasw, descriptor.getName(), invocationsInputs, boutiquesInputs);
     }
 

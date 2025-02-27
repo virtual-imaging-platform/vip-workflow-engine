@@ -8,6 +8,7 @@ import java.io.File;
 public class MoteurLiteConfiguration {
     private String gridaServerConf;
     private String gridaProxy;
+    private int maxJobsPerWorkflow;
 
     public MoteurLiteConfiguration()
             throws MoteurLiteException {
@@ -15,6 +16,7 @@ public class MoteurLiteConfiguration {
             PropertiesConfiguration config = new PropertiesConfiguration(new File("conf/settings.conf"));
             gridaServerConf = config.getString("moteurlite.grida.serverconf");
             gridaProxy = config.getString("moteurlite.grida.proxy");
+            maxJobsPerWorkflow = config.getInt("moteurlite.maxjobsperworkflow", 1000);
             if (gridaServerConf == null || gridaProxy == null) {
                 throw new MoteurLiteException("Missing parameters");
             }
@@ -26,4 +28,5 @@ public class MoteurLiteConfiguration {
 
     public String getGridaProxy() { return gridaProxy; }
     public String getGridaServerConf() { return gridaServerConf; }
+    public int getMaxJobsPerWorkflow() { return maxJobsPerWorkflow; }
 }
