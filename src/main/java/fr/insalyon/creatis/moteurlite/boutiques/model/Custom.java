@@ -2,6 +2,7 @@
 package fr.insalyon.creatis.moteurlite.boutiques.model;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Generated;
@@ -24,6 +25,13 @@ public class Custom {
 
     public Map<String, CustomListDirItem> getListDir() {
         return vipListDir;
+    }
+
+    @JsonProperty("vip:intIterator")
+    private List<String> vipIntIterator;
+
+    public List<String> getIntIterator() {
+        return vipIntIterator;
     }
 
     @JsonProperty("vip:outDir")

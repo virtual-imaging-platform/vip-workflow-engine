@@ -29,6 +29,7 @@ import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
 import fr.insalyon.creatis.moteurlite.gasw.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.custom.ListDirService;
+import fr.insalyon.creatis.moteurlite.custom.IntIteratorService;
 import fr.insalyon.creatis.moteurlite.custom.OutDirService;
 
 public class MoteurLiteRunner {
@@ -40,6 +41,7 @@ public class MoteurLiteRunner {
     private final InputsFileService inputsFileService;
     private final IterationService iterationService;
     private final ListDirService listDirService;
+    private final IntIteratorService intIteratorService;
     private final OutDirService outDirService;
 
     public MoteurLiteRunner() throws MoteurLiteException {
@@ -48,6 +50,7 @@ public class MoteurLiteRunner {
         inputsFileService = new InputsFileService();
         iterationService = new IterationService(boutiquesService);
         listDirService = new ListDirService(config);
+        intIteratorService = new IntIteratorService();
         outDirService = new OutDirService();
 
         try {
@@ -65,6 +68,8 @@ public class MoteurLiteRunner {
 
         // expand vip:listDir inputs
         allInputs = listDirService.listDir(allInputs, descriptor);
+        // expand vip:intIterator inputs
+        allInputs = intIteratorService.iterate(allInputs, descriptor);
         // save reference input values for future storage
         Map<String, List<String>> storeInputs = allInputs;
         // apply vip:outDir suffix to results-directory
