@@ -15,6 +15,14 @@ import java.util.Map;
 public class OutDirService {
     public OutDirService() {}
 
+    /**
+     * <p>
+     * Appends a timestamp or a custom subdirectory (possibly empty) to the RESULTS_DIRECTORY input.
+     * </p>
+     * <pre>
+     * "vip:outDir":"my/subdir"
+     * </pre>
+     */
     public Map<String, List<String>> resultsDirectory(Map<String, List<String>> inputsMap,
                                                       BoutiquesDescriptor boutiquesDescriptor) {
         String suffix = null;
