@@ -29,7 +29,7 @@ import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
 import fr.insalyon.creatis.moteurlite.gasw.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.custom.DirectoryInputsService;
-import fr.insalyon.creatis.moteurlite.custom.IntIteratorService;
+import fr.insalyon.creatis.moteurlite.custom.IntIteratorInputsService;
 import fr.insalyon.creatis.moteurlite.custom.ResultsDirectorySuffixService;
 
 public class MoteurLiteRunner {
@@ -41,7 +41,7 @@ public class MoteurLiteRunner {
     private final InputsFileService inputsFileService;
     private final IterationService iterationService;
     private final DirectoryInputsService directoryInputsService;
-    private final IntIteratorService intIteratorService;
+    private final IntIteratorInputsService intIteratorInputsService;
     private final ResultsDirectorySuffixService resultsDirectorySuffixService;
 
     public MoteurLiteRunner() throws MoteurLiteException {
@@ -50,7 +50,7 @@ public class MoteurLiteRunner {
         inputsFileService = new InputsFileService();
         iterationService = new IterationService(boutiquesService);
         directoryInputsService = new DirectoryInputsService(config);
-        intIteratorService = new IntIteratorService();
+        intIteratorInputsService = new IntIteratorInputsService();
         resultsDirectorySuffixService = new ResultsDirectorySuffixService();
 
         try {
@@ -68,8 +68,8 @@ public class MoteurLiteRunner {
 
         // expand vip:directoryInputs
         allInputs = directoryInputsService.directoryInputs(allInputs, descriptor);
-        // expand vip:intIterator inputs
-        allInputs = intIteratorService.iterate(allInputs, descriptor);
+        // expand vip:intIteratorInputs
+        allInputs = intIteratorInputsService.iterate(allInputs, descriptor);
         // save reference input values for future storage
         Map<String, List<String>> storeInputs = allInputs;
         // apply vip:resultsDirectorySuffix to results-directory

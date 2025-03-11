@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-public class IntIteratorService {
-    public IntIteratorService() {}
+public class IntIteratorInputsService {
+    public IntIteratorInputsService() {}
 
     /**
      * <p>
      * Expand a single-valued integer input parameter N>0 into N values from 0 to N-1.
      * </p>
      * <pre>
-     * "vip:intIterator":["input1"]
+     * "vip:intIteratorInputs":["input1"]
      * </pre>
      */
     public Map<String, List<String>> iterate(Map<String, List<String>> inputsMap,
@@ -27,17 +27,17 @@ public class IntIteratorService {
         if (custom == null) {
             return inputsMap;
         }
-        List<String> intIterators = custom.getIntIterator();
-        if (intIterators == null || intIterators.isEmpty()) {
+        List<String> intIteratorInputs = custom.getIntIteratorInputs();
+        if (intIteratorInputs == null || intIteratorInputs.isEmpty()) {
             return inputsMap;
         }
         Map<String, List<String>> result = new HashMap<>();
         for (String inputId : inputsMap.keySet()) {
             List<String> values = inputsMap.get(inputId);
-            if (intIterators.contains(inputId)) { // input is an iterator
+            if (intIteratorInputs.contains(inputId)) { // input is an iterator
                 // There must be a single value
                 if (values.size() != 1) {
-                    throw new MoteurLiteException("vip:intIterator: multiple values for input " + inputId);
+                    throw new MoteurLiteException("vip:intIteratorInputs: multiple values for input " + inputId);
                 }
                 // Parse: value must be a strictly positive integer.
                 // Let parseInt raise NumberFormatException on non-integer strings,
@@ -47,10 +47,10 @@ public class IntIteratorService {
                 try {
                     nSteps = Integer.parseInt(strValue);
                     if (nSteps <= 0) {
-                        throw new MoteurLiteException("vip:intIterator: negative value for input " + inputId);
+                        throw new MoteurLiteException("vip:intIteratorInputs: negative value for input " + inputId);
                     }
                 } catch (NumberFormatException e) {
-                    throw new MoteurLiteException("vip:intIterator: invalid value '" + strValue + "' for input " + inputId);
+                    throw new MoteurLiteException("vip:intIteratorInputs: invalid value '" + strValue + "' for input " + inputId);
                 }
                 // Generate values list, from 0 to N-1
                 List<String> steps = IntStream.range(0, nSteps).mapToObj(Integer::toString).toList();

@@ -27,12 +27,10 @@ public class Custom {
         return vipDirectoryInputs;
     }
 
-    @JsonProperty("vip:intIterator")
-    private List<String> vipIntIterator;
+    @JsonProperty("vip:intIteratorInputs")
+    private List<String> vipIntIteratorInputs;
 
-    public List<String> getIntIterator() {
-        return vipIntIterator;
-    }
+    public List<String> getIntIteratorInputs() { return vipIntIteratorInputs; }
 
     @JsonProperty("vip:resultsDirectorySuffix")
     private String vipResultsDirectorySuffix;
