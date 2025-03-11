@@ -6,9 +6,9 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import java.io.File;
 
 public class MoteurLiteConfiguration {
-    private String gridaServerConf;
-    private String gridaProxy;
-    private int maxJobsPerWorkflow;
+    final private String gridaServerConf;
+    final private String gridaProxy;
+    final private int maxJobsPerWorkflow;
 
     public MoteurLiteConfiguration()
             throws MoteurLiteException {
@@ -20,8 +20,7 @@ public class MoteurLiteConfiguration {
             if (gridaServerConf == null || gridaProxy == null) {
                 throw new MoteurLiteException("Missing parameters");
             }
-        } catch (
-                ConfigurationException e) {
+        } catch (ConfigurationException e) {
             throw new MoteurLiteException("Error parsing configuration", e);
         }
     }

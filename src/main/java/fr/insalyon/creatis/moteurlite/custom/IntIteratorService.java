@@ -4,10 +4,10 @@ import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.boutiques.model.Custom;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 public class IntIteratorService {
     public IntIteratorService() {}
@@ -28,7 +28,7 @@ public class IntIteratorService {
             return inputsMap;
         }
         List<String> intIterators = custom.getIntIterator();
-        if (intIterators == null || intIterators.size() == 0) {
+        if (intIterators == null || intIterators.isEmpty()) {
             return inputsMap;
         }
         Map<String, List<String>> result = new HashMap<>();
@@ -46,16 +46,14 @@ public class IntIteratorService {
                 int nSteps;
                 try {
                     nSteps = Integer.parseInt(strValue);
-                    if (nSteps <= 0)
-                        throw new NumberFormatException("");
+                    if (nSteps <= 0) {
+                        throw new MoteurLiteException("vip:intIterator: negative value for input " + inputId);
+                    }
                 } catch (NumberFormatException e) {
                     throw new MoteurLiteException("vip:intIterator: invalid value '" + strValue + "' for input " + inputId);
                 }
                 // Generate values list, from 0 to N-1
-                List<String> steps = new ArrayList<>();
-                for (int i = 0; i < nSteps; i++) {
-                    steps.add(Integer.toString(i));
-                }
+                List<String> steps = IntStream.range(0, nSteps).mapToObj(Integer::toString).toList();
                 result.put(inputId, steps);
             } else { // keep other inputs as is
                 result.put(inputId, values);

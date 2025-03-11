@@ -94,8 +94,9 @@ public class ListDirService {
 
     private boolean pathIsDirectory(String pathName)
             throws GRIDAClientException {
-        if (!(pathName.startsWith("lfn:") || pathName.startsWith("file:")))
+        if (!(pathName.startsWith("lfn:") || pathName.startsWith("file:"))) {
             return false;
+        }
         GridPathInfo pathInfo = gridaClient.getPathInfo(toGridaPath(pathName));
         return pathInfo.exist() && pathInfo.getType() == GridData.Type.Folder;
     }
