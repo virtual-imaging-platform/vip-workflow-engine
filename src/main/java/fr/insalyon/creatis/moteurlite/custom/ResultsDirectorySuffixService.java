@@ -12,15 +12,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OutDirService {
-    public OutDirService() {}
+public class ResultsDirectorySuffixService {
+    public ResultsDirectorySuffixService() {}
 
     /**
      * <p>
      * Appends a timestamp or a custom subdirectory (possibly empty) to the RESULTS_DIRECTORY input.
      * </p>
      * <pre>
-     * "vip:outDir":"my/subdir"
+     * "vip:resultsDirectorySuffix":"my/subdir"
      * </pre>
      */
     public Map<String, List<String>> resultsDirectory(Map<String, List<String>> inputsMap,
@@ -28,7 +28,7 @@ public class OutDirService {
         String suffix = null;
         Custom custom = boutiquesDescriptor.getCustom();
         if (custom != null) {
-            suffix = custom.getOutDir();
+            suffix = custom.getResultsDirectorySuffix();
         }
         if (suffix == null) {
             // default behaviour: append a timestamp to all results-directory values

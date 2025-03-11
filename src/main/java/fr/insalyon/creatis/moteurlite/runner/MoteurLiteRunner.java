@@ -30,7 +30,7 @@ import fr.insalyon.creatis.moteurlite.gasw.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.custom.ListDirService;
 import fr.insalyon.creatis.moteurlite.custom.IntIteratorService;
-import fr.insalyon.creatis.moteurlite.custom.OutDirService;
+import fr.insalyon.creatis.moteurlite.custom.ResultsDirectorySuffixService;
 
 public class MoteurLiteRunner {
     private static final Logger logger = Logger.getLogger(MoteurLite.class);
@@ -42,7 +42,7 @@ public class MoteurLiteRunner {
     private final IterationService iterationService;
     private final ListDirService listDirService;
     private final IntIteratorService intIteratorService;
-    private final OutDirService outDirService;
+    private final ResultsDirectorySuffixService resultsDirectorySuffixService;
 
     public MoteurLiteRunner() throws MoteurLiteException {
         config = new MoteurLiteConfiguration();
@@ -51,7 +51,7 @@ public class MoteurLiteRunner {
         iterationService = new IterationService(boutiquesService);
         listDirService = new ListDirService(config);
         intIteratorService = new IntIteratorService();
-        outDirService = new OutDirService();
+        resultsDirectorySuffixService = new ResultsDirectorySuffixService();
 
         try {
             workflowsDBRepo = WorkflowsDBRepository.getInstance();
@@ -72,8 +72,8 @@ public class MoteurLiteRunner {
         allInputs = intIteratorService.iterate(allInputs, descriptor);
         // save reference input values for future storage
         Map<String, List<String>> storeInputs = allInputs;
-        // apply vip:outDir suffix to results-directory
-        allInputs = outDirService.resultsDirectory(allInputs, descriptor);
+        // apply vip:resultsDirectorySuffix to results-directory
+        allInputs = resultsDirectorySuffixService.resultsDirectory(allInputs, descriptor);
         // compute vip:dot and cross combinations
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 

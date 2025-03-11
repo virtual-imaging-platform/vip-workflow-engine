@@ -34,10 +34,10 @@ public class Custom {
         return vipIntIterator;
     }
 
-    @JsonProperty("vip:outDir")
-    private String vipOutDir;
+    @JsonProperty("vip:resultsDirectorySuffix")
+    private String vipResultsDirectorySuffix;
 
-    public String getOutDir() { return vipOutDir; };
+    public String getResultsDirectorySuffix() { return vipResultsDirectorySuffix; };
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
