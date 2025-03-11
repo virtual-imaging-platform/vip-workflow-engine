@@ -23,8 +23,8 @@ public class ResultsDirectorySuffixService {
      * "vip:resultsDirectorySuffix":"my/subdir"
      * </pre>
      */
-    public Map<String, List<String>> resultsDirectory(Map<String, List<String>> inputsMap,
-                                                      BoutiquesDescriptor boutiquesDescriptor) {
+    public void updateInputs(Map<String, List<String>> inputsMap,
+                             BoutiquesDescriptor boutiquesDescriptor) {
         String suffix = null;
         Custom custom = boutiquesDescriptor.getCustom();
         if (custom != null) {
@@ -36,24 +36,18 @@ public class ResultsDirectorySuffixService {
             suffix = dateFormat.format(System.currentTimeMillis());
         } else if (suffix.isEmpty()) {
             // no suffix, keep results-directory unchanged
-            return inputsMap;
+            return;
         }
-        Map<String, List<String>> result = new HashMap<>();
-        for (String inputId : inputsMap.keySet()) {
-            List<String> values = inputsMap.get(inputId);
-            if (MoteurLiteConstants.RESULTS_DIRECTORY.equals(inputId)) {
-                List<String> newValues = new ArrayList<>();
-                for (String value : values) {
-                    if (value.startsWith("lfn:") || value.startsWith("file:")) {
-                        value = String.valueOf(Paths.get(value, suffix));
-                    }
-                    newValues.add(value);
-                }
-                result.put(inputId, newValues);
-            } else { // keep other inputs as is
-                result.put(inputId, values);
+        // append suffix to all values of the results-directory input
+        final String inputId = MoteurLiteConstants.RESULTS_DIRECTORY;
+        List<String> values = inputsMap.get(inputId);
+        List<String> newValues = new ArrayList<>();
+        for (String value : values) {
+            if (value.startsWith("lfn:") || value.startsWith("file:")) {
+                value = String.valueOf(Paths.get(value, suffix));
             }
+            newValues.add(value);
         }
-        return result;
+        inputsMap.put(inputId, newValues);
     }
 }

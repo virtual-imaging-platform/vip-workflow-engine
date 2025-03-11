@@ -46,20 +46,18 @@ public class DirectoryInputsService {
      * "vip:directoryInputs":{"input1":{"patterns":["*.nii","*.nii.gz"]},...}
      * </pre>
      */
-    public Map<String, List<String>> directoryInputs(Map<String, List<String>> inputsMap,
-                                                     BoutiquesDescriptor boutiquesDescriptor)
+    public void updateInputs(Map<String, List<String>> inputsMap,
+                             BoutiquesDescriptor boutiquesDescriptor)
             throws MoteurLiteException {
         // Get vip:directoryInputs items, leave inputsMap unchanged if key is missing or empty
         Custom custom = boutiquesDescriptor.getCustom();
         if (custom == null) {
-            return inputsMap;
+            return;
         }
         Map<String, CustomDirectoryInputsItem> directoryInputs = custom.getDirectoryInputs();
         if (directoryInputs == null) {
-            return inputsMap;
+            return;
         }
-        // Expand inputsMap into result
-        Map<String, List<String>> result = new HashMap<>();
         for (String inputId : inputsMap.keySet()) {
             List<String> values = inputsMap.get(inputId);
             CustomDirectoryInputsItem dirItem = directoryInputs.get(inputId);
@@ -80,12 +78,9 @@ public class DirectoryInputsService {
                         throw new MoteurLiteException("GRIDAClientException:", e);
                     }
                 }
-                result.put(inputId, files);
-            } else { // keep other inputs as is
-                result.put(inputId, values);
+                inputsMap.put(inputId, files);
             }
         }
-        return result;
     }
 
     private static String toGridaPath(String pathName) {

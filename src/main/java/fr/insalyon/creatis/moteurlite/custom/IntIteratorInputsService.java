@@ -20,18 +20,17 @@ public class IntIteratorInputsService {
      * "vip:intIteratorInputs":["input1"]
      * </pre>
      */
-    public Map<String, List<String>> iterate(Map<String, List<String>> inputsMap,
-                                             BoutiquesDescriptor boutiquesDescriptor)
+    public void updateInputs(Map<String, List<String>> inputsMap,
+                             BoutiquesDescriptor boutiquesDescriptor)
             throws MoteurLiteException {
         Custom custom = boutiquesDescriptor.getCustom();
         if (custom == null) {
-            return inputsMap;
+            return;
         }
         List<String> intIteratorInputs = custom.getIntIteratorInputs();
         if (intIteratorInputs == null || intIteratorInputs.isEmpty()) {
-            return inputsMap;
+            return;
         }
-        Map<String, List<String>> result = new HashMap<>();
         for (String inputId : inputsMap.keySet()) {
             List<String> values = inputsMap.get(inputId);
             if (intIteratorInputs.contains(inputId)) { // input is an iterator
@@ -54,11 +53,8 @@ public class IntIteratorInputsService {
                 }
                 // Generate values list, from 0 to N-1
                 List<String> steps = IntStream.range(0, nSteps).mapToObj(Integer::toString).toList();
-                result.put(inputId, steps);
-            } else { // keep other inputs as is
-                result.put(inputId, values);
+                inputsMap.put(inputId, steps);
             }
         }
-        return result;
     }
 }

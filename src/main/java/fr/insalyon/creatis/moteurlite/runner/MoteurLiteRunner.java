@@ -67,13 +67,11 @@ public class MoteurLiteRunner {
         Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
 
         // expand vip:directoryInputs
-        allInputs = directoryInputsService.directoryInputs(allInputs, descriptor);
+        directoryInputsService.updateInputs(allInputs, descriptor);
         // expand vip:intIteratorInputs
-        allInputs = intIteratorInputsService.iterate(allInputs, descriptor);
-        // save reference input values for future storage
-        Map<String, List<String>> storeInputs = allInputs;
+        intIteratorInputsService.updateInputs(allInputs, descriptor);
         // apply vip:resultsDirectorySuffix to results-directory
-        allInputs = resultsDirectorySuffixService.resultsDirectory(allInputs, descriptor);
+        resultsDirectorySuffixService.updateInputs(allInputs, descriptor);
         // compute vip:dot and cross combinations
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
@@ -85,7 +83,7 @@ public class MoteurLiteRunner {
 
         // store inputs and create processors in workflowsdb
         workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
-        workflowsDBRepo.persistInputs(workflowId, storeInputs, boutiquesInputs);
+        workflowsDBRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
 
         // init gasw
         Gasw gasw;
