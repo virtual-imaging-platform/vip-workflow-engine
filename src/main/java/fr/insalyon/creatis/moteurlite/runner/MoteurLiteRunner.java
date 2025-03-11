@@ -20,27 +20,38 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.WorkflowsDBException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteurlite.MoteurLite;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
+import fr.insalyon.creatis.moteurlite.MoteurLiteConfiguration;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
 import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.boutiques.model.Input;
-import fr.insalyon.creatis.moteurlite.boutiques.model.OutputFile;
 import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
 import fr.insalyon.creatis.moteurlite.gasw.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
+import fr.insalyon.creatis.moteurlite.custom.DirectoryInputsService;
+import fr.insalyon.creatis.moteurlite.custom.IntIteratorInputsService;
+import fr.insalyon.creatis.moteurlite.custom.ResultsDirectorySuffixService;
 
 public class MoteurLiteRunner {
     private static final Logger logger = Logger.getLogger(MoteurLite.class);
 
+    private final MoteurLiteConfiguration config;
     private final WorkflowsDBRepository workflowsDBRepo;
     private final BoutiquesService boutiquesService;
     private final InputsFileService inputsFileService;
     private final IterationService iterationService;
+    private final DirectoryInputsService directoryInputsService;
+    private final IntIteratorInputsService intIteratorInputsService;
+    private final ResultsDirectorySuffixService resultsDirectorySuffixService;
 
     public MoteurLiteRunner() throws MoteurLiteException {
+        config = new MoteurLiteConfiguration();
         boutiquesService = new BoutiquesService();
         inputsFileService = new InputsFileService();
         iterationService = new IterationService(boutiquesService);
+        directoryInputsService = new DirectoryInputsService(config);
+        intIteratorInputsService = new IntIteratorInputsService();
+        resultsDirectorySuffixService = new ResultsDirectorySuffixService();
 
         try {
             workflowsDBRepo = WorkflowsDBRepository.getInstance();
@@ -51,16 +62,31 @@ public class MoteurLiteRunner {
     }
 
     public void run(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
-        Gasw gasw;
         Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
         BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
         Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
 
+        // expand vip:directoryInputs
+        directoryInputsService.updateInputs(allInputs, descriptor);
+        // expand vip:intIteratorInputs
+        intIteratorInputsService.updateInputs(allInputs, descriptor);
+        // apply vip:resultsDirectorySuffix to results-directory
+        resultsDirectorySuffixService.updateInputs(allInputs, descriptor);
+        // compute vip:dot and cross combinations
         List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
+        // check maxJobs limit
+        int plannedJobs = invocationsInputs.size(), maxJobs = config.getMaxJobsPerWorkflow();
+        if (plannedJobs > maxJobs) {
+            throw new MoteurLiteException("Too many jobs (max:" + maxJobs + ", got:" + plannedJobs + ")");
+        }
+
+        // store inputs and create processors in workflowsdb
         workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
         workflowsDBRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
 
+        // init gasw
+        Gasw gasw;
         try {
             gasw = Gasw.getInstance();
             GaswMonitor gaswMonitor = new GaswMonitor(gasw, workflowsDBRepo, workflowId, descriptor.getName(), invocationsInputs.size());
@@ -71,6 +97,7 @@ public class MoteurLiteRunner {
             throw new MoteurLiteException("Error launching gasw", e);
         }
 
+        // launch jobs
         createJobs(gasw, descriptor.getName(), invocationsInputs, boutiquesInputs);
     }
 
