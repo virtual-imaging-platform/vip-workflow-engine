@@ -28,7 +28,7 @@ import fr.insalyon.creatis.moteurlite.boutiques.model.Input;
 import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
 import fr.insalyon.creatis.moteurlite.gasw.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
-import fr.insalyon.creatis.moteurlite.custom.ListDirService;
+import fr.insalyon.creatis.moteurlite.custom.DirectoryInputsService;
 import fr.insalyon.creatis.moteurlite.custom.IntIteratorService;
 import fr.insalyon.creatis.moteurlite.custom.ResultsDirectorySuffixService;
 
@@ -40,7 +40,7 @@ public class MoteurLiteRunner {
     private final BoutiquesService boutiquesService;
     private final InputsFileService inputsFileService;
     private final IterationService iterationService;
-    private final ListDirService listDirService;
+    private final DirectoryInputsService directoryInputsService;
     private final IntIteratorService intIteratorService;
     private final ResultsDirectorySuffixService resultsDirectorySuffixService;
 
@@ -49,7 +49,7 @@ public class MoteurLiteRunner {
         boutiquesService = new BoutiquesService();
         inputsFileService = new InputsFileService();
         iterationService = new IterationService(boutiquesService);
-        listDirService = new ListDirService(config);
+        directoryInputsService = new DirectoryInputsService(config);
         intIteratorService = new IntIteratorService();
         resultsDirectorySuffixService = new ResultsDirectorySuffixService();
 
@@ -66,8 +66,8 @@ public class MoteurLiteRunner {
         BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
         Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
 
-        // expand vip:listDir inputs
-        allInputs = listDirService.listDir(allInputs, descriptor);
+        // expand vip:directoryInputs
+        allInputs = directoryInputsService.directoryInputs(allInputs, descriptor);
         // expand vip:intIterator inputs
         allInputs = intIteratorService.iterate(allInputs, descriptor);
         // save reference input values for future storage

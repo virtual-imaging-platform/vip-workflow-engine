@@ -6,7 +6,7 @@ import javax.annotation.Generated;
 import java.util.List;
 
 @Generated("jsonschema2pojo")
-public class CustomListDirItem {
+public class CustomDirectoryInputsItem {
     @JsonProperty("patterns")
     private List<String> patterns;
 

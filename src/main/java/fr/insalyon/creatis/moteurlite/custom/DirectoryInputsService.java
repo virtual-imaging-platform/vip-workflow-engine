@@ -15,17 +15,17 @@ import fr.insalyon.creatis.moteurlite.MoteurLiteConfiguration;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.boutiques.model.Custom;
-import fr.insalyon.creatis.moteurlite.boutiques.model.CustomListDirItem;
+import fr.insalyon.creatis.moteurlite.boutiques.model.CustomDirectoryInputsItem;
 
 import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.StandaloneGridaClient;
 
-public class ListDirService {
+public class DirectoryInputsService {
     GRIDAClient gridaClient;
 
-    public ListDirService(MoteurLiteConfiguration config)
+    public DirectoryInputsService(MoteurLiteConfiguration config)
             throws MoteurLiteException {
         // Load GRIDAClient for directory listing:
         // check that config file exists to fail early and systematically
@@ -43,34 +43,34 @@ public class ListDirService {
      * Raises an exception on I/O error, or when an input directory contains no matching file.
      * </p>
      * <pre>
-     * "vip:listDir":{"input1":{"patterns":["*.nii","*.nii.gz"]},...}
+     * "vip:directoryInputs":{"input1":{"patterns":["*.nii","*.nii.gz"]},...}
      * </pre>
      */
-    public Map<String, List<String>> listDir(Map<String, List<String>> inputsMap,
-                                             BoutiquesDescriptor boutiquesDescriptor)
+    public Map<String, List<String>> directoryInputs(Map<String, List<String>> inputsMap,
+                                                     BoutiquesDescriptor boutiquesDescriptor)
             throws MoteurLiteException {
-        // Get vip:listDir items, leave inputsMap unchanged if key is missing or empty
+        // Get vip:directoryInputs items, leave inputsMap unchanged if key is missing or empty
         Custom custom = boutiquesDescriptor.getCustom();
         if (custom == null) {
             return inputsMap;
         }
-        Map<String, CustomListDirItem> listDir = custom.getListDir();
-        if (listDir == null) {
+        Map<String, CustomDirectoryInputsItem> directoryInputs = custom.getDirectoryInputs();
+        if (directoryInputs == null) {
             return inputsMap;
         }
         // Expand inputsMap into result
         Map<String, List<String>> result = new HashMap<>();
         for (String inputId : inputsMap.keySet()) {
             List<String> values = inputsMap.get(inputId);
-            CustomListDirItem dirItem = listDir.get(inputId);
-            if (dirItem != null) { // process vip:listDir for inputId
+            CustomDirectoryInputsItem dirItem = directoryInputs.get(inputId);
+            if (dirItem != null) { // process vip:directoryInputs for inputId
                 List<String> files = new ArrayList<>();
                 for (String pathName : values) {
                     try {
                         if (pathIsDirectory(pathName)) { // expand directory into a list of files
                             List<String> dirFiles = expandDirToFiles(pathName, dirItem);
                             if (dirFiles.isEmpty()) { // do not allow an input directory to have no matching file
-                                throw new MoteurLiteException("vip:listDir: empty files list for input " + inputId);
+                                throw new MoteurLiteException("vip:directoryInputs: empty files list for input " + inputId);
                             }
                             files.addAll(dirFiles);
                         } else { // path is a file, keep as is
@@ -101,7 +101,7 @@ public class ListDirService {
         return pathInfo.exist() && pathInfo.getType() == GridData.Type.Folder;
     }
 
-    private List<String> expandDirToFiles(String pathName, CustomListDirItem dirItem)
+    private List<String> expandDirToFiles(String pathName, CustomDirectoryInputsItem dirItem)
             throws GRIDAClientException {
         // Get all files in directory
         List<GridData> allFiles = gridaClient.getFolderData(toGridaPath(pathName), true);
