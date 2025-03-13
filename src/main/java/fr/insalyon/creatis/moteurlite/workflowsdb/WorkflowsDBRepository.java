@@ -1,7 +1,9 @@
-package fr.insalyon.creatis.moteurlite.gasw;
+package fr.insalyon.creatis.moteurlite.workflowsdb;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import fr.insalyon.creatis.gasw.execution.GaswStatus;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.WorkflowsDBException;
@@ -37,11 +39,22 @@ public class WorkflowsDBRepository {
     private final WorkflowDAO workflowDAO;
 
     private WorkflowsDBRepository() throws WorkflowsDBDAOException, WorkflowsDBException {
-        WorkflowsDBDAOFactory workflowsDBDAOFactory = new WorkflowsDBDAOFactory();
-        this.inputDAO = workflowsDBDAOFactory.getInputDAO();
-        this.outputDAO = workflowsDBDAOFactory.getOutputDAO();
-        this.processorDAO = workflowsDBDAOFactory.getProcessorDAO();
-        this.workflowDAO = workflowsDBDAOFactory.getWorkflowDAO();
+        this(new WorkflowsDBDAOFactory());
+    }
+
+    private WorkflowsDBRepository(WorkflowsDBDAOFactory workflowsDBDAOFactory) throws WorkflowsDBDAOException, WorkflowsDBException {
+        this(workflowsDBDAOFactory.getInputDAO(),
+                workflowsDBDAOFactory.getOutputDAO(),
+                workflowsDBDAOFactory.getProcessorDAO(),
+                workflowsDBDAOFactory.getWorkflowDAO());
+    }
+
+    // not private to allow usage from same package in tests
+    WorkflowsDBRepository(InputDAO inputDAO, OutputDAO outputDAO, ProcessorDAO processorDAO, WorkflowDAO workflowDAO) throws WorkflowsDBDAOException, WorkflowsDBException {
+        this.inputDAO = inputDAO;
+        this.outputDAO = outputDAO;
+        this.processorDAO = processorDAO;
+        this.workflowDAO = workflowDAO;
     }
 
     public static WorkflowsDBRepository getInstance() throws WorkflowsDBDAOException, WorkflowsDBException {
@@ -62,11 +75,14 @@ public class WorkflowsDBRepository {
             List<String> values = entry.getValue();
 
             for (String value : values) {
+                DataType type = getWorkflowsDBType(key, boutiquesInputs);
+                String path = DataType.URI.equals(type) ? adaptShanoirOrGirderIOValue(value) : value;
+
                 inputID.setWorkflowID(workflowId);
-                inputID.setPath(value);
+                inputID.setPath(path);
                 inputID.setProcessor(key);
 
-                input.setType(getWorkflowsDBType(key, boutiquesInputs));
+                input.setType(type);
                 input.setInputID(inputID);
 
                 try {
@@ -92,9 +108,11 @@ public class WorkflowsDBRepository {
         OutputID outputID = new OutputID();
 
         for (String outputId : uploadMap.keySet()) {
+            String path = adaptShanoirOrGirderIOValue(uploadMap.get(outputId).toString());
+
             outputID.setWorkflowID(workflowId);
             outputID.setProcessor(outputId);
-            outputID.setPath(uploadMap.get(outputId).toString());
+            outputID.setPath(path);
             output.setOutputID(outputID);
             output.setType(DataType.URI);
 
@@ -106,6 +124,55 @@ public class WorkflowsDBRepository {
             }
         }
     }
+
+    /*
+        Adapt girder and shanoir input or output uri to storable uri, in particular removing the tokens
+     */
+    private String adaptShanoirOrGirderIOValue(String ioValue) throws MoteurLiteException {
+        URI uri;
+        try {
+             uri = new URI(ioValue);
+        } catch (URISyntaxException e) {
+            return ioValue;
+        }
+        if (uri.getScheme() == null) {
+            return ioValue;
+        }
+        if ("shanoir".equals(uri.getScheme())) {
+            return adaptShanoirUri(uri);
+        } else if ("girder".equals(uri.getScheme())) {
+            return adaptGirderUri(uri);
+        } else {
+            return ioValue;
+        }
+    }
+
+    private String adaptGirderUri(URI uri) throws MoteurLiteException {
+        return selectUriQueries(uri, "apiurl", "fileId");
+    }
+
+    private String adaptShanoirUri(URI uri) throws MoteurLiteException {
+        return selectUriQueries(uri, "apiUrl", "upload_url", "resourceId", "type", "format", "keycloak_client_id", "converterId");
+    }
+
+    private String selectUriQueries(URI uri, String... parametersToKeep) throws MoteurLiteException {
+        if (uri.getQuery() == null) {
+            return uri.toString();
+        }
+        List<String> queryWhiteList = Arrays.asList(parametersToKeep);
+        String newQuery = Arrays.stream(uri.getQuery().split("&"))
+                .filter(q -> {
+                    int index = q.indexOf("=");
+                    if (index < 0) return false;
+                    return queryWhiteList.contains(q.substring(0,index));
+                })
+                .collect(Collectors.joining("&"));
+        // build a new URI
+        String newUri = uri.toString();
+        newUri = newUri.substring(0, newUri.indexOf("?"));
+        return newUri + "?" + newQuery;
+    }
+
 
     public void persistProcessors(String workflowId, String applicationName, Integer queued, Integer completed, Integer failed) throws MoteurLiteException {
         try {
