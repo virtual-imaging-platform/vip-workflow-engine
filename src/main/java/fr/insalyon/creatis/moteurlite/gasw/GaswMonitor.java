@@ -1,10 +1,10 @@
 package fr.insalyon.creatis.moteurlite.gasw;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.insalyon.creatis.moteurlite.workflowsdb.WorkflowsDBRepository;
 import org.apache.log4j.Logger;
 
 import fr.insalyon.creatis.gasw.Gasw;

@@ -26,7 +26,7 @@ import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
 import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.boutiques.model.Input;
 import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
-import fr.insalyon.creatis.moteurlite.gasw.WorkflowsDBRepository;
+import fr.insalyon.creatis.moteurlite.workflowsdb.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.custom.DirectoryInputsService;
 import fr.insalyon.creatis.moteurlite.custom.IntIteratorInputsService;
