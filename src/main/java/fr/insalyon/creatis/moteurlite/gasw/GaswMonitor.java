@@ -38,32 +38,33 @@ public class GaswMonitor extends Thread {
     @Override
     public void run() {
         while (finishedJobsNumber < numberOfInvocations) {
-            waitForGasw();
+            try {
+                waitForGasw();
 
-            List<GaswOutput> finishedJobs = gasw.getFinishedJobs();
-            logger.info("Number of finished jobs: " + finishedJobs.size());
-
-            if (finishedJobs.isEmpty()) {
-                continue;
-            } else {
-                try {
-                    processFinishedJobs(finishedJobs);
-                    workflowsDbRepository.persistProcessors(workflowId, applicationName, numberOfInvocations - finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
-                } catch (MoteurLiteException e) {
-                    logger.error("Error while persisting processors during processing: ", e);
+                List<GaswOutput> finishedJobs = gasw.getFinishedJobs();
+                logger.info("Number of finished jobs: " + finishedJobs.size());
+    
+                if (finishedJobs.isEmpty()) {
+                    continue;
+                } else {
+                    try {
+                        processFinishedJobs(finishedJobs);
+                        workflowsDbRepository.persistProcessors(workflowId, applicationName, numberOfInvocations - finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
+                    } catch (MoteurLiteException e) {
+                        logger.error("Error while persisting processors during processing: ", e);
+                    }
                 }
+            } catch (InterruptedException e) {
+                terminate(true);
+                return;
             }
         }
-        terminate();
+        terminate(false);
     }
 
-    private synchronized void waitForGasw() {
-        try {
-            gasw.waitForNotification();
-            wait();
-        } catch (InterruptedException e) {
-            logger.error("Interrupted exception while waiting for notification: ", e);
-        }
+    private synchronized void waitForGasw() throws InterruptedException {
+        gasw.waitForNotification();
+        wait();
     }
 
     private void processFinishedJobs(List<GaswOutput> finishedJobs) {
@@ -91,10 +92,14 @@ public class GaswMonitor extends Thread {
         finishedJobsNumber += finishedJobs.size();
     }
 
-    private void terminate() {
+    private void terminate(boolean killed) {
         try {
             // We decided to use that instead of the old version based on the presence of output file to determine if the job was successful.
             GaswStatus finalStatus = successfulJobsNumber > 0 ? GaswStatus.COMPLETED : GaswStatus.ERROR;
+            
+            if (killed) {
+                finalStatus = GaswStatus.KILL;
+            }
 
             workflowsDbRepository.persistWorkflow(workflowId, finalStatus);
             gasw.terminate();
