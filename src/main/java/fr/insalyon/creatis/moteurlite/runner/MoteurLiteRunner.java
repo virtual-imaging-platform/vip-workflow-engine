@@ -107,6 +107,10 @@ public class MoteurLiteRunner {
             @Override
             public void run() {
                 try {
+                    if ( ! gaswMonitor.isAlive()) {
+                        // normal shutdown, not a soft-kill
+                        return;
+                    }
                     logger.info("Trying to perform a soft-kill!");
 
                     jobSumitter.interrupt();

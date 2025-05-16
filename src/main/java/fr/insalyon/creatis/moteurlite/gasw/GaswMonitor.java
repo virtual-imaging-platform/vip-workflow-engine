@@ -103,7 +103,7 @@ public class GaswMonitor extends Thread {
 
             workflowsDbRepository.persistWorkflow(workflowId, finalStatus);
             gasw.terminate();
-            logger.info("Completed execution of workflow");
+            logger.info("workflow finished with status " + finalStatus.name());
         } catch (GaswException e) {
             logger.error("Error while terminating Gasw: ", e);
         } catch (MoteurLiteException e) {
