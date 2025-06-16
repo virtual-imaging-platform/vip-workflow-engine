@@ -13,8 +13,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.source>21</maven.compiler.source>
-        <gasw-version>3.12.0-SNAPSHOT</gasw-version>
-        <grida-version>3.1.0-SNAPSHOT</grida-version>
+        <gasw.version>3.12.0-SNAPSHOT</gasw.version>
+        <grida.version>3.1.0-SNAPSHOT</grida.version>
+        <boutiques-model.version>0.1-SNAPSHOT</boutiques-model.version>
         <revision>0.1</revision>
         <changelist>-SNAPSHOT</changelist>
         <sha1 />
@@ -70,7 +71,7 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>gasw</artifactId>
-            <version>${gasw-version}</version>
+            <version>${gasw.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -79,15 +80,20 @@
             <version>1.8.0-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>grida-standalone</artifactId>
+            <version>${grida.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>boutiques-model</artifactId>
+            <version>${boutiques-model.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>2.1.2</version>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>grida-standalone</artifactId>
-            <version>${grida-version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

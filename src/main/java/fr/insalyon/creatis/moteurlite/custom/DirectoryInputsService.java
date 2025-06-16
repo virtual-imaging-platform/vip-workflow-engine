@@ -6,16 +6,15 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import fr.insalyon.creatis.grida.common.bean.GridPathInfo;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConfiguration;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
-import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
-import fr.insalyon.creatis.moteurlite.boutiques.model.Custom;
-import fr.insalyon.creatis.moteurlite.boutiques.model.CustomDirectoryInputsItem;
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.Custom;
+import fr.insalyon.creatis.boutiques.model.CustomDirectoryInputsItem;
 
 import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.grida.client.GRIDAClient;

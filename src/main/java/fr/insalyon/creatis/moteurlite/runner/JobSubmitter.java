@@ -13,13 +13,13 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import fr.insalyon.creatis.boutiques.model.Input;
 import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswInput;
 import fr.insalyon.creatis.moteurlite.MoteurLite;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
-import fr.insalyon.creatis.moteurlite.boutiques.model.Input;
 
 public class JobSubmitter extends Thread {
     private static final Logger logger = Logger.getLogger(MoteurLite.class);
