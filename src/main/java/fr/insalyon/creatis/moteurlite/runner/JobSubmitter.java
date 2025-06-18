@@ -101,10 +101,15 @@ public class JobSubmitter extends Thread {
 
         for (String inputId : invocationInputs.keySet()) {
             String value = invocationInputs.get(inputId);
-            Input.Type type = boutiquesInputs.get(inputId).getType();
+            Input input = boutiquesInputs.get(inputId);
+            Input.Type type = input.getType();
 
+            if (input.getOptional() != null && input.getOptional() &&
+                    value.equals(MoteurLiteConstants.INPUT_WITHOUT_VALUE)) {
+                continue; // optional input with no value, skip it
+            }
             if (type == Input.Type.NUMBER) {
-                if (boutiquesInputs.get(inputId).getInteger() != null && boutiquesInputs.get(inputId).getInteger()) {
+                if (input.getInteger() != null && input.getInteger()) {
                     jsonNode.put(inputId, Integer.parseInt(value));
                 } else {
                     jsonNode.put(inputId, Float.parseFloat(value));
