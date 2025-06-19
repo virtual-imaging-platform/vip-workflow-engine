@@ -70,7 +70,8 @@ public class JobSubmitter extends Thread {
                 }
 
                 String invocationString = convertMapToJson(finalInvocationInputs, boutiquesInputs);
-                String jobId = applicationName + "-" + System.nanoTime() + ".sh";
+                // jobId can be used for filenames, so normalize it by removing spaces
+                String jobId = applicationName.replace(' ', '_') + "-" + System.nanoTime() + ".sh";
     
                 submit(new GaswInput(applicationName, applicationName + ".json", downloads, resultsDirectoryURI, invocationString, jobId));
             }
