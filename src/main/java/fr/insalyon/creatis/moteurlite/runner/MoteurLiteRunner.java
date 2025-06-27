@@ -12,9 +12,10 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOExceptio
 import fr.insalyon.creatis.moteurlite.MoteurLite;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConfiguration;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
-import fr.insalyon.creatis.moteurlite.boutiques.BoutiquesService;
-import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
-import fr.insalyon.creatis.moteurlite.boutiques.model.Input;
+import fr.insalyon.creatis.boutiques.BoutiquesException;
+import fr.insalyon.creatis.boutiques.BoutiquesService;
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.Input;
 import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
 import fr.insalyon.creatis.moteurlite.workflowsdb.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
@@ -56,37 +57,41 @@ public class MoteurLiteRunner {
     }
 
     public void run(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
-        Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
-        BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
-        Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
+        try {
+            Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
+            BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
+            Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
 
-        // expand vip:directoryInputs
-        directoryInputsService.updateInputs(allInputs, descriptor);
-        // expand vip:intIteratorInputs
-        intIteratorInputsService.updateInputs(allInputs, descriptor);
-        // apply vip:resultsDirectorySuffix to results-directory
-        resultsDirectorySuffixService.updateInputs(allInputs, descriptor);
-        // compute vip:dot and cross combinations
-        List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
+            // expand vip:directoryInputs
+            directoryInputsService.updateInputs(allInputs, descriptor);
+            // expand vip:intIteratorInputs
+            intIteratorInputsService.updateInputs(allInputs, descriptor);
+            // apply vip:resultsDirectorySuffix to results-directory
+            resultsDirectorySuffixService.updateInputs(allInputs, descriptor);
+            // compute vip:dot and cross combinations
+            List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
 
-        // check maxJobs limit
-        int plannedJobs = invocationsInputs.size(), maxJobs = config.getMaxJobsPerWorkflow();
-        if (plannedJobs > maxJobs) {
-            throw new MoteurLiteException("Too many jobs (max:" + maxJobs + ", got:" + plannedJobs + ")");
+            // check maxJobs limit
+            int plannedJobs = invocationsInputs.size(), maxJobs = config.getMaxJobsPerWorkflow();
+            if (plannedJobs > maxJobs) {
+                throw new MoteurLiteException("Too many jobs (max:" + maxJobs + ", got:" + plannedJobs + ")");
+            }
+
+            // store inputs and create processors in workflowsdb
+            workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
+            workflowsDBRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
+
+            // init gasw
+            initGaswAndMonitor(workflowId, descriptor.getName(), invocationsInputs.size());
+
+            // launch jobs
+            jobSumitter = new JobSubmitter(gasw, descriptor.getName(), invocationsInputs, boutiquesInputs);
+            jobSumitter.start();
+
+            listenSoftKill();
+        } catch (BoutiquesException e) {
+            throw new MoteurLiteException(e);
         }
-
-        // store inputs and create processors in workflowsdb
-        workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
-        workflowsDBRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
-
-        // init gasw
-        initGaswAndMonitor(workflowId, descriptor.getName(), invocationsInputs.size());
-
-        // launch jobs
-        jobSumitter = new JobSubmitter(gasw, descriptor.getName(), invocationsInputs, boutiquesInputs);
-        jobSumitter.start();
-
-        listenSoftKill();
     }
 
     private void initGaswAndMonitor(String workflowId, String descriptorName, int numberOfInvocations) throws MoteurLiteException {

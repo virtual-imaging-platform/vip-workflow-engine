@@ -1,10 +1,9 @@
 package fr.insalyon.creatis.moteurlite.custom;
 
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
-import fr.insalyon.creatis.moteurlite.boutiques.model.BoutiquesDescriptor;
-import fr.insalyon.creatis.moteurlite.boutiques.model.Custom;
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.Custom;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;

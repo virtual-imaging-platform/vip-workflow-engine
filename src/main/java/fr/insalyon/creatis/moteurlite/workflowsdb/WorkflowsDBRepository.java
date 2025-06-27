@@ -66,7 +66,7 @@ public class WorkflowsDBRepository {
 
     public void persistInputs(
             String workflowId, Map<String, List<String>> inputValues,
-            Map<String, fr.insalyon.creatis.moteurlite.boutiques.model.Input> boutiquesInputs) throws MoteurLiteException {
+            Map<String, fr.insalyon.creatis.boutiques.model.Input> boutiquesInputs) throws MoteurLiteException {
         Input input = new Input();
         InputID inputID = new InputID();
 
@@ -95,11 +95,11 @@ public class WorkflowsDBRepository {
         }
     }
 
-    private DataType getWorkflowsDBType(String boutiquesInputID, Map<String, fr.insalyon.creatis.moteurlite.boutiques.model.Input> boutiquesInputs) {
+    private DataType getWorkflowsDBType(String boutiquesInputID, Map<String, fr.insalyon.creatis.boutiques.model.Input> boutiquesInputs) {
         if (MoteurLiteConstants.RESULTS_DIRECTORY.equals(boutiquesInputID)) {
             return DataType.URI;
         } else {
-            return fr.insalyon.creatis.moteurlite.boutiques.model.Input.Type.FILE.equals(boutiquesInputs.get(boutiquesInputID).getType()) ? DataType.URI : DataType.String;
+            return fr.insalyon.creatis.boutiques.model.Input.Type.FILE.equals(boutiquesInputs.get(boutiquesInputID).getType()) ? DataType.URI : DataType.String;
         }
     }
 
