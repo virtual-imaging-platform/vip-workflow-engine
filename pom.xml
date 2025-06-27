@@ -13,11 +13,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.source>21</maven.compiler.source>
-        <gasw.version>3.12.0-SNAPSHOT</gasw.version>
-        <grida.version>3.1.0-SNAPSHOT</grida.version>
-        <boutiques-model.version>0.1-SNAPSHOT</boutiques-model.version>
-        <revision>0.1</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <gasw.version>4.0</gasw.version>
+        <grida.version>3.1.0</grida.version>
+        <boutiques-model.version>1.0</boutiques-model.version>
+        <revision>1.0</revision>
+        <changelist/>
         <sha1 />
     </properties>
 
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>moteur2-workflowsdb-common</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
