@@ -16,8 +16,8 @@
         <gasw.version>4.0</gasw.version>
         <grida.version>3.1.0</grida.version>
         <boutiques-model.version>1.0</boutiques-model.version>
-        <revision>1.0.1</revision>
-        <changelist/>
+        <revision>1.1.0</revision>
+        <changelist>-SNAPSHOT</changelist>
         <sha1 />
     </properties>
 
