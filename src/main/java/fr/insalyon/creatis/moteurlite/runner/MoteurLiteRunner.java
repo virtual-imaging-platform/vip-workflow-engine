@@ -2,6 +2,7 @@ package fr.insalyon.creatis.moteurlite.runner;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -61,6 +62,7 @@ public class MoteurLiteRunner {
             Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
             BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
             Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
+            Set<String> optionalInputs = boutiquesService.getInputOptionalOfBoutiquesFile(descriptor);
 
             // expand vip:directoryInputs
             directoryInputsService.updateInputs(allInputs, descriptor);
@@ -69,7 +71,7 @@ public class MoteurLiteRunner {
             // apply vip:resultsDirectorySuffix to results-directory
             resultsDirectorySuffixService.updateInputs(allInputs, descriptor);
             // compute vip:dot and cross combinations
-            List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
+            List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, optionalInputs, descriptor);
 
             // check maxJobs limit
             int plannedJobs = invocationsInputs.size(), maxJobs = config.getMaxJobsPerWorkflow();

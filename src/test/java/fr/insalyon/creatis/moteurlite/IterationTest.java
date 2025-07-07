@@ -7,12 +7,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import fr.insalyon.creatis.boutiques.BoutiquesService;
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.Custom;
+import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.iteration.IterationTypes;
 
 public class IterationTest {
@@ -137,5 +142,26 @@ public class IterationTest {
         result = types.cross(new ArrayList<>(), new ArrayList<>());
 
         assertEquals(0, result.size());
+    }
+
+    @Test
+    public void dotEmptyOptionalValue() throws MoteurLiteException {
+        BoutiquesService boutiquesService = new BoutiquesService();
+        IterationService iterationService = new IterationService(boutiquesService);
+        BoutiquesDescriptor boutiquesDescriptor = new BoutiquesDescriptor();
+        Custom customDot = new Custom();
+
+        customDot.setAdditionalProperty(
+            "vip:dot", 
+            Arrays.asList("scan", "color", "type"));
+        boutiquesDescriptor.setCustom(customDot);
+  
+        inputsC.put("type", new ArrayList<>());
+        inputsA.putAll(inputsC);
+
+        result = iterationService.compute(inputsA, new HashSet<>(Arrays.asList("type")), boutiquesDescriptor);
+        assertEquals(2, result.size());
+        assertTrue(result.stream().anyMatch((m) -> m.containsKey("scan")));
+        assertTrue(result.stream().anyMatch((m) -> m.containsKey("color")));
     }
 }
