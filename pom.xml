@@ -15,7 +15,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <gasw.version>4.0</gasw.version>
         <grida.version>3.1.0</grida.version>
-        <boutiques-model.version>1.0</boutiques-model.version>
+        <boutiques-model.version>1.1</boutiques-model.version>
         <revision>1.1.0</revision>
         <changelist>-SNAPSHOT</changelist>
         <sha1 />
