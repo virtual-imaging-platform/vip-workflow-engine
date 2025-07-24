@@ -17,7 +17,7 @@
         <grida.version>3.1.0</grida.version>
         <boutiques-model.version>1.1</boutiques-model.version>
         <revision>1.2.0</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <changelist />
         <sha1 />
     </properties>
 
