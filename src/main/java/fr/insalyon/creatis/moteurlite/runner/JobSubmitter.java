@@ -61,9 +61,13 @@ public class JobSubmitter extends Thread {
                     } else {
                         if (Input.Type.FILE.equals(boutiquesInputs.get(inputId).getType())) {
                             URI downloadURI = getURI(inputValue);
-                            String filename = Paths.get(downloadURI.getPath()).getFileName().toString();
-                            downloads.add(downloadURI);
-                            inputValue = filename;
+                            if (downloadURI.getPath() == null) {
+                              logger.info("Skipping download for file input with no path: " + inputId + "=" + inputValue);
+                            } else {
+                               String filename = Paths.get(downloadURI.getPath()).getFileName().toString();
+                               downloads.add(downloadURI);
+                               inputValue = filename;
+                            }
                         }
                         finalInvocationInputs.put(inputId, inputValue);
                     }
@@ -105,9 +109,16 @@ public class JobSubmitter extends Thread {
             Input input = boutiquesInputs.get(inputId);
             Input.Type type = input.getType();
 
-            if (input.getOptional() != null && input.getOptional() &&
-                    value.equals(MoteurLiteConstants.INPUT_WITHOUT_VALUE)) {
-                continue; // optional input with no value, skip it
+            if (input.getOptional() != null && input.getOptional()) {
+                String testValue = value;
+                // for file inputs, ignore any colon-based prefix (such as "file:", "lfn:")
+                if (type == Input.Type.FILE) {
+                    testValue = value.replaceFirst("[^:]*:","");
+                }
+                // skip optional inputs with no value
+                if(testValue.equals(MoteurLiteConstants.INPUT_WITHOUT_VALUE)) {
+                    continue;
+                }
             }
             if (type == Input.Type.NUMBER) {
                 if (input.getInteger() != null && input.getInteger()) {
