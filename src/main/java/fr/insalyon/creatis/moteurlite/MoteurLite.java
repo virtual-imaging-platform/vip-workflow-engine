@@ -10,8 +10,8 @@ public class MoteurLite {
             throw new IllegalArgumentException("Invalid workflowId. It should be a simple non-empty string.");
         } else if ( ! args[1].endsWith(".json")) {
             throw new IllegalArgumentException("Invalid boutiquesFilePath. It should be a JSON file.");
-        } else if ( ! args[2].endsWith(".xml")) {
-            throw new IllegalArgumentException("Invalid inputsFilePath. It should be an XML file.");
+        } else if ( ! args[2].endsWith(".json") && ! args[2].endsWith(".xml")) {
+            throw new IllegalArgumentException("Invalid inputsFilePath. It should be an JSON/XML file.");
         } else {
             new MoteurLiteRunner().run(args[0], args[1], args[2]);
         }

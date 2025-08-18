@@ -58,7 +58,7 @@ public class MoteurLiteRunner {
 
     public void run(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
         try {
-            Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
+            Map<String, List<String>> allInputs = inputsFileService.parse(inputsFilePath);
             BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
             Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
 

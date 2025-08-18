@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -18,24 +19,52 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
 public class InputsFileService {
 
     private static final Logger logger = Logger.getLogger(InputsFileService.class);
 
-    /**
-     * This method parses input data from an XML file and returns a Map where each key
-     * corresponds to a source name and the value is a List of all items under that source.
-     */
-    public Map<String, List<String>> parseInputData(String filePath) throws MoteurLiteException {
+    public Map<String, List<String>> parse(String filePath) throws MoteurLiteException {
+        String ext = FilenameUtils.getExtension(filePath);
+        File file = new File(filePath);
+
+        if ( ! ext.isEmpty()) {
+            switch (ext) {
+                case "json":
+                    return handleJSON(file);
+                case "xml":
+                    return handleXML(file);
+                default:
+                    throw new MoteurLiteException("Unsupported input file extension (only json or xml)");
+            }
+        } else {
+            throw new MoteurLiteException("Input file extension missing!");
+        }
+    }
+
+    public Map<String, List<String>> handleJSON(File file) throws MoteurLiteException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            return mapper.readValue(file, new TypeReference<Map<String, List<String>>>() {});
+
+        } catch (IOException e) {
+            logger.error("Cannot transform JSON String to JSON Map!");
+            throw new MoteurLiteException(e);
+        }
+    }
+
+    public Map<String, List<String>> handleXML(File file) throws MoteurLiteException {
         Map<String, List<String>> inputMap = new HashMap<>(); 
         
         try {
-            File xmlFile = new File(filePath);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xmlFile);
+            Document doc = dBuilder.parse(file);
             doc.getDocumentElement().normalize();
 
             NodeList nodeList = doc.getElementsByTagName("source");
@@ -63,8 +92,8 @@ public class InputsFileService {
                 }
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            logger.error("Failed to parse input data from XML file: " + filePath, e);
-            throw new MoteurLiteException("Failed to parse input data from XML file: " + filePath, e);
+            logger.error("Failed to parse input data from XML file: " + file.getPath(), e);
+            throw new MoteurLiteException("Failed to parse input data from XML file: " + file.getPath(), e);
         }
         return inputMap;
     }
