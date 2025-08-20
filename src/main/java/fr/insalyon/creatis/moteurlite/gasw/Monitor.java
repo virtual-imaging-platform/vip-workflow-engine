@@ -14,8 +14,8 @@ import fr.insalyon.creatis.gasw.GaswOutput;
 import fr.insalyon.creatis.gasw.execution.GaswStatus;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
-public class GaswMonitor extends Thread {
-    private static final Logger logger = Logger.getLogger(GaswMonitor.class);
+public class Monitor extends Thread {
+    private static final Logger logger = Logger.getLogger(Monitor.class);
 
     private String workflowId;
     private String applicationName;
@@ -27,7 +27,7 @@ public class GaswMonitor extends Thread {
     private Integer successfulJobsNumber = 0;
     private Integer failedJobsNumber = 0;
 
-    public GaswMonitor(Gasw gasw, WorkflowsDBRepository workflowsDbRepository, String workflowId, String applicationName, int numberOfInvocations) {
+    public Monitor(Gasw gasw, WorkflowsDBRepository workflowsDbRepository, String workflowId, String applicationName, int numberOfInvocations) {
         this.gasw = gasw;
         this.workflowsDbRepository = workflowsDbRepository;
         this.workflowId = workflowId;
@@ -102,7 +102,7 @@ public class GaswMonitor extends Thread {
             }
 
             workflowsDbRepository.persistWorkflow(workflowId, finalStatus);
-            gasw.terminate();
+            gasw.terminate(killed);
             logger.info("workflow finished with status " + finalStatus.name());
         } catch (GaswException e) {
             logger.error("Error while terminating Gasw: ", e);
