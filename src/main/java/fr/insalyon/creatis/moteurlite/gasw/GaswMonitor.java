@@ -4,8 +4,10 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.insalyon.creatis.moteurlite.workflowsdb.WorkflowsDBRepository;
-import org.apache.log4j.Logger;
 
 import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
@@ -15,7 +17,7 @@ import fr.insalyon.creatis.gasw.execution.GaswStatus;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
 public class GaswMonitor extends Thread {
-    private static final Logger logger = Logger.getLogger(GaswMonitor.class);
+    private static final Logger logger = LoggerFactory.getLogger(GaswMonitor.class);
 
     private String workflowId;
     private String applicationName;
@@ -103,7 +105,7 @@ public class GaswMonitor extends Thread {
 
             workflowsDbRepository.persistWorkflow(workflowId, finalStatus);
             gasw.terminate();
-            logger.info("workflow finished with status " + finalStatus.name());
+            logger.info("workflow finished with status {} finalStatus.name()");
         } catch (GaswException e) {
             logger.error("Error while terminating Gasw: ", e);
         } catch (MoteurLiteException e) {

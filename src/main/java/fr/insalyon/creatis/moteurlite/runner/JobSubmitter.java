@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,7 +23,7 @@ import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
 public class JobSubmitter extends Thread {
-    private static final Logger logger = Logger.getLogger(MoteurLite.class);
+    private static final Logger logger = LoggerFactory.getLogger(MoteurLite.class);
 
     private final Gasw                      gasw;
     private final String                    applicationName;
@@ -62,7 +63,7 @@ public class JobSubmitter extends Thread {
                         if (Input.Type.FILE.equals(boutiquesInputs.get(inputId).getType())) {
                             URI downloadURI = getURI(inputValue);
                             if (downloadURI.getPath() == null) {
-                              logger.info("Skipping download for file input with no path: " + inputId + "=" + inputValue);
+                              logger.info("Skipping download for file input with no path: {} = {}", inputId, inputValue);
                             } else {
                                String filename = Paths.get(downloadURI.getPath()).getFileName().toString();
                                downloads.add(downloadURI);
@@ -95,7 +96,7 @@ public class JobSubmitter extends Thread {
         try {
             return new URI(inputValue);
         } catch (URISyntaxException e) {
-            logger.error("Error parsing URI : " + inputValue, e);
+            logger.error("Error parsing URI: {}", inputValue, e);
             throw new MoteurLiteException("Error parsing URI : " + inputValue, e);
         }
     }

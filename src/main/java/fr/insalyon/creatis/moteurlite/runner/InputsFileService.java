@@ -11,7 +11,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,7 +23,7 @@ import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
 public class InputsFileService {
 
-    private static final Logger logger = Logger.getLogger(InputsFileService.class);
+    private static final Logger logger = LoggerFactory.getLogger(InputsFileService.class);
 
     /**
      * This method parses input data from an XML file and returns a Map where each key
@@ -63,8 +64,8 @@ public class InputsFileService {
                 }
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            logger.error("Failed to parse input data from XML file: " + filePath, e);
-            throw new MoteurLiteException("Failed to parse input data from XML file: " + filePath, e);
+            logger.error("Failed to parse input data from XML file: {}", filePath, e);
+            throw new MoteurLiteException("Failed to parse input data from XML file: {}" + filePath, e);
         }
         return inputMap;
     }

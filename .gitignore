@@ -23,3 +23,6 @@ build/
 
 # Ignore logs
 *.log
+
+workflow.err
+workflow.out
