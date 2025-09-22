@@ -16,7 +16,7 @@ import fr.insalyon.creatis.boutiques.BoutiquesException;
 import fr.insalyon.creatis.boutiques.BoutiquesService;
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.boutiques.model.Input;
-import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
+import fr.insalyon.creatis.moteurlite.gasw.Monitor;
 import fr.insalyon.creatis.moteurlite.workflowsdb.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.custom.DirectoryInputsService;
@@ -37,7 +37,7 @@ public class MoteurLiteRunner {
 
     private Gasw       gasw;
     private JobSubmitter jobSumitter;
-    private GaswMonitor gaswMonitor;
+    private Monitor monitor;
 
     public MoteurLiteRunner() throws MoteurLiteException {
         config = new MoteurLiteConfiguration();
@@ -97,9 +97,9 @@ public class MoteurLiteRunner {
     private void initGaswAndMonitor(String workflowId, String descriptorName, int numberOfInvocations) throws MoteurLiteException {
         try {
             gasw = Gasw.getInstance();
-            gaswMonitor = new GaswMonitor(gasw, workflowsDBRepo, workflowId, descriptorName, numberOfInvocations);
-            gasw.setNotificationClient(gaswMonitor);
-            gaswMonitor.start();
+            monitor = new Monitor(gasw, workflowsDBRepo, workflowId, descriptorName, numberOfInvocations);
+            gasw.setNotificationClient(monitor);
+            monitor.start();
 
         } catch (GaswException e) {
             logger.error("Error launching gasw", e);
@@ -112,7 +112,7 @@ public class MoteurLiteRunner {
             @Override
             public void run() {
                 try {
-                    if ( ! gaswMonitor.isAlive()) {
+                    if ( ! monitor.isAlive()) {
                         // normal shutdown, not a soft-kill
                         return;
                     }
@@ -121,8 +121,8 @@ public class MoteurLiteRunner {
                     jobSumitter.interrupt();
                     jobSumitter.join();
 
-                    gaswMonitor.interrupt();
-                    gaswMonitor.join();
+                    monitor.interrupt();
+                    monitor.join();
 
                     logger.info("Soft-kill have been successfully done!");
 
