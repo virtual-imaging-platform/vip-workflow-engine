@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import fr.insalyon.creatis.boutiques.BoutiquesService;
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.boutiques.model.Custom;
+import fr.insalyon.creatis.boutiques.model.Input;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.iteration.IterationTypes;
 
@@ -155,11 +156,16 @@ public class IterationTest {
             "vip:dot", 
             Arrays.asList("scan", "color", "type"));
         boutiquesDescriptor.setCustom(customDot);
-  
+
         inputsC.put("type", new ArrayList<>());
         inputsA.putAll(inputsC);
 
-        result = iterationService.compute(inputsA, new HashSet<>(Arrays.asList("type")), boutiquesDescriptor);
+        Input input = new Input();
+        input.setId("type");
+        input.setOptional(true);
+        boutiquesDescriptor.setInputs(Set.of(input));
+
+        result = iterationService.compute(inputsA, boutiquesDescriptor);
         assertEquals(2, result.size());
         assertTrue(result.stream().anyMatch((m) -> m.containsKey("scan")));
         assertTrue(result.stream().anyMatch((m) -> m.containsKey("color")));
