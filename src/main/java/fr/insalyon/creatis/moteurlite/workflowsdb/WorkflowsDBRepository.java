@@ -25,11 +25,12 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorkflowsDBRepository {
 
-    private static final Logger logger = Logger.getLogger(WorkflowsDBRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowsDBRepository.class);
 
     private static WorkflowsDBRepository instance;
 
@@ -88,7 +89,7 @@ public class WorkflowsDBRepository {
                 try {
                     inputDAO.add(input);
                 } catch (WorkflowsDBDAOException e) {
-                    logger.error("Failed to persist input: " + key + " / " + value, e);
+                    logger.error("Failed to persist input: {} / {}", key, value, e);
                     throw new MoteurLiteException("Failed to persist input: " + key + " / " + value, e);
                 }
             }
@@ -119,7 +120,7 @@ public class WorkflowsDBRepository {
             try {
                 outputDAO.add(output);
             } catch (WorkflowsDBDAOException e) {
-                logger.error("Failed to persist output: " + outputID.getProcessor() + " / " + outputID.getPath() , e);
+                logger.error("Failed to persist output: {} / {}", outputID.getProcessor(), outputID.getPath(), e);
                 throw new MoteurLiteException("Failed to persist output: " + outputID.getProcessor() + " / " + outputID.getPath() , e);
             }
         }
@@ -195,7 +196,7 @@ public class WorkflowsDBRepository {
                 processorDAO.add(processors);
             }
         } catch (WorkflowsDBDAOException e) {
-            logger.error("Failed to persist processor: " + applicationName, e);
+            logger.error("Failed to persist processor: {}", applicationName, e);
             throw new MoteurLiteException("Failed to persist processor: " + applicationName, e);
         }
     }
@@ -221,11 +222,11 @@ public class WorkflowsDBRepository {
                 workflow.setFinishedTime(currentDate);
                 workflowDAO.update(workflow);
             } else {
-                logger.error("Workflow with ID " + workflowId + " not found.");
+                logger.error("Workflow with ID {} not found.", workflowId);
                 throw new MoteurLiteException("Workflow with ID " + workflowId + " not found.");
             }
         } catch (WorkflowsDBDAOException e) {
-            logger.error("Failed to get or update workflow : " + workflowId, e);
+            logger.error("Failed to get or update workflow: {}", workflowId, e);
             throw new MoteurLiteException("Failed to get or update workflow : " + workflowId, e);
         }
     }

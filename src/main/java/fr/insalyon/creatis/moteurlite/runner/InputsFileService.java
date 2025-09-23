@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +15,7 @@ import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
 public class InputsFileService {
 
-    private static final Logger logger = Logger.getLogger(InputsFileService.class);
+    private static final Logger logger = LoggerFactory.getLogger(InputsFileService.class);
 
     public Map<String, List<String>> parse(String filePath) throws MoteurLiteException {
         ObjectMapper mapper = new ObjectMapper();

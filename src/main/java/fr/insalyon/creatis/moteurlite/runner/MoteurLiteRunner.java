@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
@@ -25,7 +26,7 @@ import fr.insalyon.creatis.moteurlite.custom.IntIteratorInputsService;
 import fr.insalyon.creatis.moteurlite.custom.ResultsDirectorySuffixService;
 
 public class MoteurLiteRunner {
-    private static final Logger logger = Logger.getLogger(MoteurLite.class);
+    private static final Logger logger = LoggerFactory.getLogger(MoteurLite.class);
 
     private final MoteurLiteConfiguration config;
     private final WorkflowsDBRepository workflowsDBRepo;
