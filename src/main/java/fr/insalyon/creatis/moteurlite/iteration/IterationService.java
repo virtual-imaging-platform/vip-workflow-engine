@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.boutiques.BoutiquesService;
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
 public class IterationService {
     private final BoutiquesService boutiquesService;
@@ -23,6 +23,11 @@ public class IterationService {
         Set<String> crossKeys = boutiquesService.getCrossMap(boutiquesDescriptor);
         Set<String> dotKeys = boutiquesService.getDotMap(boutiquesDescriptor);
         Set<String> allKeys = new HashSet<>(inputsMap.keySet());
+        Set<String> optionalKeys = boutiquesService.getInputOptionalOfBoutiquesFile(boutiquesDescriptor);
+
+        // for removing optional empty inputs from dotKeys to avoid iteration with inputs
+        // of different size (that will lead to failure)
+        removeEmptyOptionalKeys(dotKeys, inputsMap, optionalKeys);
 
         allKeys.removeAll(crossKeys);
         allKeys.removeAll(dotKeys);
@@ -44,4 +49,11 @@ public class IterationService {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    private void removeEmptyOptionalKeys(Set<String> keys, Map<String, List<String>> inputs, Set<String> optionalKeys) {
+        for (String key : optionalKeys) {
+            if (inputs.get(key) == null || inputs.get(key).isEmpty()) {
+                keys.remove(key);
+            }
+        }
+    }
 }

@@ -57,6 +57,7 @@ public class JobSubmitter extends Thread {
     
                 for (String inputId : invocationInputs.keySet()) {
                     String inputValue = invocationInputs.get(inputId);
+
                     if (MoteurLiteConstants.RESULTS_DIRECTORY.equals(inputId)) {
                         resultsDirectoryURI = getURI(inputValue);
                     } else {
@@ -110,17 +111,6 @@ public class JobSubmitter extends Thread {
             Input input = boutiquesInputs.get(inputId);
             Input.Type type = input.getType();
 
-            if (input.getOptional() != null && input.getOptional()) {
-                String testValue = value;
-                // for file inputs, ignore any colon-based prefix (such as "file:", "lfn:")
-                if (type == Input.Type.FILE) {
-                    testValue = value.replaceFirst("[^:]*:","");
-                }
-                // skip optional inputs with no value
-                if(testValue.equals(MoteurLiteConstants.INPUT_WITHOUT_VALUE)) {
-                    continue;
-                }
-            }
             if (type == Input.Type.NUMBER) {
                 if (input.getInteger() != null && input.getInteger()) {
                     jsonNode.put(inputId, Integer.parseInt(value));

@@ -209,6 +209,8 @@ public class WorkflowsDBRepository {
                 finalStatus = WorkflowStatus.Completed;
             } else if (status.equals(GaswStatus.ERROR)) {
                 finalStatus = WorkflowStatus.Failed;
+            } else if (status.equals(GaswStatus.KILL)) {
+                finalStatus = WorkflowStatus.Killed;
             }
 
             Workflow workflow = workflowDAO.get(workflowId);
