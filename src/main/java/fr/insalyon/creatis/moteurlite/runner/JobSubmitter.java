@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,7 +23,7 @@ import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 
 public class JobSubmitter extends Thread {
-    private static final Logger logger = Logger.getLogger(MoteurLite.class);
+    private static final Logger logger = LoggerFactory.getLogger(MoteurLite.class);
 
     private final Gasw                      gasw;
     private final String                    applicationName;
@@ -56,13 +57,14 @@ public class JobSubmitter extends Thread {
     
                 for (String inputId : invocationInputs.keySet()) {
                     String inputValue = invocationInputs.get(inputId);
+
                     if (MoteurLiteConstants.RESULTS_DIRECTORY.equals(inputId)) {
                         resultsDirectoryURI = getURI(inputValue);
                     } else {
                         if (Input.Type.FILE.equals(boutiquesInputs.get(inputId).getType())) {
                             URI downloadURI = getURI(inputValue);
                             if (downloadURI.getPath() == null) {
-                              logger.info("Skipping download for file input with no path: " + inputId + "=" + inputValue);
+                              logger.info("Skipping download for file input with no path: {} = {}", inputId, inputValue);
                             } else {
                                String filename = Paths.get(downloadURI.getPath()).getFileName().toString();
                                downloads.add(downloadURI);
@@ -95,7 +97,7 @@ public class JobSubmitter extends Thread {
         try {
             return new URI(inputValue);
         } catch (URISyntaxException e) {
-            logger.error("Error parsing URI : " + inputValue, e);
+            logger.error("Error parsing URI: {}", inputValue, e);
             throw new MoteurLiteException("Error parsing URI : " + inputValue, e);
         }
     }
@@ -109,17 +111,6 @@ public class JobSubmitter extends Thread {
             Input input = boutiquesInputs.get(inputId);
             Input.Type type = input.getType();
 
-            if (input.getOptional() != null && input.getOptional()) {
-                String testValue = value;
-                // for file inputs, ignore any colon-based prefix (such as "file:", "lfn:")
-                if (type == Input.Type.FILE) {
-                    testValue = value.replaceFirst("[^:]*:","");
-                }
-                // skip optional inputs with no value
-                if(testValue.equals(MoteurLiteConstants.INPUT_WITHOUT_VALUE)) {
-                    continue;
-                }
-            }
             if (type == Input.Type.NUMBER) {
                 if (input.getInteger() != null && input.getInteger()) {
                     jsonNode.put(inputId, Integer.parseInt(value));

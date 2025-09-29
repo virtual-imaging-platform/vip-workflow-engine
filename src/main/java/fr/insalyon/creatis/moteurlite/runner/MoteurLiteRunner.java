@@ -2,8 +2,10 @@ package fr.insalyon.creatis.moteurlite.runner;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
@@ -16,7 +18,7 @@ import fr.insalyon.creatis.boutiques.BoutiquesException;
 import fr.insalyon.creatis.boutiques.BoutiquesService;
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.boutiques.model.Input;
-import fr.insalyon.creatis.moteurlite.gasw.GaswMonitor;
+import fr.insalyon.creatis.moteurlite.gasw.Monitor;
 import fr.insalyon.creatis.moteurlite.workflowsdb.WorkflowsDBRepository;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.custom.DirectoryInputsService;
@@ -24,7 +26,7 @@ import fr.insalyon.creatis.moteurlite.custom.IntIteratorInputsService;
 import fr.insalyon.creatis.moteurlite.custom.ResultsDirectorySuffixService;
 
 public class MoteurLiteRunner {
-    private static final Logger logger = Logger.getLogger(MoteurLite.class);
+    private static final Logger logger = LoggerFactory.getLogger(MoteurLite.class);
 
     private final MoteurLiteConfiguration config;
     private final WorkflowsDBRepository workflowsDBRepo;
@@ -37,7 +39,7 @@ public class MoteurLiteRunner {
 
     private Gasw       gasw;
     private JobSubmitter jobSumitter;
-    private GaswMonitor gaswMonitor;
+    private Monitor monitor;
 
     public MoteurLiteRunner() throws MoteurLiteException {
         config = new MoteurLiteConfiguration();
@@ -58,7 +60,7 @@ public class MoteurLiteRunner {
 
     public void run(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
         try {
-            Map<String, List<String>> allInputs = inputsFileService.parseInputData(inputsFilePath);
+            Map<String, List<String>> allInputs = inputsFileService.parse(inputsFilePath);
             BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
             Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
 
@@ -97,9 +99,9 @@ public class MoteurLiteRunner {
     private void initGaswAndMonitor(String workflowId, String descriptorName, int numberOfInvocations) throws MoteurLiteException {
         try {
             gasw = Gasw.getInstance();
-            gaswMonitor = new GaswMonitor(gasw, workflowsDBRepo, workflowId, descriptorName, numberOfInvocations);
-            gasw.setNotificationClient(gaswMonitor);
-            gaswMonitor.start();
+            monitor = new Monitor(gasw, workflowsDBRepo, workflowId, descriptorName, numberOfInvocations);
+            gasw.setNotificationClient(monitor);
+            monitor.start();
 
         } catch (GaswException e) {
             logger.error("Error launching gasw", e);
@@ -112,7 +114,7 @@ public class MoteurLiteRunner {
             @Override
             public void run() {
                 try {
-                    if ( ! gaswMonitor.isAlive()) {
+                    if ( ! monitor.isAlive()) {
                         // normal shutdown, not a soft-kill
                         return;
                     }
@@ -121,8 +123,8 @@ public class MoteurLiteRunner {
                     jobSumitter.interrupt();
                     jobSumitter.join();
 
-                    gaswMonitor.interrupt();
-                    gaswMonitor.join();
+                    monitor.interrupt();
+                    monitor.join();
 
                     logger.info("Soft-kill have been successfully done!");
 
