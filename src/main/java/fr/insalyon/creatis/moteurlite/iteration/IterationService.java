@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.moteurlite.iteration;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 import fr.insalyon.creatis.boutiques.BoutiquesService;
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
+import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
 
 public class IterationService {
     private final BoutiquesService boutiquesService;
@@ -35,6 +37,12 @@ public class IterationService {
         dotKeys.retainAll(inputsMap.keySet());
         crossKeys.retainAll(inputsMap.keySet());
         crossKeys.addAll(allKeys);
+
+        Set<String> resultsDirs = new HashSet<>(inputsMap.getOrDefault(MoteurLiteConstants.RESULTS_DIRECTORY, Collections.emptyList()));
+        if (resultsDirs.size() > 1) {
+            dotKeys.add(MoteurLiteConstants.RESULTS_DIRECTORY);
+            crossKeys.remove(MoteurLiteConstants.RESULTS_DIRECTORY);
+        }
 
         List<Map<String, String>> dotCombinations = iterationTypes.dot(getSelectedMap(inputsMap, dotKeys));
         List<Map<String, String>> crossCombinations = iterationTypes.cross(getSelectedMap(inputsMap, crossKeys));
