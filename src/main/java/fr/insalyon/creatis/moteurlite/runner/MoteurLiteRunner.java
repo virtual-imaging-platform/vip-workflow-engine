@@ -83,6 +83,10 @@ public class MoteurLiteRunner {
                     Map<String, String> invocationInputMap = new HashMap<>();
                     // Only keep the first value of each input map, there is not supposed to be multiple ones here
                     for (Map.Entry<String, List<String>> entry : inputMap.entrySet()) {
+                        if (entry.getValue().size() > 1) {
+                            throw new MoteurLiteException("Multiple values for input '" + entry.getKey() + "' are not allowed when providing a list of input maps");
+                        }
+
                         invocationInputMap.put(entry.getKey(), entry.getValue().getFirst());
                     }
 
