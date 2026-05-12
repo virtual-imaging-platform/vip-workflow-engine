@@ -32,18 +32,21 @@ public class IterationTest {
     private List<Map<String, String>> expectedResult = new ArrayList<>();
     private List<Map<String, String>> result;
 
+    private int maxJobs;
+
     @BeforeEach
     public void initData() {
         inputsA.put("scan", Arrays.asList("pied", "jambe"));
         inputsA.put("color", Arrays.asList("blue", "red"));
         inputsB.put("age", Arrays.asList("1", "2", "3"));
         inputsC.put("type", Arrays.asList("metal", "iron"));
+        maxJobs = 1000;
     }
 
     @Test
-    public void crossInput() {
+    public void crossInput() throws MoteurLiteException {
         inputsA.putAll(inputsB);
-        result = types.cross(inputsA);
+        result = types.cross(inputsA, maxJobs);
 
         expectedResult.add(Map.of("scan", "pied", "color", "blue", "age", "1"));
         expectedResult.add(Map.of("scan", "pied", "color", "blue", "age", "2"));
@@ -73,9 +76,9 @@ public class IterationTest {
     }
 
     @Test
-    public void emptyCrossInput() {
+    public void emptyCrossInput() throws MoteurLiteException {
         inputsA = new HashMap<>();
-        result = types.cross(inputsA);
+        result = types.cross(inputsA, maxJobs);
 
         assertEquals(0, result.size());
     }
@@ -97,7 +100,7 @@ public class IterationTest {
     @Test
     public void crossOnDotAndCross() throws MoteurLiteException{
         inputsB.putAll(inputsC);
-        result = types.cross(types.dot(inputsA), types.cross(inputsB));
+        result = types.cross(types.dot(inputsA), types.cross(inputsB, maxJobs), maxJobs);
 
         expectedResult.add(Map.of("scan", "pied", "color", "blue", "age", "1", "type", "metal"));
         expectedResult.add(Map.of("scan", "pied", "color", "blue", "age", "2", "type", "metal"));
@@ -116,8 +119,8 @@ public class IterationTest {
     }
 
     @Test
-    public void crossOnEmptyDotAndCross() {
-        result = types.cross(new ArrayList<>(), types.cross(inputsA));
+    public void crossOnEmptyDotAndCross() throws MoteurLiteException {
+        result = types.cross(new ArrayList<>(), types.cross(inputsA, maxJobs), maxJobs);
 
         expectedResult.add(Map.of("scan", "pied", "color", "blue"));
         expectedResult.add(Map.of("scan", "pied", "color", "red"));
@@ -130,7 +133,7 @@ public class IterationTest {
     @Test
     public void crossOnDotAndEmptyCross() throws MoteurLiteException {
         inputsA.putAll(inputsC);
-        result = types.cross(types.dot(inputsA), new ArrayList<>());
+        result = types.cross(types.dot(inputsA), new ArrayList<>(), maxJobs);
 
         expectedResult.add(Map.of("scan", "pied", "color", "blue", "type", "metal"));
         expectedResult.add(Map.of("scan", "jambe", "color", "red", "type", "iron"));
@@ -139,8 +142,8 @@ public class IterationTest {
     }
 
     @Test
-    public void crossOnEmptyDotAndEmptyCross() {
-        result = types.cross(new ArrayList<>(), new ArrayList<>());
+    public void crossOnEmptyDotAndEmptyCross()  throws MoteurLiteException {
+        result = types.cross(new ArrayList<>(), new ArrayList<>(), maxJobs);
 
         assertEquals(0, result.size());
     }
@@ -165,9 +168,16 @@ public class IterationTest {
         input.setOptional(true);
         boutiquesDescriptor.setInputs(Set.of(input));
 
-        result = iterationService.compute(inputsA, boutiquesDescriptor);
+        result = iterationService.compute(inputsA, boutiquesDescriptor, maxJobs);
         assertEquals(2, result.size());
         assertTrue(result.stream().anyMatch((m) -> m.containsKey("scan")));
         assertTrue(result.stream().anyMatch((m) -> m.containsKey("color")));
+    }
+
+    @Test
+    public void crossInputOverMaxJobs() {
+        maxJobs = 2;
+        assertThrows(MoteurLiteException.class, () -> types.cross(inputsA, maxJobs));
+        assertThrows(MoteurLiteException.class, () -> types.cross(types.cross(inputsA, 1000), types.cross(inputsB, 1000), maxJobs));
     }
 }

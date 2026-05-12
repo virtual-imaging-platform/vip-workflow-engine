@@ -21,7 +21,7 @@ public class IterationService {
         this.iterationTypes = new IterationTypes();
     }
 
-    public List<Map<String, String>> compute(Map<String, List<String>> inputsMap, BoutiquesDescriptor boutiquesDescriptor) throws MoteurLiteException {
+    public List<Map<String, String>> compute(Map<String, List<String>> inputsMap, BoutiquesDescriptor boutiquesDescriptor, int maxJobs) throws MoteurLiteException {
         Set<String> crossKeys = boutiquesService.getCrossMap(boutiquesDescriptor);
         Set<String> dotKeys = boutiquesService.getDotMap(boutiquesDescriptor);
         Set<String> allKeys = new HashSet<>(inputsMap.keySet());
@@ -45,8 +45,8 @@ public class IterationService {
         }
 
         List<Map<String, String>> dotCombinations = iterationTypes.dot(getSelectedMap(inputsMap, dotKeys));
-        List<Map<String, String>> crossCombinations = iterationTypes.cross(getSelectedMap(inputsMap, crossKeys));
-        List<Map<String, String>> resultCombinations = iterationTypes.cross(dotCombinations, crossCombinations);
+        List<Map<String, String>> crossCombinations = iterationTypes.cross(getSelectedMap(inputsMap, crossKeys), maxJobs);
+        List<Map<String, String>> resultCombinations = iterationTypes.cross(dotCombinations, crossCombinations, maxJobs);
 
         return resultCombinations;
     }
