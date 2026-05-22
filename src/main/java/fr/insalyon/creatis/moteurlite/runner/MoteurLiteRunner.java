@@ -102,6 +102,8 @@ public class MoteurLiteRunner {
 
             // store inputs and create processors in workflowsdb
             workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
+            // Same input values may be persisted multiple times with dot combinations or multiple input maps.
+            // This technically breaks the Inputs primary key (workflowId/path/input), but we use merge() as db operation, which overwrites duplicates safely.
             for (Map<String, List<String>> inputMap : allInputs) {
                 workflowsDBRepo.persistInputs(workflowId, inputMap, boutiquesInputs);
             }
