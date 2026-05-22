@@ -1,5 +1,7 @@
 package fr.insalyon.creatis.moteurlite.runner;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,18 +61,38 @@ public class MoteurLiteRunner {
 
     public void run(String workflowId, String boutiquesFilePath, String inputsFilePath) throws MoteurLiteException {
         try {
-            Map<String, List<String>> allInputs = inputsFileService.parse(inputsFilePath);
+            List<Map<String, List<String>>> allInputs = inputsFileService.parse(inputsFilePath);
             BoutiquesDescriptor descriptor = boutiquesService.parseFile(boutiquesFilePath);
             Map<String, Input> boutiquesInputs = boutiquesService.getInputsMap(descriptor);
+            for (Map<String, List<String>> inputMap : allInputs) {
+                // expand vip:directoryInputs
+                directoryInputsService.updateInputs(inputMap, descriptor);
+                // expand vip:intIteratorInputs
+                intIteratorInputsService.updateInputs(inputMap, descriptor);
+                // apply vip:resultsDirectorySuffix to results-directory
+                resultsDirectorySuffixService.updateInputs(inputMap, descriptor);
+            }
 
-            // expand vip:directoryInputs
-            directoryInputsService.updateInputs(allInputs, descriptor);
-            // expand vip:intIteratorInputs
-            intIteratorInputsService.updateInputs(allInputs, descriptor);
-            // apply vip:resultsDirectorySuffix to results-directory
-            resultsDirectorySuffixService.updateInputs(allInputs, descriptor);
-            // compute vip:dot and cross combinations
-            List<Map<String, String>> invocationsInputs = iterationService.compute(allInputs, descriptor);
+            List<Map<String, String>> invocationsInputs;
+            // Compute vip:dot and cross combinations only if there is a single input map
+            if (allInputs.size() == 1) {
+                invocationsInputs = iterationService.compute(allInputs.getFirst(), descriptor);
+            } else {
+                invocationsInputs = new ArrayList<>();
+                for (Map<String, List<String>> inputMap : allInputs) {
+                    Map<String, String> invocationInputMap = new HashMap<>();
+                    // Only keep the first value of each input map, there is not supposed to be multiple ones here
+                    for (Map.Entry<String, List<String>> entry : inputMap.entrySet()) {
+                        if (entry.getValue().size() > 1) {
+                            throw new MoteurLiteException("Multiple values for input '" + entry.getKey() + "' are not allowed when providing a list of input maps");
+                        }
+
+                        invocationInputMap.put(entry.getKey(), entry.getValue().getFirst());
+                    }
+
+                    invocationsInputs.add(invocationInputMap);
+                }
+            }
 
             // check maxJobs limit
             int plannedJobs = invocationsInputs.size(), maxJobs = config.getMaxJobsPerWorkflow();
@@ -80,8 +102,11 @@ public class MoteurLiteRunner {
 
             // store inputs and create processors in workflowsdb
             workflowsDBRepo.persistProcessors(workflowId, descriptor.getName(), 0, 0, 0);
-            workflowsDBRepo.persistInputs(workflowId, allInputs, boutiquesInputs);
-
+            // Same input values may be persisted multiple times with dot combinations or multiple input maps.
+            // This technically breaks the Inputs primary key (workflowId/path/input), but we use merge() as db operation, which overwrites duplicates safely.
+            for (Map<String, List<String>> inputMap : allInputs) {
+                workflowsDBRepo.persistInputs(workflowId, inputMap, boutiquesInputs);
+            }
             // init gasw
             initGaswAndMonitor(workflowId, descriptor.getName(), invocationsInputs.size());
 

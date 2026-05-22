@@ -17,11 +17,11 @@ public class InputsFileService {
 
     private static final Logger logger = LoggerFactory.getLogger(InputsFileService.class);
 
-    public Map<String, List<String>> parse(String filePath) throws MoteurLiteException {
+    public List<Map<String, List<String>>> parse(String filePath) throws MoteurLiteException {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            return mapper.readValue(new File(filePath), new TypeReference<Map<String, List<String>>>() {});
+            return mapper.readValue(new File(filePath), new TypeReference<>() {});
 
         } catch (IOException e) {
             logger.error("Cannot transform JSON String to JSON Map!");
