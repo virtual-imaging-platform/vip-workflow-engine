@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.insalyon.creatis.gasw.GaswLauncher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +123,7 @@ public class MoteurLiteRunner {
 
     private void initGaswAndMonitor(String workflowId, String descriptorName, int numberOfInvocations) throws MoteurLiteException {
         try {
-            gasw = Gasw.getInstance();
+            gasw = GaswLauncher.start();
             monitor = new Monitor(gasw, workflowsDBRepo, workflowId, descriptorName, numberOfInvocations);
             gasw.setNotificationClient(monitor);
             monitor.start();
