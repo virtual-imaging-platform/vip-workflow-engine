@@ -76,7 +76,7 @@ public class MoteurLiteRunner {
             List<Map<String, String>> invocationsInputs;
             // Compute vip:dot and cross combinations only if there is a single input map
             if (allInputs.size() == 1) {
-                invocationsInputs = iterationService.compute(allInputs.getFirst(), descriptor);
+                invocationsInputs = iterationService.compute(allInputs.getFirst(), descriptor, config.getMaxJobsPerWorkflow());
             } else {
                 invocationsInputs = new ArrayList<>();
                 for (Map<String, List<String>> inputMap : allInputs) {
