@@ -1,15 +1,6 @@
 package fr.insalyon.creatis.moteurlite;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +11,8 @@ import fr.insalyon.creatis.boutiques.model.Custom;
 import fr.insalyon.creatis.boutiques.model.Input;
 import fr.insalyon.creatis.moteurlite.iteration.IterationService;
 import fr.insalyon.creatis.moteurlite.iteration.IterationTypes;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IterationTest {
 
@@ -66,7 +59,7 @@ public class IterationTest {
 
     @Test
     public void dotInput() throws MoteurLiteException {
-        result = types.dot(inputsA);
+        result = types.dot(inputsA, new HashSet<>());
 
         expectedResult.add(Map.of("scan", "pied", "color", "blue"));
         expectedResult.add(Map.of("scan", "jambe", "color", "red"));
@@ -86,7 +79,7 @@ public class IterationTest {
     @Test
     public void emptyDotInput() throws MoteurLiteException {
         inputsA = new HashMap<>();
-        result = types.dot(inputsA);
+        result = types.dot(inputsA, new HashSet<>());
 
         assertEquals(0, result.size());
     }
@@ -94,13 +87,13 @@ public class IterationTest {
     @Test
     public void wrongSizeDotInput() {
         inputsA.putAll(inputsB);
-        assertThrows(MoteurLiteException.class, () -> types.dot(inputsA));
+        assertThrows(MoteurLiteException.class, () -> types.dot(inputsA, new HashSet<>()));
     }
 
     @Test
     public void crossOnDotAndCross() throws MoteurLiteException{
         inputsB.putAll(inputsC);
-        result = types.cross(types.dot(inputsA), types.cross(inputsB, maxJobs), maxJobs);
+        result = types.cross(types.dot(inputsA, new HashSet<>()), types.cross(inputsB, maxJobs), maxJobs);
 
         expectedResult.add(Map.of("scan", "pied", "color", "blue", "age", "1", "type", "metal"));
         expectedResult.add(Map.of("scan", "pied", "color", "blue", "age", "2", "type", "metal"));
@@ -133,7 +126,7 @@ public class IterationTest {
     @Test
     public void crossOnDotAndEmptyCross() throws MoteurLiteException {
         inputsA.putAll(inputsC);
-        result = types.cross(types.dot(inputsA), new ArrayList<>(), maxJobs);
+        result = types.cross(types.dot(inputsA, new HashSet<>()), new ArrayList<>(), maxJobs);
 
         expectedResult.add(Map.of("scan", "pied", "color", "blue", "type", "metal"));
         expectedResult.add(Map.of("scan", "jambe", "color", "red", "type", "iron"));
@@ -179,5 +172,18 @@ public class IterationTest {
         maxJobs = 2;
         assertThrows(MoteurLiteException.class, () -> types.cross(inputsA, maxJobs));
         assertThrows(MoteurLiteException.class, () -> types.cross(types.cross(inputsA, 1000), types.cross(inputsB, 1000), maxJobs));
+    }
+
+    @Test
+    public void dotInputWithDefaultValues() {
+        inputsA.put("scan", Arrays.asList("pied", "jambe"));
+        inputsA.put("color", List.of("blue"));
+        expectedResult.add(Map.of("scan", "pied", "color", "blue"));
+        expectedResult.add(Map.of("scan", "jambe"));
+        Set<String> defaultValues = Set.of("color");
+
+        assertDoesNotThrow(() ->  result = types.dot(inputsA, defaultValues));
+        assertEquals(2, result.size());
+        assertTrue(result.containsAll(expectedResult));
     }
 }

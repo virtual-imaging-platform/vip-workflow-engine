@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.moteurlite.iteration;
 
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,23 +37,32 @@ public class IterationTypes {
      * </pre>
      *
      */
-    public List<Map<String, String>> dot(Map<String, List<String>> inputs) throws MoteurLiteException {
+    public List<Map<String, String>> dot(Map<String, List<String>> inputs, Set<String> defaultValueKeys) throws MoteurLiteException {
         List<Map<String, String>> combinations = new ArrayList<>();
 
         if (inputs.size() == 0)
             return combinations;
 
-        boolean sameSize = inputs.values().stream().mapToInt(List::size).distinct().count() == 1;
-        int size = inputs.values().stream().mapToInt(List::size).min().getAsInt();
+        // Check if all required inputs have the same size, ignore default values inputs if present
+        boolean sameSize = inputs.entrySet().stream().filter(entry -> !defaultValueKeys.contains(entry.getKey()))
+                .map(Map.Entry::getValue).mapToInt(List::size).distinct().count() == 1;
+        int size = inputs.entrySet().stream().filter(entry -> !defaultValueKeys.contains(entry.getKey()))
+                .map(Map.Entry::getValue).mapToInt(List::size).min().getAsInt();
 
         if (!sameSize) {
-            throw new MoteurLiteException("Dot iteration is impossible with inputs of different size!");
+            throw new MoteurLiteException("Dot iteration is impossible with required inputs of different size!");
         }
         for (int i = 0; i < size; i++) {
             Map<String, String> combination = new HashMap<>();
 
             for (Map.Entry<String, List<String>> entry : inputs.entrySet()) {
-                combination.put(entry.getKey(), entry.getValue().get(i));
+                List<String> values = entry.getValue();
+                // Check if the index is within the bounds of the list and if the value is null
+                if (values.size() <= i || values.get(i) == null) {
+                    continue;
+                }
+
+                combination.put(entry.getKey(), values.get(i));
             }
             combinations.add(combination);
         }

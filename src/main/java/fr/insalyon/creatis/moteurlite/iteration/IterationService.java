@@ -26,6 +26,7 @@ public class IterationService {
         Set<String> dotKeys = boutiquesService.getDotMap(boutiquesDescriptor);
         Set<String> allKeys = new HashSet<>(inputsMap.keySet());
         Set<String> optionalKeys = boutiquesService.getInputOptionalOfBoutiquesFile(boutiquesDescriptor);
+        Set<String> defaultValueKeys = boutiquesService.getInputDefaultOfBoutiquesFile(boutiquesDescriptor);
 
         // for removing optional empty inputs from dotKeys to avoid iteration with inputs
         // of different size (that will lead to failure)
@@ -44,7 +45,7 @@ public class IterationService {
             crossKeys.remove(MoteurLiteConstants.RESULTS_DIRECTORY);
         }
 
-        List<Map<String, String>> dotCombinations = iterationTypes.dot(getSelectedMap(inputsMap, dotKeys));
+        List<Map<String, String>> dotCombinations = iterationTypes.dot(getSelectedMap(inputsMap, dotKeys), defaultValueKeys);
         List<Map<String, String>> crossCombinations = iterationTypes.cross(getSelectedMap(inputsMap, crossKeys), maxJobs);
         List<Map<String, String>> resultCombinations = iterationTypes.cross(dotCombinations, crossCombinations, maxJobs);
 
