@@ -30,7 +30,9 @@ public class IterationService {
 
         // for removing optional empty inputs from dotKeys to avoid iteration with inputs
         // of different size (that will lead to failure)
-        removeEmptyOptionalKeys(dotKeys, inputsMap, optionalKeys);
+        removeEmptyKeys(dotKeys, inputsMap, optionalKeys);
+        // same with required inputs that have default values
+        removeEmptyKeys(dotKeys, inputsMap, defaultValueKeys);
 
         allKeys.removeAll(crossKeys);
         allKeys.removeAll(dotKeys);
@@ -45,7 +47,7 @@ public class IterationService {
             crossKeys.remove(MoteurLiteConstants.RESULTS_DIRECTORY);
         }
 
-        List<Map<String, String>> dotCombinations = iterationTypes.dot(getSelectedMap(inputsMap, dotKeys), defaultValueKeys);
+        List<Map<String, String>> dotCombinations = iterationTypes.dot(getSelectedMap(inputsMap, dotKeys));
         List<Map<String, String>> crossCombinations = iterationTypes.cross(getSelectedMap(inputsMap, crossKeys), maxJobs);
         List<Map<String, String>> resultCombinations = iterationTypes.cross(dotCombinations, crossCombinations, maxJobs);
 
@@ -58,8 +60,8 @@ public class IterationService {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private void removeEmptyOptionalKeys(Set<String> keys, Map<String, List<String>> inputs, Set<String> optionalKeys) {
-        for (String key : optionalKeys) {
+    private void removeEmptyKeys(Set<String> keys, Map<String, List<String>> inputs, Set<String> targetKeys) {
+        for (String key : targetKeys) {
             if (inputs.get(key) == null || inputs.get(key).isEmpty()) {
                 keys.remove(key);
             }
