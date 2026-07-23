@@ -9,10 +9,15 @@ import java.util.stream.Collectors;
 
 import fr.insalyon.creatis.boutiques.BoutiquesService;
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.moteurlite.MoteurLite;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IterationService {
+    private static final Logger logger = LoggerFactory.getLogger(IterationService.class);
+
     private final BoutiquesService boutiquesService;
     private final IterationTypes iterationTypes;
 
@@ -26,10 +31,13 @@ public class IterationService {
         Set<String> dotKeys = boutiquesService.getDotMap(boutiquesDescriptor);
         Set<String> allKeys = new HashSet<>(inputsMap.keySet());
         Set<String> optionalKeys = boutiquesService.getInputOptionalOfBoutiquesFile(boutiquesDescriptor);
+        Set<String> defaultValueKeys = boutiquesService.getInputDefaultOfBoutiquesFile(boutiquesDescriptor);
 
         // for removing optional empty inputs from dotKeys to avoid iteration with inputs
         // of different size (that will lead to failure)
-        removeEmptyOptionalKeys(dotKeys, inputsMap, optionalKeys);
+        removeEmptyKeys(dotKeys, inputsMap, optionalKeys, null);
+        // same with required inputs that have default values
+        removeEmptyKeys(dotKeys, inputsMap, defaultValueKeys, "Removing empty required dot default values inputs, user should have provided values");
 
         allKeys.removeAll(crossKeys);
         allKeys.removeAll(dotKeys);
@@ -57,10 +65,13 @@ public class IterationService {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private void removeEmptyOptionalKeys(Set<String> keys, Map<String, List<String>> inputs, Set<String> optionalKeys) {
-        for (String key : optionalKeys) {
+    private void removeEmptyKeys(Set<String> keys, Map<String, List<String>> inputs, Set<String> targetKeys, String message) {
+        for (String key : targetKeys) {
             if (inputs.get(key) == null || inputs.get(key).isEmpty()) {
                 keys.remove(key);
+                if (message != null) {
+                    logger.warn("{} : {}", message, key);
+                }
             }
         }
     }
