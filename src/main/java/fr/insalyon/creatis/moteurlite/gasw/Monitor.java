@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import fr.insalyon.creatis.moteurlite.workflowsdb.WorkflowsDBRepository;
 
 import fr.insalyon.creatis.gasw.Gasw;
+import fr.insalyon.creatis.gasw.GaswLauncher;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswExitCode;
 import fr.insalyon.creatis.gasw.GaswOutput;
@@ -45,16 +46,11 @@ public class Monitor extends Thread {
 
                 List<GaswOutput> finishedJobs = gasw.getFinishedJobs();
                 logger.info("Number of finished jobs: " + finishedJobs.size());
-    
-                if (finishedJobs.isEmpty()) {
-                    continue;
-                } else {
-                    try {
-                        processFinishedJobs(finishedJobs);
-                        workflowsDbRepository.persistProcessors(workflowId, applicationName, numberOfInvocations - finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
-                    } catch (MoteurLiteException e) {
-                        logger.error("Error while persisting processors during processing: ", e);
-                    }
+                try {
+                    processFinishedJobs(finishedJobs);
+                    workflowsDbRepository.persistProcessors(workflowId, applicationName, numberOfInvocations - finishedJobsNumber, successfulJobsNumber, failedJobsNumber);
+                } catch (MoteurLiteException e) {
+                    logger.error("Error while persisting processors during processing: ", e);
                 }
             } catch (InterruptedException e) {
                 terminate(true);
@@ -65,7 +61,6 @@ public class Monitor extends Thread {
     }
 
     private synchronized void waitForGasw() throws InterruptedException {
-        gasw.waitForNotification();
         wait();
     }
 
@@ -104,7 +99,7 @@ public class Monitor extends Thread {
             }
 
             workflowsDbRepository.persistWorkflow(workflowId, finalStatus);
-            gasw.terminate(killed);
+            GaswLauncher.stop(killed);
             logger.info("workflow finished with status {}", finalStatus.name());
         } catch (GaswException e) {
             logger.error("Error while terminating Gasw: ", e);
