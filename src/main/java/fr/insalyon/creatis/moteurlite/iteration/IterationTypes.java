@@ -89,8 +89,17 @@ public class IterationTypes {
      * ]
      * </pre>
      */
-    public List<Map<String, String>> cross(Map<String, List<String>> inputs) {
+
+    public List<Map<String, String>> cross(Map<String, List<String>> inputs, int maxJobs) throws MoteurLiteException {
         List<Map<String, String>> combinations = new ArrayList<>();
+        int totalJobs = 1;
+        for (List<String> values : inputs.values()) {
+            totalJobs *= values.size();
+        }
+
+        if (totalJobs > maxJobs) {
+            throw new MoteurLiteException("Too many jobs (max:" + maxJobs + ", got:" + totalJobs + ")");
+        }
 
         for (Map.Entry<String, List<String>> entry : inputs.entrySet()) {
             String key = entry.getKey();
@@ -123,23 +132,24 @@ public class IterationTypes {
      * This used to cross existing dot and cross combinations.   
      * </p>
      */
-    public List<Map<String, String>> cross(List<Map<String, String>> combinationsA, List<Map<String, String>> combinationsB) {
+    public List<Map<String, String>> cross(List<Map<String, String>> combinationsA, List<Map<String, String>> combinationsB, int maxJobs) throws MoteurLiteException {
         List<Map<String, String>> result = new ArrayList<>();
-
-        if (combinationsA.isEmpty()) {
-            return combinationsB;
-        } else if (combinationsB.isEmpty()) {
-            return combinationsA;
-        } else {
-            for (Map<String, String> mapA : combinationsA) {
-                for (Map<String, String> mapB : combinationsB) {
-                    Map<String, String> combined = new HashMap<>(mapA);
-    
-                    combined.putAll(mapB);
-                    result.add(combined);
-                }
-            }
-            return result;
+        if (combinationsA.isEmpty()) return combinationsB;
+        if (combinationsB.isEmpty()) return combinationsA;
+        int totalJobs = combinationsA.size() * combinationsB.size();
+        if (totalJobs > maxJobs) {
+            throw new MoteurLiteException("Too many jobs (max:" + maxJobs + ", got:" + totalJobs + ")");
         }
+
+        for (Map<String, String> mapA : combinationsA) {
+            for (Map<String, String> mapB : combinationsB) {
+                Map<String, String> combined = new HashMap<>(mapA);
+
+                combined.putAll(mapB);
+                result.add(combined);
+            }
+        }
+        return result;
+
     }
 }

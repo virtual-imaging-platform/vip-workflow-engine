@@ -79,7 +79,7 @@ public class JobSubmitter extends Thread {
                 // jobId can be used for filenames, so normalize it by removing spaces
                 String jobId = applicationName.replace(' ', '_') + "-" + System.nanoTime() + ".sh";
     
-                submit(new GaswInput(applicationName, applicationName + ".json", downloads, resultsDirectoryURI, invocationString, jobId));
+                submit(new GaswInput(applicationName, applicationName, downloads, resultsDirectoryURI, invocationString, jobId));
             }
         }
     }

@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.moteurlite.iteration;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -8,9 +9,15 @@ import java.util.stream.Collectors;
 
 import fr.insalyon.creatis.boutiques.BoutiquesService;
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.moteurlite.MoteurLite;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
+import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IterationService {
+    private static final Logger logger = LoggerFactory.getLogger(IterationService.class);
+
     private final BoutiquesService boutiquesService;
     private final IterationTypes iterationTypes;
 
@@ -19,15 +26,18 @@ public class IterationService {
         this.iterationTypes = new IterationTypes();
     }
 
-    public List<Map<String, String>> compute(Map<String, List<String>> inputsMap, BoutiquesDescriptor boutiquesDescriptor) throws MoteurLiteException {
+    public List<Map<String, String>> compute(Map<String, List<String>> inputsMap, BoutiquesDescriptor boutiquesDescriptor, int maxJobs) throws MoteurLiteException {
         Set<String> crossKeys = boutiquesService.getCrossMap(boutiquesDescriptor);
         Set<String> dotKeys = boutiquesService.getDotMap(boutiquesDescriptor);
         Set<String> allKeys = new HashSet<>(inputsMap.keySet());
         Set<String> optionalKeys = boutiquesService.getInputOptionalOfBoutiquesFile(boutiquesDescriptor);
+        Set<String> defaultValueKeys = boutiquesService.getInputDefaultOfBoutiquesFile(boutiquesDescriptor);
 
         // for removing optional empty inputs from dotKeys to avoid iteration with inputs
         // of different size (that will lead to failure)
-        removeEmptyOptionalKeys(dotKeys, inputsMap, optionalKeys);
+        removeEmptyKeys(dotKeys, inputsMap, optionalKeys, null);
+        // same with required inputs that have default values
+        removeEmptyKeys(dotKeys, inputsMap, defaultValueKeys, "Removing empty required dot default values inputs, user should have provided values");
 
         allKeys.removeAll(crossKeys);
         allKeys.removeAll(dotKeys);
@@ -36,9 +46,15 @@ public class IterationService {
         crossKeys.retainAll(inputsMap.keySet());
         crossKeys.addAll(allKeys);
 
+        Set<String> resultsDirs = new HashSet<>(inputsMap.getOrDefault(MoteurLiteConstants.RESULTS_DIRECTORY, Collections.emptyList()));
+        if (resultsDirs.size() > 1) {
+            dotKeys.add(MoteurLiteConstants.RESULTS_DIRECTORY);
+            crossKeys.remove(MoteurLiteConstants.RESULTS_DIRECTORY);
+        }
+
         List<Map<String, String>> dotCombinations = iterationTypes.dot(getSelectedMap(inputsMap, dotKeys));
-        List<Map<String, String>> crossCombinations = iterationTypes.cross(getSelectedMap(inputsMap, crossKeys));
-        List<Map<String, String>> resultCombinations = iterationTypes.cross(dotCombinations, crossCombinations);
+        List<Map<String, String>> crossCombinations = iterationTypes.cross(getSelectedMap(inputsMap, crossKeys), maxJobs);
+        List<Map<String, String>> resultCombinations = iterationTypes.cross(dotCombinations, crossCombinations, maxJobs);
 
         return resultCombinations;
     }
@@ -49,10 +65,13 @@ public class IterationService {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private void removeEmptyOptionalKeys(Set<String> keys, Map<String, List<String>> inputs, Set<String> optionalKeys) {
-        for (String key : optionalKeys) {
+    private void removeEmptyKeys(Set<String> keys, Map<String, List<String>> inputs, Set<String> targetKeys, String message) {
+        for (String key : targetKeys) {
             if (inputs.get(key) == null || inputs.get(key).isEmpty()) {
                 keys.remove(key);
+                if (message != null) {
+                    logger.warn("{} : {}", message, key);
+                }
             }
         }
     }
