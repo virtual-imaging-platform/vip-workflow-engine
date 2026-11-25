@@ -21,6 +21,7 @@ import fr.insalyon.creatis.gasw.GaswInput;
 import fr.insalyon.creatis.moteurlite.MoteurLite;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
+import fr.insalyon.creatis.moteurlite.util.DownloadUtils;
 
 public class JobSubmitter extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(MoteurLite.class);
@@ -64,11 +65,19 @@ public class JobSubmitter extends Thread {
                         if (Input.Type.FILE.equals(boutiquesInputs.get(inputId).getType())) {
                             URI downloadURI = getURI(inputValue);
                             if (downloadURI.getPath() == null) {
-                              logger.info("Skipping download for file input with no path: {} = {}", inputId, inputValue);
+                                logger.info("Skipping download for file input with no path: {} = {}", inputId,
+                                        inputValue);
                             } else {
-                               String filename = Paths.get(downloadURI.getPath()).getFileName().toString();
-                               downloads.add(downloadURI);
-                               inputValue = filename;
+                                if ((downloadURI.getScheme().equalsIgnoreCase("https")
+                                        || downloadURI.getScheme().equalsIgnoreCase("http"))) {
+                                    String filename = DownloadUtils.resolveRemoteFilename(downloadURI)
+                                            .orElse(Paths.get(downloadURI.getPath()).getFileName().toString());
+                                    inputValue = filename;
+                                } else {
+                                    String filename = Paths.get(downloadURI.getPath()).getFileName().toString();
+                                    inputValue = filename;
+                                }
+                                downloads.add(downloadURI);
                             }
                         }
                         finalInvocationInputs.put(inputId, inputValue);
