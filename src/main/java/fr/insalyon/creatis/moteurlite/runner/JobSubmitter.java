@@ -19,22 +19,29 @@ import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswInput;
 import fr.insalyon.creatis.moteurlite.MoteurLite;
+import fr.insalyon.creatis.moteurlite.MoteurLiteConfiguration;
 import fr.insalyon.creatis.moteurlite.MoteurLiteConstants;
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
+import fr.insalyon.creatis.moteurlite.util.DownloadUtils;
 
 public class JobSubmitter extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(MoteurLite.class);
 
-    private final Gasw                      gasw;
-    private final String                    applicationName;
+    private final Gasw gasw;
+    private final String applicationName;
     private final List<Map<String, String>> allInvocationsInputs;
-    private final Map<String, Input>        boutiquesInputs;
+    private final Map<String, Input> boutiquesInputs;
+    private final int maxContentDispositionLength;
+    private final ArrayList<String> validDomains;
 
-    public JobSubmitter(Gasw gasw, String applicationName, List<Map<String, String>> allInvocationsInputs, Map<String, Input> boutiquesInputs) {
+    public JobSubmitter(MoteurLiteConfiguration config, Gasw gasw, String applicationName,
+            List<Map<String, String>> allInvocationsInputs, Map<String, Input> boutiquesInputs) {
         this.gasw = gasw;
         this.applicationName = applicationName;
         this.allInvocationsInputs = allInvocationsInputs;
         this.boutiquesInputs = boutiquesInputs;
+        this.maxContentDispositionLength = config.getMaxContentDispositionLength();
+        this.validDomains = config.getValidDomains();
     }
 
     @Override
@@ -54,7 +61,7 @@ public class JobSubmitter extends Thread {
                 URI resultsDirectoryURI = null;
                 List<URI> downloads = new ArrayList<>();
                 Map<String, String> finalInvocationInputs = new HashMap<>();
-    
+
                 for (String inputId : invocationInputs.keySet()) {
                     String inputValue = invocationInputs.get(inputId);
 
@@ -64,11 +71,21 @@ public class JobSubmitter extends Thread {
                         if (Input.Type.FILE.equals(boutiquesInputs.get(inputId).getType())) {
                             URI downloadURI = getURI(inputValue);
                             if (downloadURI.getPath() == null) {
-                              logger.info("Skipping download for file input with no path: {} = {}", inputId, inputValue);
+                                logger.info("Skipping download for file input with no path: {} = {}", inputId,
+                                        inputValue);
                             } else {
-                               String filename = Paths.get(downloadURI.getPath()).getFileName().toString();
-                               downloads.add(downloadURI);
-                               inputValue = filename;
+                                if (((downloadURI.getScheme().equalsIgnoreCase("https")
+                                        || downloadURI.getScheme().equalsIgnoreCase("http")))
+                                        && validDomains.contains(downloadURI.getHost())) {
+                                    String filename = DownloadUtils
+                                            .resolveRemoteFilename(downloadURI, maxContentDispositionLength)
+                                            .orElse(Paths.get(downloadURI.getPath()).getFileName().toString());
+                                    inputValue = filename;
+                                } else {
+                                    String filename = Paths.get(downloadURI.getPath()).getFileName().toString();
+                                    inputValue = filename;
+                                }
+                                downloads.add(downloadURI);
                             }
                         }
                         finalInvocationInputs.put(inputId, inputValue);
@@ -78,8 +95,9 @@ public class JobSubmitter extends Thread {
                 String invocationString = convertMapToJson(finalInvocationInputs, boutiquesInputs);
                 // jobId can be used for filenames, so normalize it by removing spaces
                 String jobId = applicationName.replace(' ', '_') + "-" + System.nanoTime() + ".sh";
-    
-                submit(new GaswInput(applicationName, applicationName, downloads, resultsDirectoryURI, invocationString, jobId));
+
+                submit(new GaswInput(applicationName, applicationName, downloads, resultsDirectoryURI, invocationString,
+                        jobId));
             }
         }
     }
