@@ -1,12 +1,15 @@
 package fr.insalyon.creatis.moteurlite;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 import fr.insalyon.creatis.moteurlite.util.DownloadUtils;
 
-public class ContentDispositionParserTest {
 
+public class ContentDispositionParserTest {
 
     @Test
     public void parsesSimpleFilename() {
@@ -16,9 +19,9 @@ public class ContentDispositionParserTest {
 
     @Test
     public void parsesQuotedFilename() {
-        assertEquals("quarterly report.pdf",
+        assertEquals("with space report.pdf",
                 DownloadUtils.getFilename(
-                        "attachment; filename=\"quarterly report.pdf\""));
+                        "attachment; filename=\"with space report.pdf\""));
     }
 
     @Test
@@ -46,8 +49,17 @@ public class ContentDispositionParserTest {
     public void prefersFilenameStarOverFilename() {
         assertEquals("actual.pdf",
                 DownloadUtils.getFilename(
-                        "attachment; filename=\"fallback.pdf\"; "
-                                + "filename*=UTF-8''actual.pdf"));
+                        "attachment; filename=\"fallback.pdf\"; filename*=UTF-8''actual.pdf"));
+    }
+
+    @Test
+    public void fallsBackWhenFilenameStarIsInvalid() {
+        assertAll(
+            () -> assertEquals("fallback1.txt", DownloadUtils.getFilename("attachment; filename=\"fallback1.txt\"; filename*=bogus''file.txt")),    // unknown charset
+            () -> assertEquals("fallback2.txt", DownloadUtils.getFilename("attachment; filename=\"fallback2.txt\"; filename*=UTF-8'file.txt")),     // missing second quote
+            () -> assertEquals("fallback3.txt", DownloadUtils.getFilename("attachment; filename=\"fallback3.txt\"; filename*=UTF-8''%E2%82%")),     // truncated percent-encoding
+            () -> assertEquals("fallback4.txt", DownloadUtils.getFilename("attachment; filename=\"fallback4.txt\"; filename*=UTF-8''%ZZ.txt"))      // invalid hex digits
+        );
     }
 
     @Test
@@ -63,14 +75,19 @@ public class ContentDispositionParserTest {
     }
 
     @Test
+    public void returnsNullWhenEmptyHeader() {
+        assertNull(DownloadUtils.getFilename(""));
+    }
+
+    @Test
     public void returnsNullWhenFilenameIsMissing() {
         assertNull(DownloadUtils.getFilename("attachment"));
     }
 
     @Test
-    public void fallsBackWhenFilenameStarIsInvalid() {
-        assertEquals("fallback.pdf",
-                DownloadUtils.getFilename(
-                        "attachment; filename=\"fallback.pdf\"; filename*=bad"));
+    public void throwsParseExceptionForWrongFormat() {
+        //TODO add more edge case
+        assertThrows(IllegalArgumentException.class, () -> DownloadUtils.getFilename("azeaze\";;'"));
     }
+
 }

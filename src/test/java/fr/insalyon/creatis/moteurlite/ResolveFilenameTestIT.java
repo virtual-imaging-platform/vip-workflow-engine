@@ -22,6 +22,7 @@ public class ResolveFilenameTestIT {
     private HttpServer server;
     private HttpClient client;
     private AtomicReference<String> receivedMethod;
+    private final int maxContentDispositionSize = 8192;
 
     @BeforeEach
     void startServer() throws IOException {
@@ -35,6 +36,12 @@ public class ResolveFilenameTestIT {
             exchange.sendResponseHeaders(200, -1);
             exchange.close();
         });
+        server.createContext("/directory/download", exchange -> {
+            receivedMethod.set(exchange.getRequestMethod());
+            exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=\"R07223.zip\"");
+            exchange.sendResponseHeaders(200, -1);
+            exchange.close();
+        });
         server.createContext("/no-header", exchange -> {
             exchange.sendResponseHeaders(200, -1);
             exchange.close();
@@ -42,7 +49,7 @@ public class ResolveFilenameTestIT {
 
         server.createContext("/long-header", exchange -> {
             String longValue = "attachment; filename=\"" +
-                    "x".repeat(DownloadUtils.MAX_CONTENT_DISPOSITION_LENGTH + 1) +
+                    "x".repeat(maxContentDispositionSize + 1) +
                     "\"";
             exchange.getResponseHeaders().set("Content-Disposition", longValue);
             exchange.sendResponseHeaders(200, -1);
@@ -64,17 +71,22 @@ public class ResolveFilenameTestIT {
     }
 
     @Test
+    public void headRequestParsesFilenameStarFromResponse() throws Exception {
+        assertEquals("café.pdf", DownloadUtils.resolveRemoteFilename(uri("/download"), maxContentDispositionSize).orElseThrow());
+    }
+
+    @Test
     public void headRequestParsesFilenameFromResponse() throws Exception {
-        assertEquals("café.pdf", DownloadUtils.resolveRemoteFilename(uri("/download")).orElseThrow());
+        assertEquals("R07223.zip", DownloadUtils.resolveRemoteFilename(uri("/directory/download"), maxContentDispositionSize).orElseThrow());
     }
 
     @Test
     public void returnsEmptyWhenHeaderIsMissing() throws Exception {
-        assertTrue(DownloadUtils.resolveRemoteFilename(uri("/no-header")).isEmpty());
+        assertTrue(DownloadUtils.resolveRemoteFilename(uri("/no-header"), maxContentDispositionSize).isEmpty());
     }
 
     @Test
     public void returnsEmptyWhenHeaderExceedsLimit() throws Exception {
-        assertTrue(DownloadUtils.resolveRemoteFilename(uri("/long-header")).isEmpty());
+        assertTrue(DownloadUtils.resolveRemoteFilename(uri("/long-header"), maxContentDispositionSize).isEmpty());
     }
 }

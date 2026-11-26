@@ -111,7 +111,7 @@ public class MoteurLiteRunner {
             initGaswAndMonitor(workflowId, descriptor.getName(), invocationsInputs.size());
 
             // launch jobs
-            jobSumitter = new JobSubmitter(gasw, descriptor.getName(), invocationsInputs, boutiquesInputs);
+            jobSumitter = new JobSubmitter(config, gasw, descriptor.getName(), invocationsInputs, boutiquesInputs);
             jobSumitter.start();
 
             listenSoftKill();

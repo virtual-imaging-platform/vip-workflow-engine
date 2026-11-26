@@ -12,14 +12,15 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.http.ContentDisposition;
+
 import fr.insalyon.creatis.moteurlite.MoteurLiteException;
+import fr.insalyon.creatis.moteurlite.MoteurLiteConfiguration;
 
 public class DownloadUtils {
 
-    //TODO expose as setting ?
-    public static int MAX_CONTENT_DISPOSITION_LENGTH = 8 * 1024;
-
-    public static Optional<String> resolveRemoteFilename(URI downloadUrl) throws MoteurLiteException {
+    public static Optional<String> resolveRemoteFilename(URI downloadUrl, int maxContentDispositionLength)
+            throws MoteurLiteException {
         URI uri = downloadUrl;
 
         HttpClient client = HttpClient.newBuilder()
@@ -32,47 +33,37 @@ public class DownloadUtils {
                 .build();
         try {
             HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            Optional<String> contentDisposition = response.headers()
+            Optional<String> contentDispositionStr = response.headers()
                     .firstValue("Content-Disposition")
-                    .filter(value -> value.length() <= MAX_CONTENT_DISPOSITION_LENGTH);
-            return contentDisposition.map(value -> getFilename(value));
+                    .filter(value -> value.length() <= maxContentDispositionLength);
+            if (contentDispositionStr.isPresent()) {
+                return Optional.ofNullable(getFilename(contentDispositionStr.get()));
+            } else {
+                return contentDispositionStr;
+            }
         } catch (java.io.IOException | InterruptedException e) {
-            throw new MoteurLiteException("Http error while resolving filename for URI " + downloadUrl.toString());
+            throw new MoteurLiteException("Http error while resolving filename for URI " + downloadUrl.toString(), e);
         }
     }
 
-    //TODO if use spring at terms, better use Spring ContentDisposition
-    public static final Pattern FILENAME_STAR = Pattern.compile(
-            "(?:^|;)\\s*filename\\*\\s*=\\s*UTF-8''([^;\\s]+)", Pattern.CASE_INSENSITIVE);
-
-    public static final Pattern FILENAME = Pattern.compile(
-            "(?:^|;)\\s*filename\\s*=\\s*(?:\"((?:\\\\.|[^\"])*)\"|([^;\\s]*))", Pattern.CASE_INSENSITIVE);
+    public static ContentDisposition parseWithFallback(String header) {
+        try {
+            return ContentDisposition.parse(header);
+        } catch (IllegalArgumentException ex) {
+            // filename* might be invalid; try removing it (everything until a semicolon)
+            if (header.matches("(?is).*;\\s*filename\\*\\s*=.*")) {
+                String withoutExtended = header.replaceAll("(?i);\\s*filename\\*\\s*=\\s*[^;]*", "");
+                return ContentDisposition.parse(withoutExtended);
+            }
+            throw ex;
+        }
+    }
 
     public static String getFilename(String header) {
-        if (header == null)
+        if (header == null || header.isBlank()) {
             return null;
-
-        Matcher extended = FILENAME_STAR.matcher(header);
-        if (extended.find()) {
-            try {
-                // Preserve literal '+'; URLDecoder otherwise treats it as a space
-                return URLDecoder.decode(
-                        extended.group(1).replace("+", "%2B"),
-                        StandardCharsets.UTF_8);
-            } catch (IllegalArgumentException ignored) {
-                // Fallback to filename
-            }
         }
-
-        Matcher ordinary = FILENAME.matcher(header);
-        if (!ordinary.find())
-            return null;
-
-        String filename = ordinary.group(1) != null
-                ? ordinary.group(1).replace("\\\"", "\"").replace("\\\\", "\\")
-                : ordinary.group(2);
-
-        return filename.isEmpty() ? null : filename;
+        return parseWithFallback(header).getFilename();
     }
 
 }
